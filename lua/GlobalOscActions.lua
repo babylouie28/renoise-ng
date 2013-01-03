@@ -33,13 +33,21 @@ end
 
 function current_song()
   print("Get the file path of the current song")
-
   local song_list = renoise.app().recently_loaded_song_files 
   print( ("Current song: %s"):format(song_list[1])  )
-
   return song_list[1]         
 end
 
+
+function save_current_song_as_version()
+  -- The idea is to get the name of the current song, and add a timestamp
+  -- of some kind to the end, then save it under that new name.
+  -- 
+  local save_as_path = string.gsub( current_song(), ".xrns", ("__" .. os.date("%Y%m%d%H%M%S") .. ".xrns") )
+  renoise.app():save_song_as(save_as_path)
+-- Note:  After saving, Renoise now considers the current song to be this versioned song.
+
+end
 
 function lpad(s, l, c)
   local res = s.rep(c or ' ', l - #s) .. s
@@ -1364,123 +1372,133 @@ add_global_action {
 
 
                         add_global_action { 
-                          pattern = "/song/reset", 
-                          description = "Call undo many many times",
+                          pattern = "/song/save_version", 
+                          description = "Saves current song useing versioned name",
 
                           arguments = nil,
                           handler = function()
-                            print("triggered song reset")
-                            -- hacky!
-                            for i=0,300 do
-                              renoise.song():undo()
-                            end
+                            save_current_song_as_version()
                           end
                         }
 
-                        add_global_action { 
-                          pattern = "/song/undo", 
-                          description = "Call undo once",
+                        add_global_action {  -- It might make more sense to reload the current file
+                        pattern = "/song/reset", 
+                        description = "Call undo many many times",
 
-                          arguments = nil,
-                          handler = function()
-                            print("triggered song undo")
+                        arguments = nil,
+                        handler = function()
+                          print("triggered song reset")
+                          -- hacky!
+                          for i=0,300 do
                             renoise.song():undo()
                           end
-                        }
+                        end
+                      }
 
-                        add_global_action { 
-                          pattern = "/song/load", 
-                          description = "Load the song at the given file path",
+                      add_global_action { 
+                        pattern = "/song/undo", 
+                        description = "Call undo once",
 
-                          -- renoise.app():load_song(filename)
-                          -- If the current song has had any changes, even if "undo" has been called a million times,
-                          -- the song will be considered changed and there will be a prompt to save or discard changes.
-                          -- Most annoying.  Here the plan is to always save the current song to some tmp location to
-                          -- prevent any possible save notifications
-                          arguments = { argument("filepath", "string") },
-                          handler = function(filepath)
-                            print(("OSC Message: Loading filepath '%s'"):format(filepath))
-                            renoise.app():save_song_as("/tmp/renoise-song.xrns") -- NOT CROSSPLATFORM! :(
-                            renoise.app():load_song(filepath)
+                        arguments = nil,
+                        handler = function()
+                          print("triggered song undo")
+                          renoise.song():undo()
+                        end
+                      }
+
+                      add_global_action { 
+                        pattern = "/song/load", 
+                        description = "Load the song at the given file path",
+
+                        -- renoise.app():load_song(filename)
+                        -- If the current song has had any changes, even if "undo" has been called a million times,
+                        -- the song will be considered changed and there will be a prompt to save or discard changes.
+                        -- Most annoying.  Here the plan is to always save the current song to some tmp location to
+                        -- prevent any possible save notifications
+                        arguments = { argument("filepath", "string") },
+                        handler = function(filepath)
+                          print(("OSC Message: Loading filepath '%s'"):format(filepath))
+                          renoise.app():save_song_as("/tmp/renoise-song.xrns") -- NOT CROSSPLATFORM! :(
+                          renoise.app():load_song(filepath)
+                        end
+                      }
+
+                      -- The idea is that you would have some number of songs in the same directory as the currently
+                      -- loaded song, and that the current song has a name that ends with a number.
+                      -- If given some number, this handler needs ot determine the name of the current song, the
+                      -- current song directory, and create a song path by replacing the song-name number.
+                      --
+                      -- For simplicity assume that for this to work the song number is at the end of the file name,
+                      -- after a double underscore:  some_song_name__001.xrns and is always three digits
+                      --
+                      -- The handler would then get the current song name (or, for that matter, the complete song path)
+                      -- and replace the trailing /__\d\d\d.xrns/ with __<new-number>.xrns.  More or less.
+                      --
+                      -- Using this kind of convention makes it easier to manage without requiring too many song-name
+                      -- restrictions.
+                      --
+                      -- THe idea is that a phone tool could load a number of different songs by providing a number, without
+                      -- having to know all the song name details.
+                      --
+                      --   "/song/load/by_number <3-digit-string>
+                      add_global_action { 
+                        pattern = "/song/load/by_number", 
+                        description = "Load a song determined by a number provided, using a redetermined naming convention",
+
+                        -- renoise.app():load_song(filename)
+                        -- If the current song has had any changes, even if "undo" has been called a million times,
+                        -- the song will be considered changed and there will be a prompt to save or discard changes.
+                        -- Most annoying.  Here the plan is to always save the current song to some tmp location to
+                        -- prevent any possible save notifications
+                        arguments = { argument("song_number", "string") },
+                        handler = function(song_number)
+                          -- For whatever reason this is not getting the complete umber; leading zeros are dropped.
+                          song_number = lpad(song_number, 3, '0')
+                          print(("OSC Message: Loading song number '%s'"):format(song_number))
+
+                          renoise.app():save_song_as("/tmp/renoise-song.xrns") -- NOT CROSSPLATFORM! :(
+
+                          local current_song_path = current_song()
+                          -- not _exactly_ what I wanted, but works
+                          local song_path_segments = split( current_song_path, "__...%.xrns")
+                          print(("song_path_segments[1] =  '%s'"):format(song_path_segments[1]))
+
+                          local new_song_path = song_path_segments[1] .. "__" .. song_number .. ".xrns"
+                          renoise.app():load_song(new_song_path)
+                        end
+                      }
+
+
+
+                      add_track_action { 
+                        pattern = "/clear", 
+                        description = "Clear track XXX\n"..
+                        "XXX is the track index, -1 the currently selected track",
+
+                        arguments = nil,
+                        handler = function(track_index)
+                          local tracks = song().tracks
+                          if (track_index >= 1 and track_index <= #tracks) then
+                            --- tracks[track_index]:clear() 
+                            renoise.song().patterns[1].tracks[track_index]:clear()
                           end
-                        }
+                        end,
+                      }
 
-                        -- The idea is that you would have some number of songs in the same directory as the currently
-                        -- loaded song, and that the current song has a name that ends with a number.
-                        -- If given some number, this handler needs ot determine the name of the current song, the
-                        -- current song directory, and create a song path by replacing the song-name number.
-                        --
-                        -- For simplicity assume that for this to work the song number is at the end of the file name,
-                        -- after a double underscore:  some_song_name__001.xrns and is always three digits
-                        --
-                        -- The handler would then get the current song name (or, for that matter, the complete song path)
-                        -- and replace the trailing /__\d\d\d.xrns/ with __<new-number>.xrns.  More or less.
-                        --
-                        -- Using this kind of convention makes it easier to manage without requiring too many song-name
-                        -- restrictions.
-                        --
-                        -- THe idea is that a phone tool could load a number of different songs by providing a number, without
-                        -- having to know all the song name details.
-                        --
-                        --   "/song/load/by_number <3-digit-string>
-                        add_global_action { 
-                          pattern = "/song/load/by_number", 
-                          description = "Load a song determined by a number provided, using a redetermined naming convention",
+                      add_track_action { 
+                        pattern = "/patternize", 
+                        description = "Add pattern to track XXX\n"..
+                        "XXX is the track index, -1 the currently selected track",
 
-                          -- renoise.app():load_song(filename)
-                          -- If the current song has had any changes, even if "undo" has been called a million times,
-                          -- the song will be considered changed and there will be a prompt to save or discard changes.
-                          -- Most annoying.  Here the plan is to always save the current song to some tmp location to
-                          -- prevent any possible save notifications
-                          arguments = { argument("song_number", "string") },
-                          handler = function(song_number)
-                            -- For whatever reason this is not getting the complete umber; leading zeros are dropped.
-                            song_number = lpad(song_number, 3, '0')
-                            print(("OSC Message: Loading song number '%s'"):format(song_number))
+                        arguments = nil,
+                        handler = function(track_index)
+                          local tracks = song().tracks
+                          if (track_index >= 1 and track_index <= #tracks) then
+                            --- tracks[track_index]:clear()
 
-                            renoise.app():save_song_as("/tmp/renoise-song.xrns") -- NOT CROSSPLATFORM! :(
-
-                            local current_song_path = current_song()
-                            -- not _exactly_ what I wanted, but works
-                            local song_path_segments = split( current_song_path, "__...%.xrns")
-                            print(("song_path_segments[1] =  '%s'"):format(song_path_segments[1]))
-
-                            local new_song_path = song_path_segments[1] .. "__" .. song_number .. ".xrns"
-                            renoise.app():load_song(new_song_path)
+                            renoise.song().patterns[1].tracks[track_index]:clear()
                           end
-                        }
+                        end,
+                      }
 
-
-
-                        add_track_action { 
-                          pattern = "/clear", 
-                          description = "Clear track XXX\n"..
-                          "XXX is the track index, -1 the currently selected track",
-
-                          arguments = nil,
-                          handler = function(track_index)
-                            local tracks = song().tracks
-                            if (track_index >= 1 and track_index <= #tracks) then
-                              --- tracks[track_index]:clear() 
-                              renoise.song().patterns[1].tracks[track_index]:clear()
-                            end
-                          end,
-                        }
-
-                        add_track_action { 
-                          pattern = "/patternize", 
-                          description = "Add pattern to track XXX\n"..
-                          "XXX is the track index, -1 the currently selected track",
-
-                          arguments = nil,
-                          handler = function(track_index)
-                            local tracks = song().tracks
-                            if (track_index >= 1 and track_index <= #tracks) then
-                              --- tracks[track_index]:clear()
-
-                              renoise.song().patterns[1].tracks[track_index]:clear()
-                            end
-                          end,
-                        }
-
-                        log:error("********************************* OSC!**************************************")
+                      log:error("********************************* OSC!**************************************")

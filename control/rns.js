@@ -89,39 +89,39 @@ loadSongArray : function(songIDs, x, y) {
                 },
 
 
-///////////////////////////////////
-// Track delay controls.  Need to fix this:  There needs to be a way to reset the value back to zero, and
-// the slider has to be centered on 0 as a baseline.
+                ///////////////////////////////////
+                // Track delay controls.  Need to fix this:  There needs to be a way to reset the value back to zero, and
+                // the slider has to be centered on 0 as a baseline.
 
 trackDelayControl : function(idx, x, y){ return( {
-                         "name": "trackDelay" + idx,
-                         "type": "Slider",
-                         "bounds": [x, y, this.volSliderW , this.volSliderH],
-                         "startingValue": 0,
-                         "color": "#00ff33",
-                         "stroke": "#333",
-                         "backgroundColor": "#60f",
+                        "name": "trackDelay" + idx,
+                        "type": "Slider",
+                        "bounds": [x, y, this.volSliderW , this.volSliderH],
+                        "startingValue": 0,
+                        "color": "#00ff33",
+                        "stroke": "#333",
+                        "backgroundColor": "#60f",
 
-                         "min": -100.0,
-                         "max": 100.0,
-                         "label" : this.value,
-                         "isXFader": true,
-                         "isVertical": true,
-                         "address" :  "/renoise/song/track/" + idx + "/output_delay",
-                         }  ); 
+                        "min": -100.0,
+                        "max": 100.0,
+                        "label" : this.value,
+                        "isXFader": true,
+                        "isVertical": true,
+                        "address" :  "/renoise/song/track/" + idx + "/output_delay",
+                        }  ); 
 
-                     },
+                    },
 
 trackDelayControls : function(num, x, y) {
-                        var ctrls = [];
-                        for (var i=0;i<num;i++) { 
-                          ctrls.push(  this.trackDelayControl(i+1, x+((this.gapSize+this.volSliderW)*i) , y )  ); 
-                          ctrls.push(  this.trackDelayResetControl(i+1, x+((this.gapSize+ this.volSliderW)*i),  y + this.gapSize + this.volSliderH )  ); 
-                        }
-                        return ctrls;
-                      },
+                       var ctrls = [];
+                       for (var i=0;i<num;i++) { 
+                         ctrls.push(  this.trackDelayControl(i+1, x+((this.gapSize+this.volSliderW)*i) , y )  ); 
+                         ctrls.push(  this.trackDelayResetControl(i+1, x+((this.gapSize+ this.volSliderW)*i),  y + this.gapSize + this.volSliderH )  ); 
+                       }
+                       return ctrls;
+                     },
 
-                ///////////////////////////////////////
+                     ///////////////////////////////////////
 
 
 trackVolumeControl : function(idx, x, y){ return( {
@@ -176,24 +176,24 @@ trackClearControls : function(num, x, y) {
                        return ctrls;
                      },
 
-    trackDelayResetControl : function(idx, x, y){
-                       return( {
-                           "name": this.trackSelectPrefix  + "DelayReset" + idx,
-                           "type": "Button",
-                           "label": "@",
-                           "bounds" :[ x, y,  this.buttonW, this.buttonH],
-                           "color": "#033",
-                           "backgroundColor": "#FF3",
-                           "stroke": "#333",
-                           "mode":"momentary",
-                           "requiresTouchDown": false,
-                           "min": 0,
-                           "max": 0,
-                           "ontouchstart": "trackDelay" + idx + ".setValue(0)",
-                           });
-                       // Note: It seems that all events send OSC messages.  For this one it sends /trackSelect<idx>. 
-                       // It gets ignored by Renoise.
-                     },
+trackDelayResetControl : function(idx, x, y){
+                           return( {
+                               "name": this.trackSelectPrefix  + "DelayReset" + idx,
+                               "type": "Button",
+                               "label": "@",
+                               "bounds" :[ x, y,  this.buttonW, this.buttonH],
+                               "color": "#033",
+                               "backgroundColor": "#FF3",
+                               "stroke": "#333",
+                               "mode":"momentary",
+                               "requiresTouchDown": false,
+                               "min": 0,
+                               "max": 0,
+                               "ontouchstart": "trackDelay" + idx + ".setValue(0)",
+                               });
+                           // Note: It seems that all events send OSC messages.  For this one it sends /trackSelect<idx>. 
+                           // It gets ignored by Renoise.
+                         },
 
 trackSelectControl : function(idx, x, y){
                        return( {
@@ -545,11 +545,24 @@ loadPage = [];
 // then the handler come computes the file name  /some/file/path/folder/song__004.xrns
 // and loads it.
 loadPage = loadPage.concat( Control.ui.commonControls("loadPage") );
-loadPage = loadPage.concat(
-       Control.ui.loadSongArray( 
-          ["001", "002", "003", "004", "005"], 
-          Control.ui.xstart, 
-          Control.ui.trackCtrlsStartY+Control.ui.vertOffset(1) )  );
+loadPage = loadPage.concat( Control.ui.loadSongArray( ["001", "002", "003", "004", "005"], 
+        Control.ui.xstart, 
+        Control.ui.vertOffset(1))  );
+
+loadPage.push( {
+    "name": "saveVersion",
+    "type": "Button",
+    "bounds": [ Control.ui.xstart, 
+    Control.ui.vertOffset(2) , 
+    Control.ui.buttonW, 
+    Control.ui.buttonH ],
+    "startingValue": 0,
+    "isLocal": true,
+    "mode": "momentary",
+    "stroke": "#F00",
+    "label":   "Save!",
+    "ontouchstart": "oscManager.sendOSC( ['/renoise/song/save_version']); ",
+    } );
 
 pages = [controlPage, editPage, loadPage];
 
