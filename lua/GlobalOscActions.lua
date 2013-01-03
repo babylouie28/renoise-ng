@@ -1,4 +1,4 @@
-require "renoise.http.log"
+require "renoise.http.log" -- This does not seem to actually do what I wanted :(
 
 
 local log = Log(Log.DEBUG)
@@ -1209,7 +1209,6 @@ add_global_action {
 --
     local client_renoise, socket_error = renoise.Socket.create_client(
     "127.0.0.1", 8000, renoise.Socket.PROTOCOL_UDP)
-    -- Is there ANY way to set this after this file has been loaded?  A GUI thing to add? This will change based on different uses.
 
     if (socket_error) then 
       renoise.app():show_warning(("Failed to start the " .. 
