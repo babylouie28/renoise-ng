@@ -12,22 +12,38 @@ end
 
 -- http://lua-users.org/wiki/SplitJoin
 function split(str, pat)
-   local t = {}  -- NOTE: use {n = 0} in Lua-5.0
-   local fpat = "(.-)" .. pat
-   local last_end = 1
-   local s, e, cap = str:find(fpat, 1)
-   while s do
-      if s ~= 1 or cap ~= "" then
-	 table.insert(t,cap)
-      end
-      last_end = e+1
-      s, e, cap = str:find(fpat, last_end)
-   end
-   if last_end <= #str then
-      cap = str:sub(last_end)
-      table.insert(t, cap)
-   end
-   return t
+  local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+  local fpat = "(.-)" .. pat
+  local last_end = 1
+  local s, e, cap = str:find(fpat, 1)
+  while s do
+    if s ~= 1 or cap ~= "" then
+      table.insert(t,cap)
+    end
+    last_end = e+1
+    s, e, cap = str:find(fpat, last_end)
+  end
+  if last_end <= #str then
+    cap = str:sub(last_end)
+    table.insert(t, cap)
+  end
+  return t
+end
+
+
+function current_song()
+  print("Get the file path of the current song")
+
+  local song_list = renoise.app().recently_loaded_song_files 
+  print( ("Current song: %s"):format(song_list[1])  )
+
+  return song_list[1]         
+end
+
+
+function lpad(s, l, c)
+  local res = s.rep(c or ' ', l - #s) .. s
+  return res, res ~= s
 end
 
 --[[============================================================================
@@ -1205,8 +1221,8 @@ add_global_action {
       return
     end
 
--- Set up an OSC cleint to send message back to Renoise itself
---
+    -- Set up an OSC cleint to send message back to Renoise itself
+    --
     local client_renoise, socket_error = renoise.Socket.create_client(
     "127.0.0.1", 8000, renoise.Socket.PROTOCOL_UDP)
 
@@ -1215,7 +1231,7 @@ add_global_action {
       "OSC client. Error: '%s'"):format(socket_error))
       return
     end
-  
+
 
     -- JGB handlers ----
 
@@ -1242,9 +1258,9 @@ add_global_action {
       description = "Speaks the current BPM using the track/intrument pairing",
 
 
-     arguments = { argument("track_index", "number"), 
-                   argument("instrument_index", "number") },
-      
+      arguments = { argument("track_index", "number"), 
+      argument("instrument_index", "number") },
+
 
       handler = function(track_index, instrument_index)
         local bpm_int = renoise.song().transport.bpm  
@@ -1258,168 +1274,213 @@ add_global_action {
 
         -- /renoise_response/transport/bpm
 
-        
+
         if  bpm_int < 100  then 
           print( ("Under 100: Split up  %s" ):format(bpm_string) )
           d1,d2 = bpm_string:match('(%d)(%d)')
           print( ("Speak %s %s, track %d, intr %s "):format(d1, d2, track_index, instrument_index) )
           --  '/renoise/trigger/note_on',  'iiii', track, instrument, note, velocity
 
---       for i=1,10 do
- --       client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-  --        {tag="i", value=track_index}, {tag="i", value=9}, {tag="i", value=midi_notes[tonumber(i)]}, {tag="i", value=125} }))
-   --         
-    --    sleep(1)
---        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
- --         {tag="i", value=track_index}, {tag="i", value=9}, {tag="i", value=midi_notes[i]}  } )  )
---
-  --      end
-
-        client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} }))        
-        sleep(1)
-        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  } )  )
-
-
-        client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} }))
-        sleep(1)
-        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  }))
-
-
-        else
-          print( ("100 or greater: Split up  %s" ):format(bpm_string) )
-          d1,d2,d3 = bpm_string:match('(%d)(%d)(%d)')
-          print( ("Speak %s %s %s"):format(d1, d2, d3) )
-        
-        client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} }))        
-        sleep(1)
-        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  } )  )
-
-
-        client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} }))
-        sleep(1)
-        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  }))
-
+          --       for i=1,10 do
+          --       client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+          --        {tag="i", value=track_index}, {tag="i", value=9}, {tag="i", value=midi_notes[tonumber(i)]}, {tag="i", value=125} }))
+          --         
+          --    sleep(1)
+          --        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+          --         {tag="i", value=track_index}, {tag="i", value=9}, {tag="i", value=midi_notes[i]}  } )  )
+          --
+          --      end
 
           client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}, {tag="i", value=125} }))
-        sleep(1)
-        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}  }))
-
-        end
+            {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} }))        
+            sleep(1)
+            client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+              {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  } )  )
 
 
-        print("Send info OSC message")
-        client:send(
-        OscMessage("/info", { 
-          {tag="s", value=tostring(renoise.song().transport.bpm)} 
-        })
-        )
-        print("OSC message sent")
-      end
-    }
--- renoise.app().recently_loaded_song_file
-
-    add_global_action { 
-      pattern = "/test/recent_loaded", 
-      description = "Get a list of recently loaded songs",
-
-      arguments = nil,
-      handler = function()
-        print("Get a list of recently loaded songs")
-    
-        local song_list = renoise.app().recently_loaded_song_files 
-         print( ("Current song: %s"):format(song_list[1])  ) 
-         local path_parts = split( song_list[1], "/")
-         -- local path_parts =  string.gmatch(song_list[1], "[^\/]")
-         table.remove(path_parts)
-         local last_folder = "/" .. table.concat(path_parts, "/")
-          print( ("Current folder: %s"):format(last_folder)  ) 
-
-      end
-    }
-
-    add_global_action { 
-      pattern = "/song/reset", 
-      description = "Call undo many many times",
-
-      arguments = nil,
-      handler = function()
-        print("triggered song reset")
-        -- hacky!
-        for i=0,300 do
-          renoise.song():undo()
-        end
-      end
-    }
-
-    add_global_action { 
-      pattern = "/song/undo", 
-      description = "Call undo once",
-
-      arguments = nil,
-      handler = function()
-        print("triggered song undo")
-        renoise.song():undo()
-      end
-    }
-
-    add_global_action { 
-      pattern = "/song/load", 
-      description = "Load the song at the given file path",
-
-      -- renoise.app():load_song(filename)
-      -- If the current song has had any changes, even if "undo" has been called a million times,
-      -- the song will be considered changed and there will be a prompt to save or discard changes.
-      -- Most annoying.  Here the plan is to always save the current song to some tmp location to
-      -- prevent any possible save notifications
-      arguments = { argument("filepath", "string") },
-      handler = function(filepath)
-        print(("OSC Message: Loading filepath '%s'"):format(filepath))
-        renoise.app():save_song_as("/tmp/renoise-song.xrns") -- NOT CROSSPLATFORM! :(
-        renoise.app():load_song(filepath)
-      end
-    }
+              client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+                {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} }))
+                sleep(1)
+                client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+                  {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  }))
 
 
+                else
+                  print( ("100 or greater: Split up  %s" ):format(bpm_string) )
+                  d1,d2,d3 = bpm_string:match('(%d)(%d)(%d)')
+                  print( ("Speak %s %s %s"):format(d1, d2, d3) )
 
-    add_track_action { 
-      pattern = "/clear", 
-      description = "Clear track XXX\n"..
-      "XXX is the track index, -1 the currently selected track",
+                  client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+                    {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} }))        
+                    sleep(1)
+                    client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+                      {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  } )  )
 
-      arguments = nil,
-      handler = function(track_index)
-        local tracks = song().tracks
-        if (track_index >= 1 and track_index <= #tracks) then
-          --- tracks[track_index]:clear() 
-          renoise.song().patterns[1].tracks[track_index]:clear()
-        end
-      end,
-    }
 
-    add_track_action { 
-      pattern = "/patternize", 
-      description = "Add pattern to track XXX\n"..
-      "XXX is the track index, -1 the currently selected track",
+                      client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+                        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} }))
+                        sleep(1)
+                        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+                          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  }))
 
-      arguments = nil,
-      handler = function(track_index)
-        local tracks = song().tracks
-        if (track_index >= 1 and track_index <= #tracks) then
-          --- tracks[track_index]:clear()
 
-          renoise.song().patterns[1].tracks[track_index]:clear()
-        end
-      end,
-    }
+                          client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+                            {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}, {tag="i", value=125} }))
+                            sleep(1)
+                            client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+                              {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}  }))
 
-    log:error("********************************* OSC!**************************************")
+                            end
+
+
+                            print("Send info OSC message")
+                            client:send(
+                            OscMessage("/info", { 
+                              {tag="s", value=tostring(renoise.song().transport.bpm)} 
+                            })
+                            )
+                            print("OSC message sent")
+                          end
+                        }
+
+                        add_global_action { 
+                          pattern = "/test/recent_loaded", 
+                          description = "Get a list of recently loaded songs",
+
+                          arguments = nil,
+                          handler = function()
+                            print("Get a list of recently loaded songs")
+
+                            local song_list = renoise.app().recently_loaded_song_files 
+                            print( ("Current song: %s"):format(current_song())  ) 
+                            local path_parts = split( current_song(), "/")
+                            -- local path_parts =  string.gmatch(song_list[1], "[^\/]")
+                            table.remove(path_parts)
+                            local last_folder = "/" .. table.concat(path_parts, "/")
+                            print( ("Current folder: %s"):format(last_folder)  ) 
+
+                          end
+                        }
+
+
+                        add_global_action { 
+                          pattern = "/song/reset", 
+                          description = "Call undo many many times",
+
+                          arguments = nil,
+                          handler = function()
+                            print("triggered song reset")
+                            -- hacky!
+                            for i=0,300 do
+                              renoise.song():undo()
+                            end
+                          end
+                        }
+
+                        add_global_action { 
+                          pattern = "/song/undo", 
+                          description = "Call undo once",
+
+                          arguments = nil,
+                          handler = function()
+                            print("triggered song undo")
+                            renoise.song():undo()
+                          end
+                        }
+
+                        add_global_action { 
+                          pattern = "/song/load", 
+                          description = "Load the song at the given file path",
+
+                          -- renoise.app():load_song(filename)
+                          -- If the current song has had any changes, even if "undo" has been called a million times,
+                          -- the song will be considered changed and there will be a prompt to save or discard changes.
+                          -- Most annoying.  Here the plan is to always save the current song to some tmp location to
+                          -- prevent any possible save notifications
+                          arguments = { argument("filepath", "string") },
+                          handler = function(filepath)
+                            print(("OSC Message: Loading filepath '%s'"):format(filepath))
+                            renoise.app():save_song_as("/tmp/renoise-song.xrns") -- NOT CROSSPLATFORM! :(
+                            renoise.app():load_song(filepath)
+                          end
+                        }
+
+                        -- The idea is that you would have some number of songs in the same directory as the currently
+                        -- loaded song, and that the current song has a name that ends with a number.
+                        -- If given some number, this handler needs ot determine the name of the current song, the
+                        -- current song directory, and create a song path by replacing the song-name number.
+                        --
+                        -- For simplicity assume that for this to work the song number is at the end of the file name,
+                        -- after a double underscore:  some_song_name__001.xrns and is always three digits
+                        --
+                        -- The handler would then get the current song name (or, for that matter, the complete song path)
+                        -- and replace the trailing /__\d\d\d.xrns/ with __<new-number>.xrns.  More or less.
+                        --
+                        -- Using this kind of convention makes it easier to manage without requiring too many song-name
+                        -- restrictions.
+                        --
+                        -- THe idea is that a phone tool could load a number of different songs by providing a number, without
+                        -- having to know all the song name details.
+                        --
+                        --   "/song/load/by_number <3-digit-string>
+                        add_global_action { 
+                          pattern = "/song/load/by_number", 
+                          description = "Load a song determined by a number provided, using a redetermined naming convention",
+
+                          -- renoise.app():load_song(filename)
+                          -- If the current song has had any changes, even if "undo" has been called a million times,
+                          -- the song will be considered changed and there will be a prompt to save or discard changes.
+                          -- Most annoying.  Here the plan is to always save the current song to some tmp location to
+                          -- prevent any possible save notifications
+                          arguments = { argument("song_number", "string") },
+                          handler = function(song_number)
+                            -- For whatever reason this is not getting the complete umber; leading zeros are dropped.
+                            song_number = lpad(song_number, 3, '0')
+                            print(("OSC Message: Loading song number '%s'"):format(song_number))
+
+                            renoise.app():save_song_as("/tmp/renoise-song.xrns") -- NOT CROSSPLATFORM! :(
+
+                            local current_song_path = current_song()
+                            -- not _exactly_ what I wanted, but works
+                            local song_path_segments = split( current_song_path, "__...%.xrns")
+                            print(("song_path_segments[1] =  '%s'"):format(song_path_segments[1]))
+
+                            local new_song_path = song_path_segments[1] .. "__" .. song_number .. ".xrns"
+                            renoise.app():load_song(new_song_path)
+                          end
+                        }
+
+
+
+                        add_track_action { 
+                          pattern = "/clear", 
+                          description = "Clear track XXX\n"..
+                          "XXX is the track index, -1 the currently selected track",
+
+                          arguments = nil,
+                          handler = function(track_index)
+                            local tracks = song().tracks
+                            if (track_index >= 1 and track_index <= #tracks) then
+                              --- tracks[track_index]:clear() 
+                              renoise.song().patterns[1].tracks[track_index]:clear()
+                            end
+                          end,
+                        }
+
+                        add_track_action { 
+                          pattern = "/patternize", 
+                          description = "Add pattern to track XXX\n"..
+                          "XXX is the track index, -1 the currently selected track",
+
+                          arguments = nil,
+                          handler = function(track_index)
+                            local tracks = song().tracks
+                            if (track_index >= 1 and track_index <= #tracks) then
+                              --- tracks[track_index]:clear()
+
+                              renoise.song().patterns[1].tracks[track_index]:clear()
+                            end
+                          end,
+                        }
+
+                        log:error("********************************* OSC!**************************************")

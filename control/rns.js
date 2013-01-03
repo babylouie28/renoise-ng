@@ -67,20 +67,44 @@ keyboardArray : function(num, x, y) {
                   return(ctrls);
                 },
 
+///////////////////////////////////
+// Track delay controls.  Need to fix this:  There needs to be a way to reset the value back to zero, and
+// the slider has to be centered on 0 as a baseline.
 
-trackVolumeControls : function(num, x, y) {
+trackDelayControl : function(idx, x, y){ return( {
+                         "name": "trackDelay" + idx,
+                         "type": "Slider",
+                         "bounds": [x, y, this.volSliderW , this.volSliderH],
+                         "startingValue": 0,
+                         "color": "#00ff33",
+                         "stroke": "#333",
+                         "backgroundColor": "#60f",
+                         "min": -1.0,
+                         "max": 1.0,
+                         "label" : this.value,
+                         "isXFader": true,
+                         "isVertical": true,
+                         "address" :  "/renoise/song/track/" + idx + "/output_delay",
+                         }  ); 
+
+                     },
+
+trackDelayControls : function(num, x, y) {
                         var ctrls = [];
                         for (var i=0;i<num;i++) { 
-                          ctrls.push(  this.trackVolumeControl(i+1, x+((this.gapSize + this.ui.volSliderW)*i) , y )  ); 
-                          ctrls.push(  this.trackSelectControl(i+1, x+((this.gapSize + this.volSliderW)*i),  y + this.gapSize + this.volSliderH )  ); 
+                          ctrls.push(  this.trackDelayControl(i+1, x+((this.gapSize+this.volSliderW)*i) , y )  ); 
+                          ctrls.push(  this.trackDelayResetControl(i+1, x+((this.gapSize+ this.volSliderW)*i),  y + this.gapSize + this.volSliderH )  ); 
                         }
                         return ctrls;
                       },
 
+                ///////////////////////////////////////
+
+
 trackVolumeControl : function(idx, x, y){ return( {
                          "name": "trackVol" + idx,
                          "type": "Slider",
-                         "bounds": [x, y, Control.ui.volSliderW , Control.ui.volSliderH],
+                         "bounds": [x, y, this.volSliderW , this.volSliderH],
                          "startingValue": 0,
                          "color": "#00ff33",
                          "stroke": "#333",
@@ -111,8 +135,8 @@ trackClearControl : function(idx, x, y){
                           "label" : "!!!!",
                           "x": x,
                           "y": y,
-                          "width": Control.ui.buttonW,
-                          "height": Control.ui.buttonH,
+                          "width": this.buttonW,
+                          "height": this.buttonH,
                           "color": "#fff",
                           "backgroundColor": "#F00",
                           "stroke": "#000",
@@ -129,12 +153,32 @@ trackClearControls : function(num, x, y) {
                        return ctrls;
                      },
 
-trackSelectControl : function(idx, x, y){
+    trackDelayResetControl : function(idx, x, y){
                        return( {
-                           "name": Control.ui.trackSelectPrefix  + idx,
+                           "name": this.trackSelectPrefix  + "DelayReset" + idx,
                            "type": "Button",
                            "label": "@",
-                           "bounds" :[ x, y,  Control.ui.buttonW, Control.ui.buttonH],
+                           "bounds" :[ x, y,  this.buttonW, this.buttonH],
+                           "color": "#033",
+                           "backgroundColor": "#FF3",
+                           "stroke": "#333",
+                           "mode":"momentary",
+                           "requiresTouchDown": false,
+                           "min": 0,
+                           "max": 0,
+                           "ontouchstart": "trackDelay" + idx + ".setValue(0)",
+                          "address" :  "/renoise/song/track/" + idx + "/output_delay",
+                           });
+                       // Note: It seems that all events send OSC messages.  For this one it sends /trackSelect<idx>. 
+                       // It gets ignored by Renoise.
+                     },
+
+trackSelectControl : function(idx, x, y){
+                       return( {
+                           "name": this.trackSelectPrefix  + idx,
+                           "type": "Button",
+                           "label": "@",
+                           "bounds" :[ x, y,  this.buttonW, this.buttonH],
                            "color": "#FF3333",
                            "backgroundColor": "#3F3",
                            "stroke": "#333",
@@ -148,9 +192,73 @@ trackSelectControl : function(idx, x, y){
                        // It gets ignored by Renoise.
                      },
 
+commonControls : function(pageName) { 
+                   var ctrls = [];
 
+                   ctrls.push( {
+                       "name": pageName + "Refresh",
+                       "type": "Button",
+                       "bounds": [ this.xstart, this.vertOffset(9) , this.buttonW, this.buttonH ],
+                       "startingValue": 0,
+                       "isLocal": true,
+                       "mode": "contact",
+                       "ontouchstart": "interfaceManager.refreshInterface()",
+                       "stroke": "#3Cf",
+                       "label": "Refresh!",
+                       });
 
-                     // Need this because we want to define the object properties in terms of other properties
+                   ctrls.push( {
+                       "name": pageName + "Menu",
+                       "type": "Button",
+                       "bounds": [ this.horizOffset(1)+this.gapSize*4, this.vertOffset(9) , this.buttonW, this.buttonH],
+                       "mode": "toggle",
+                       "stroke": "#f63",
+                       "isLocal": true,
+                       "ontouchstart": "if(this.value == this.max) { control.showToolbar(); } else { control.hideToolbar(); }",
+                       "label": "Menu",
+                       } );
+
+                   ctrls.push( {
+                       "name": pageName + "Play",
+                       "type": "Button",
+                       "bounds": [ this.horizOffset(2) + this.gapSize*4, this.vertOffset(9) , this.buttonW, this.buttonH],
+                       "startingValue": 0,
+                       "isLocal": true,
+                       "mode": "contact",
+                       "ontouchstart": "control.changePage(0);",
+                       "stroke": "#0F0",
+                       "label": "  Play",
+                       });
+
+                   ctrls.push( {
+                       "name": pageName + "Edit",
+                       "type": "Button",
+                       "bounds": [ this.horizOffset(3)+this.gapSize*4, this.vertOffset(9) , this.buttonW, this.buttonH],
+                       "startingValue": 0,
+                       "isLocal": true,
+                       "mode": "contact",
+                       "ontouchstart": "control.changePage(1);",
+                       "stroke": "#F00",
+                       "label": "  Edit",
+                       });
+
+                   ctrls.push( {
+                       "name": pageName + "Load",
+                       "type": "Button",
+                       "bounds": [ this.horizOffset(4)+this.gapSize*4, this.vertOffset(9) , this.buttonW, this.buttonH],
+                       "startingValue": 0,
+                       "isLocal": true,
+                       "mode": "contact",
+                       "ontouchstart": "control.changePage(2);",
+                       "stroke": "#00F",
+                       "label": "  Load",
+                       });
+
+                   return ctrls;
+
+                 },
+
+                 // Need this because we want to define the object properties in terms of other properties
 init: function() {
         this.gapSize    = this.blockSize * 0.15; 
         this.buttonW    = this.blockSize*2;
@@ -321,7 +429,7 @@ var controlPage = [ {
     "backgroundColor": "#fff",
     "stroke": "#000",
 },
-];
+  ];
 
 
 
@@ -331,105 +439,90 @@ controlPage.push( Control.ui.bpmSlider( Control.ui.xstart , Control.ui.trackCtrl
 controlPage = controlPage.concat( Control.ui.keyboardArray( Control.renoise.numOfTracks, Control.ui.xstart , Control.ui.trackCtrlsStartY+Control.ui.vertOffset(1)  ) );
 controlPage = controlPage.concat( Control.ui.trackVolumeControls(Control.renoise.numOfTracks, Control.ui.xstart , Control.ui.trackCtrlsStartY+Control.ui.vertOffset(2) ) );
 
+controlPage = controlPage.concat( Control.ui.commonControls("playPage") );
+/*
 
-controlPage.push(  {
-    "name": "refresh",
-    "type": "Button",
-    "bounds": [ Control.ui.xstart, 
-                Control.ui.vertOffset(9) , 
-                Control.ui.buttonW, 
-                Control.ui.buttonH],
-    "startingValue": 0,
-    "isLocal": true,
-    "mode": "contact",
-    "ontouchstart": "interfaceManager.refreshInterface()",
-    "stroke": "#fff",
-    "label": "Refresh!",
-    });
+   controlPage.push(  {
+   "name": "refresh",
+   "type": "Button",
+   "bounds": [ Control.ui.xstart, 
+   Control.ui.vertOffset(9) , 
+   Control.ui.buttonW, 
+   Control.ui.buttonH],
+   "startingValue": 0,
+   "isLocal": true,
+   "mode": "contact",
+   "ontouchstart": "interfaceManager.refreshInterface()",
+   "stroke": "#fff",
+   "label": "Refresh!",
+   });
 
-controlPage.push( {
-    "name": "tabButton",
-    "type": "Button",
-    "bounds": [ Control.ui.horizOffset(1)+Control.ui.gapSize*4, 
-                Control.ui.vertOffset(9) , 
-                Control.ui.buttonW, 
-                Control.ui.buttonH],
-    "mode": "toggle",
-    "stroke": "#0F0",
-    "isLocal": true,
-    "ontouchstart": "if(this.value == this.max) { control.showToolbar(); } else { control.hideToolbar(); }",
-    "label": "Menu",
-    } );
+   controlPage.push( {
+   "name": "tabButton",
+   "type": "Button",
+   "bounds": [ Control.ui.horizOffset(1)+Control.ui.gapSize*4, 
+   Control.ui.vertOffset(9) , 
+   Control.ui.buttonW, 
+   Control.ui.buttonH],
+   "mode": "toggle",
+   "stroke": "#0F0",
+   "isLocal": true,
+   "ontouchstart": "if(this.value == this.max) { control.showToolbar(); } else { control.hideToolbar(); }",
+   "label": "Menu",
+   } );
 
-controlPage.push( {
-    "name": "page2",
-    "type": "Button",
-    "bounds": [ Control.ui.horizOffset(4)+Control.ui.gapSize*4, 
-                Control.ui.vertOffset(9) , 
-                Control.ui.buttonW, 
-                Control.ui.buttonH],
-    "startingValue": 0,
-    "isLocal": true,
-    "mode": "contact",
-    "ontouchstart": "control.changePage('next');",
-    "stroke": "#F00",
-    "label": "  Page 2",
-    });
-
+   controlPage.push( {
+   "name": "page2",
+   "type": "Button",
+   "bounds": [ Control.ui.horizOffset(4)+Control.ui.gapSize*4, 
+   Control.ui.vertOffset(9) , 
+   Control.ui.buttonW, 
+   Control.ui.buttonH],
+   "startingValue": 0,
+   "isLocal": true,
+   "mode": "contact",
+   "ontouchstart": "control.changePage('next');",
+   "stroke": "#F00",
+   "label": "  Page 2",
+   });
+   */
 
 var editPage = [ ]
 
 editPage = editPage.concat( Control.ui.trackClearControls( 
-        Control.renoise.numOfTracks, 
-        Control.ui.xstart, 
-        Control.ui.trackCtrlsStartY+Control.ui.horizOffset(0) + Control.ui.gapSize ) );
+      Control.renoise.numOfTracks, 
+      Control.ui.xstart, 
+      Control.ui.trackCtrlsStartY+Control.ui.horizOffset(0) + Control.ui.gapSize ) );
 
 editPage.push(Control.ui.resetButton(Control.ui.xstart, Control.ui.ystart));
-
-editPage.push( {
-    "name": "refresh",
-    "type": "Button",
-    "bounds": [ Control.ui.xstart, 
-                Control.ui.vertOffset(9) , 
-                Control.ui.buttonW, 
-                Control.ui.buttonH],
-    "startingValue": 0,
-    "isLocal": true,
-    "mode": "contact",
-    "ontouchstart": "interfaceManager.refreshInterface()",
-    "stroke": "#fff",
-    "label": "Refresh!",
-    });
-
-editPage.push( {
-    "name": "tabButton",
-    "type": "Button",
-    "bounds": [ Control.ui.horizOffset(1)+Control.ui.gapSize*4, 
-                Control.ui.vertOffset(9) , 
-                Control.ui.buttonW, 
-                Control.ui.buttonH],
-    "mode": "toggle",
-    "stroke": "#0F0",
-    "isLocal": true,
-    "ontouchstart": "if(this.value == this.max) { control.showToolbar(); } else { control.hideToolbar(); }",
-    "label": "Menu",
-    } );
-
-editPage.push( {
-    "name": "page1",
-    "type": "Button",
-    "bounds": [ Control.ui.horizOffset(4)+Control.ui.gapSize*4, 
-                Control.ui.vertOffset(9) , 
-                Control.ui.buttonW, 
-                Control.ui.buttonH],
-    "startingValue": 0,
-    "isLocal": true,
-    "mode": "contact",
-    "ontouchstart": "control.changePage('previous');",
-    "stroke": "#F00",
-    "label": "  Page 1",
-    });
+// The Edit page needs some controls for other actions, such as altering the delay
+// up or down on each track.  THe trick to put suitbale controls on each page
+// while not making things too small and crowdy, and not making it easy to
+// screw up.
+//
+// The Edit page has comtrols that will clear an entire trakc as well as exeucte 
+// a massive series of undo, wiping out all changes.
+//
 
 
-pages = [controlPage, editPage];
+editPage = editPage.concat( Control.ui.trackDelayControls(Control.renoise.numOfTracks, Control.ui.xstart , Control.ui.trackCtrlsStartY+Control.ui.vertOffset(1) ) );
+
+editPage = editPage.concat( Control.ui.commonControls("editPage") );
+
+loadPage = [];
+// Need to add controls for loading songs based on an index number. 
+// The plan is that GlobalOscActions.lua handles a message that requests
+// a song be loaded given some number, such as "002"
+// The handler looks at the current song file path and swaps out the number in that
+// file name to get the name of the file to load.
+//
+// For exaple, if you are currently playing /some/file/path/folder/song__002.xrns
+//
+// and request /renoise/song/load/by_number "004"
+//
+// then the handler come computes the file name  /some/file/path/folder/song__004.xrns
+// and loads it.
+loadPage = loadPage.concat( Control.ui.commonControls("loadPage") );
+
+pages = [controlPage, editPage, loadPage];
 
