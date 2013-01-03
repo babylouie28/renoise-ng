@@ -67,6 +67,28 @@ keyboardArray : function(num, x, y) {
                   return(ctrls);
                 },
 
+loadSongButton : function(songID, x, y) { return( {
+                     "name":  "loadSong" + songID,
+                     "type": "Button",
+                     "label": songID,
+                     "bounds": [ x, y,  this.buttonW, this.buttonH],
+                     "color": "#F33",
+                     "backgroundColor": "#F0F",
+                     "stroke": "#333",
+                     "mode":"momentary",
+                     "ontouchstart": "oscManager.sendOSC( [ '/renoise/song/load/by_number',  's', '" + songID + "'])",
+                     } );
+                 },
+
+loadSongArray : function(songIDs, x, y) {
+                  var ctrls = [];
+                  for (var i=0;i<songIDs.length;i++) { 
+                    ctrls.push( this.loadSongButton(songIDs[i],  x+((this.gapSize+this.buttonW)*i) , y ));
+                  }
+                  return(ctrls);
+                },
+
+
 ///////////////////////////////////
 // Track delay controls.  Need to fix this:  There needs to be a way to reset the value back to zero, and
 // the slider has to be centered on 0 as a baseline.
@@ -79,8 +101,9 @@ trackDelayControl : function(idx, x, y){ return( {
                          "color": "#00ff33",
                          "stroke": "#333",
                          "backgroundColor": "#60f",
-                         "min": -1.0,
-                         "max": 1.0,
+
+                         "min": -100.0,
+                         "max": 100.0,
                          "label" : this.value,
                          "isXFader": true,
                          "isVertical": true,
@@ -167,7 +190,6 @@ trackClearControls : function(num, x, y) {
                            "min": 0,
                            "max": 0,
                            "ontouchstart": "trackDelay" + idx + ".setValue(0)",
-                          "address" :  "/renoise/song/track/" + idx + "/output_delay",
                            });
                        // Note: It seems that all events send OSC messages.  For this one it sends /trackSelect<idx>. 
                        // It gets ignored by Renoise.
@@ -523,6 +545,11 @@ loadPage = [];
 // then the handler come computes the file name  /some/file/path/folder/song__004.xrns
 // and loads it.
 loadPage = loadPage.concat( Control.ui.commonControls("loadPage") );
+loadPage = loadPage.concat(
+       Control.ui.loadSongArray( 
+          ["001", "002", "003", "004", "005"], 
+          Control.ui.xstart, 
+          Control.ui.trackCtrlsStartY+Control.ui.vertOffset(1) )  );
 
 pages = [controlPage, editPage, loadPage];
 
