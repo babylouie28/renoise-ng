@@ -76,7 +76,7 @@ loadSongButton : function(songID, x, y) { return( {
                      "backgroundColor": "#F0F",
                      "stroke": "#333",
                      "mode":"momentary",
-                     "ontouchstart": "oscManager.sendOSC( [ '/renoise/song/load/by_number',  's', '" + songID + "'])",
+                     "ontouchstart": "oscManager.sendOSC( [ '/renoise/song/load/by_id',  's', '" + songID + "'])",
                      } );
                  },
 
@@ -540,7 +540,7 @@ loadPage = [];
 //
 // For exaple, if you are currently playing /some/file/path/folder/song__002.xrns
 //
-// and request /renoise/song/load/by_number "004"
+// and request /renoise/song/load/by_id "004"
 //
 // then the handler come computes the file name  /some/file/path/folder/song__004.xrns
 // and loads it.
