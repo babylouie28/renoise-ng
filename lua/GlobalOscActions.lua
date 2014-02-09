@@ -54,6 +54,9 @@ function lpad(s, l, c)
   return res, res ~= s
 end
 
+
+
+
 --[[============================================================================
 
 GlobalOscActions.lua
@@ -546,7 +549,16 @@ add_global_action {
   end,
 }
 
+add_global_action { 
+  pattern = "/jgb/currentLineNotifier", 
+  description = "JGB: Set up  a current line notifier for idle obsr,",
 
+  arguments = { },
+  handler = function()
+    log:error("********************************* /jgb/currentLineNotifier **************************************")
+    renoise.tool().app_idle_observable:add_notifier( send_current_line)
+  end,
+}
 
 
 
@@ -1210,6 +1222,12 @@ add_global_action {
     end
 
 
+
+    -- JGB 
+function send_current_line()
+   print("Current line: ")
+end
+
     ------------------------------------------------------------------------------------------
     -- Attempting to add OSC responses
     -- See http://forum.renoise.com/index.php?/topic/35659-sending-osc-from-globaloscactionslua/
@@ -1220,7 +1238,8 @@ add_global_action {
 
     -- open a socket connection to the server
     local client, socket_error = renoise.Socket.create_client(
-    "192.168.0.9", 8080, renoise.Socket.PROTOCOL_UDP)
+    "127.0.0.1", 8080, renoise.Socket.PROTOCOL_UDP)
+    -- "192.168.0.9", 8080, renoise.Socket.PROTOCOL_UDP)
     -- Is there ANY way to set this after this file has been loaded?  A GUI thing to add? This will change based on different uses.
 
     if (socket_error) then 
@@ -1229,7 +1248,7 @@ add_global_action {
       return
     end
 
-    -- Set up an OSC cleint to send message back to Renoise itself
+    -- Set up an OSC client to send message back to Renoise itself
     --
     local client_renoise, socket_error = renoise.Socket.create_client(
     "127.0.0.1", 8000, renoise.Socket.PROTOCOL_UDP)
@@ -1242,6 +1261,144 @@ add_global_action {
 
 
     -- JGB handlers ----
+    --
+
+      add_global_action { 
+        pattern = "/song/swap_volume", 
+        description = "Given two track numbers, make one max vol and the other 0 vol. If one is already 0, make that one max.  Else choose the first as max ",
+       --  The idea is that you have two tralted tracks, such as a bass line and a variation.  
+       --  You want to be able to switch from one to the other while playing.
+       --  The assumption is that ony one is ever playing; the other has a volume of 0.
+       --  `mute` might have been a better option but auto-seek seems to not work so unmuting in the middle
+       --  means you do not hear a sample play; using volume = 0 should work though.
+       --  Downside is that you might not want the track to be at max volume.
+       --  However, if we just swap volumes then al should be OK.
+       --  If by chance both tracks ahve 0 volume then set the first track to the given volume to ensure that
+       --  something plays.
+        arguments = { 
+              argument("track1", "number"), 
+              argument("track2", "number"),
+              argument("volume", "number"),
+            },
+
+        handler = function(track1, track2, volume)
+
+          print("swap_volume for ", track1, track2)
+          local rns = renoise.song  
+          local v1 = renoise.song().tracks[track1].prefx_volume['value']
+          local v2 = renoise.song().tracks[track2].prefx_volume['value']
+          print("v1 = ", v1)
+          print("v2 = ", v2)
+          
+          set_track_parameter(track1, "prefx_volume", v2)
+          set_track_parameter(track2, "prefx_volume", v1)
+      end
+    }
+
+
+      add_global_action { 
+        pattern = "/pattern/back", 
+        description = "Jump back to previous pattern but keep same relative line position",
+
+        arguments = nil,
+        handler = function()
+          print("Jump back!")
+          local rns = renoise.song  
+          local pos = renoise.song().transport.playback_pos
+          pos.sequence = pos.sequence - 1
+          rns().transport.playback_pos = pos
+        end
+      }
+
+      add_global_action { 
+        pattern = "/pattern/into", 
+        description = "Jump to the given pattern number but keep same relative line position",
+
+        arguments = { argument("pattern_index", "number"), argument("stick_to", "number") },
+
+        handler = function(pattern_index, stick_to)
+          print("Jump into!")
+          local rns = renoise.song  
+          local pos = renoise.song().transport.playback_pos
+          pos.sequence = pattern_index
+          rns().transport.playback_pos = pos
+
+          if stick_to > -1  then
+            song().transport.loop_pattern = true
+
+            -- This as copied from elsewhere
+            local start_pos = song().transport.loop_start
+            start_pos.line = 1; start_pos.sequence = clamp_value(stick_to, 1, 
+            song().transport.song_length.sequence)
+
+            local end_pos = song().transport.loop_end
+            end_pos.line = 1; end_pos.sequence =  clamp_value(stick_to + 1, 1, song().transport.song_length.sequence + 1)
+            song().transport.loop_range = {start_pos, end_pos}
+            song().transport:set_scheduled_sequence(clamp_value(stick_to, 1, song().transport.song_length.sequence))
+          else
+
+            song().transport.loop_pattern = false
+
+            -- clear_pattern_loop(song())
+
+             -- This was grabbed from a function that handles an default OSC message for 
+             -- setting  a pattern loop range.
+             -- Seems that if you pass it 0,0 it clears the pattern.
+     --        handler = function(rstart, rend)
+     local rstart = 0
+     local rend = 0
+      local start_pos = song().transport.loop_start
+      start_pos.line = 1; start_pos.sequence = clamp_value(rstart, 1, song().transport.song_length.sequence)
+
+      local end_pos = song().transport.loop_end
+      end_pos.line = 1; end_pos.sequence =  clamp_value(rend + 1, 1, song().transport.song_length.sequence + 1)
+
+      song().transport.loop_range = {start_pos, end_pos}
+  -- end
+
+
+          end
+        end
+      }
+
+      -- Need a better name for this.
+      add_global_action { 
+        pattern = "/pattern/pop", 
+        description = "Jump to the given pattern number but keep same relative line position",
+
+        arguments = { argument("pattern_index", "number")},
+
+        handler = function(pattern_index)
+          print("Jump into!")
+          local rns = renoise.song  
+          local pos = renoise.song().transport.playback_pos
+          pos.sequence = pattern_index
+          rns().transport.playback_pos = pos
+          --[[
+          if stick_to > -1  then
+            song().transport.loop_pattern = true
+
+            -- This as copied from elsewhere
+                    local start_pos = song().transport.loop_start
+        start_pos.line = 1; start_pos.sequence = clamp_value(stick_to, 1, 
+        song().transport.song_length.sequence)
+
+        local end_pos = song().transport.loop_end
+        end_pos.line = 1; end_pos.sequence =  clamp_value(stick_to + 1, 1, 
+        song().transport.song_length.sequence + 1)
+
+        song().transport.loop_range = {start_pos, end_pos}
+
+        song().transport:set_scheduled_sequence(clamp_value(stick_to, 1, song().transport.song_length.sequence))
+
+          end
+          --]]
+          
+        end
+      }
+
+
+
 
     add_global_action { 
       pattern = "/query/bpm", 
@@ -1277,6 +1434,7 @@ add_global_action {
         local midi_notes = { 48, 49,  50,  51,  52,  53, 54, 55, 56, 57}
         local d1, d2, d3
         print("triggered BPM query ")
+        print(tostring(track_index))
         print( ("Try to speak %s" ):format(bpm_string))
 
 
@@ -1501,4 +1659,4 @@ add_global_action {
                         end,
                       }
 
-                      log:error("********************************* OSC!**************************************")
+log:error("********************************* OSC!**************************************")
