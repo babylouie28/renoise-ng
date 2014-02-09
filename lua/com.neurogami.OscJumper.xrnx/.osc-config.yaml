@@ -1,0 +1,25 @@
+:port: 7013
+:address: 127.0.0.1
+
+# The first goal is to create a bundle that sets nice loop jump
+# We have a bass2 track fo an laternate bass line, and the first track is an odd
+# piano thing that we coukld pop in and out
+# Renoise counts tracks starting with  1.
+# The bass tracks are 5 and 6
+:initial_messages:
+  - /renoise/transport/start  
+  - /ng/pattern/into 3 7
+  - /ng/loop/schedule 3 6
+  - /ng/song/swap_volume  5 6 0.8
+  - /renoise/song/track/1/mute
+  - /renoise/song/track/1/unmute
+  - /renoise/transport/stop
+  - /renoise/song/bpm 122
+  - /renoise/song/lpb 4
+  - /renoise/song/sequence/trigger 8 
+  - /renoise/song/sequence/trigger 2 | /renoise/song/bpm 122 | /renoise/transport/start 
+  - /renoise/song/track/5/mute | /renoise/song/track/6/unmute
+  - /renoise/song/track/6/mute | /renoise/song/track/5/unmute
+  - /ng/pattern/into 3 7
+  - /ng/pattern/into 4 -7
+  - /ng/song/swap_volume  5 6 0.8

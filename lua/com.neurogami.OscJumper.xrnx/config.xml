@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OscJumperParameters doc_version="0">
+  <nodes>
+    <node1>
+      <port>7013</port>
+      <protocol>2</protocol>
+      <ip>127.0.0.1</ip>
+    </node1>
+    <node2>
+      <enable>false</enable>
+      <port>8000</port>
+      <protocol>2</protocol>
+      <ip>0.0.0.0</ip>
+    </node2>
+  </nodes>
+</OscJumperParameters>
