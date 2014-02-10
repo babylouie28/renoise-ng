@@ -66,19 +66,12 @@ end
 
 
       }, {
-        -- Takes two track naumbers and a volume value. Looks at the volumes of the 
-        -- indicated tracks. If one is 0 and the other not, then it swaps the volumes.
-        -- It's *supposed* to use that third value as a fall-back volume in case both
-        -- tracks have a volume of zero. Apparently it does no such thing.
-        -- Anyway, the reason this is meant to swap zero <=> not-zero is because
-        -- swapping mure/unmute does not work so well if you are mid-sample; the sound does
-        -- not come in until the next note is triggered.
-        --
+        -- Takes two track numbers and swaps theri voulme settings.
         -- If using this then you need to set up your track pairs so that one is a set volume
         -- and the other is set to 0
         pattern = "/song/swap_volume", 
 
-        handler = function(track1, track2, volume)
+        handler = function(track1, track2)
 
           print("swap_volume for ", track1, track2)
           local song = renoise.song  
