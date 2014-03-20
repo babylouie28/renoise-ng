@@ -52,13 +52,14 @@ function showUI()
       mode = "center",
 
       vb:button {
-        text = "OK",
+        text = "Insert",
         notifier = insert_note
       },
 
       vb:button {
-        text = "Cancel",
+        text = "Close",
         notifier = function()
+          print("XXX Close has been triggered XXX")
           ui_dialog:close()
         end
       }
@@ -72,8 +73,8 @@ function showUI()
     if (key.name == "esc") then
       dialog:close()
     elseif (key.name == "return") then
+      print("Return: Call insert_note()")
       insert_note()
-      dialog:close()
     else
       return key
     end

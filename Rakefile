@@ -12,6 +12,10 @@ namespace :package do
     input_filenames = %w{ main.lua manifest.xml OscJumper/Handlers.lua  OscJumper/Notifier.lua OscJumper/Preferences.lua   OscJumper/Utils.lua }
 
     zipfile_name = "../com.neurogami.OscJumper.xrnx"
+    if File.exist? zipfile_name
+      sh "rm #{zipfile_name}"
+    end
+
 
     Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
       input_filenames.each do |filename|
@@ -23,7 +27,7 @@ namespace :package do
 
       #  zipfile.get_output_stream("myFile") { |os| os.write "myFile contains just this" }
     end
-
+    sh "mv #{zipfile_name} ../dist/"
   end
 
 
@@ -35,6 +39,9 @@ namespace :package do
     input_filenames = %w{ main.lua manifest.xml }
 
     zipfile_name = "../com.neurogami.RawMidi.xrnx"
+    if File.exist? zipfile_name
+      sh "rm #{zipfile_name}"
+    end
 
     Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
       input_filenames.each do |filename|
@@ -42,6 +49,7 @@ namespace :package do
       end
     end
 
+    sh "mv #{zipfile_name} ../dist/"
   end
 end
 
