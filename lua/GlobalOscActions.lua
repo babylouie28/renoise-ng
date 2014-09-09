@@ -1,9 +1,35 @@
 require "renoise.http.log" -- This does not seem to actually do what I wanted :(
 
 
+-- ------------------------------------------------------------------------- --
+
+local function table_to_string(table)
+  local result = ''
+
+  if (type(table) == 'table') then
+    result = '{ '
+
+    for index = 1, #table do
+      result = result .. table_to_string(table[index])
+      if (index ~= #table) then
+        result = result .. ', '
+      end
+    end
+
+    result = result .. ' }'
+  else
+    result = tostring(table)
+  end
+
+  return(result)
+end
+
+
 local log = Log(Log.DEBUG)
 
 local send_tracks = nil
+local send_track_count = 0
+
 
 local MASTER_TRACK = renoise.Track.TRACK_TYPE_MASTER
 local master_track_index = nil
@@ -560,18 +586,20 @@ add_global_action {
       print("Go get send tracks")
       send_tracks = {}
 
-
+      send_track_count = 0
       for i = 1,#renoise.song().tracks do
         if renoise.song().tracks[i].type == MASTER_TRACK then
           master_track_index = i  
         end
 
         if renoise.song().tracks[i].type == renoise.Track.TRACK_TYPE_SEND  then
+          send_track_count = send_track_count + 1
           print("Storing send track: " .. renoise.song().tracks[i].name)
-          send_tracks[renoise.song().tracks[i].name] =  renoise.song().tracks[i]
+          send_tracks[send_track_count] =  renoise.song().tracks[i]
+
         end
       end
-      
+
     else
       print("send_tracks = ")
       print(send_tracks)
@@ -582,12 +610,14 @@ add_global_action {
     --  *** GlobalOscActions.lua:564: attempt to index a nil value   
     if (track_index > 0 and track_index <= #tracks) then
       print("Found the track!")
+      local send_device = nil
       --          
       local devices = tracks[track_index].devices
       -- 2: do not try bypassing the mixer device
 
       if (#devices > 0 ) then
-        for device_idx,device in ripairs(devices) do
+        local i, j
+        for device_idx, device in ripairs(devices) do
           -- The demo song, with a percussion group that uses a send, has the send on track 5.
           -- It contains the first 4 tracks.
           -- The default name is "#Send"
@@ -603,6 +633,70 @@ add_global_action {
           -- The goal is to avoid looking up send tracks on every call.
           --
           print(device.display_name)
+          -- Need a way to catch the send device, and if found  go
+          -- and see if we can alter the waht send track it uses.
+          -- This means having a way to test either the type of a device
+          -- or rely on a naming convention
+          --
+          -- Unless there is a Renoise way to test for device type, assume the name follows this convention:
+          -- "send_<tag>"
+          -- Then extract the tag and assume the matching send tracks follow this convention:
+          -- "<tag>_<id>"
+          --
+          -- So, for out demo track, the percussion send device is named "send_perc"
+          -- and the two send tracks for it are "perc_1" and "perc_2"
+          i, j = string.find(device.display_name, "send_")
+          if i == 1 then
+            -- Get the part that comes after 'send_'
+            local send_tag = string.gsub(device.display_name, "send_", "")
+            print("Found a send device with tag " .. send_tag )
+            send_device  = device
+            -- Now loop over the send tracks to find a match
+
+            local idx
+            print( ("We have %d send tracks"):format(send_track_count ) )
+            local match_count = 0;
+            for idx = 1, send_track_count do
+              print("Check name of send track '" .. send_tracks[idx].name .. "' for '" .. send_tag .. "'")
+              
+              i, j = string.find( send_tracks[idx].name, send_tag)
+
+              if i then
+                match_count = match_count + 1
+                print("- - - - - - We have a send track tag match on send track " .. send_tracks[idx].name )
+                print(("Matched send track is idx %d and match_count %d "):format(idx, match_count) )
+                -- If this send track matches on the tag and is the correct index
+                -- then we need to set the device to use that send track
+                if match_count == send_index then
+                  print( ("*****  Found a matching send track with index %d ******" ):format(idx) )
+                  -- How do we set the parameter on the send device?
+                  print("Device parameters for ")
+                  print(device)
+                  
+      
+                 for __,param in ipairs(device.parameters) do
+                   print(param.name)
+                    if  param.name == "Receiver" then
+                      print("YES")
+
+                      print(" !!!!! Have parameter " .. param.name .. " !!!!!! ")
+                      param.value = idx - 1
+                      print("Updated value of  device " .. device.display_name )
+                      break
+                  else
+                      print(" no ")
+                    end
+                  end
+
+              
+                  break
+                end
+              end
+            end
+
+            break
+            --- End send track lopp
+          end
         end
       end
     else
