@@ -2,6 +2,14 @@
 require 'zip'
 
 
+desc "Copy over ./lua/GlobalOscActions.lua"
+task :global do
+  warn "This is hardcoded for Ubuntu"
+  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V2.8.2/Scripts/`
+
+end
+
+
 namespace :package do
 
   desc "Package up OscJumper"

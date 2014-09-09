@@ -26,7 +26,7 @@ IOW, you can't be specifiy the two tracks to swap with hand movements; there nee
 
 This could be based off some controllable aspect of the gesture; finger count or Y or Y.
 
-We could map X (lef/right) to some set of paired tracks, with the client UI changing color to indicate what pair would be effected.
+We could map X (lef/right) to some set of paired tracks, with the client UI changing color to indicate what pair would be affected.
 
 If we kept that number small (4?) but used a decent range (two feet?) then you could move to a track-pair quickly without having to be super precise.  Then, if a track-pair were active, use a clear gesture (circle? ) to do the volume swap.
 
