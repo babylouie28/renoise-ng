@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>3</ApiVersion>
+  <AutoUpgraded>true</AutoUpgraded>
+  <Id>com.neurogami.MidiModder</Id>
+  <Version>1.0</Version>
+  <Author>Neurogami | james@neurogami.com  </Author>
+  <Name>Neurogami OSC Jumper</Name>
+  <Category>In Progress</Category>
+  <Description>Maps MIDI to something or other</Description>
+  <Homepage>http://renoise.neurogami.com</Homepage>
+</RenoiseScriptingTool>

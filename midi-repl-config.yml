@@ -1,0 +1,9 @@
+---
+# :device: 1
+:initial_messages:
+ - "!NGjump 3 2 "
+ - 1 55 100
+ - 1 55
+ - 1 46 127
+ - 1 46 
+
