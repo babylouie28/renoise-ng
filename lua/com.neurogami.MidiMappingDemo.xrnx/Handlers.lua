@@ -1,8 +1,11 @@
-HANDER_PREFIX = "handler_"
+HANDLER_PREFIX = "handler_"
 
 function handler_64_127(message, midi_out_device)
   send_switch(5, 1)
+  local msg = {0x0, message[2], message[3]}
+  --midi_out_device:send(msg)
   midi_out_device:send(message)
+
   print("     handler_64_127()   ")
 end
 

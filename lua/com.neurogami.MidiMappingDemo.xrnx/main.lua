@@ -23,10 +23,6 @@ local midi_out_device
 -- MIDI device and uses some code to interpret sensor input as MIDI triggers.
 local DEVICE_NAMES = {"Teensy MIDI NG", "Launchpad", "LoopBe Internal MIDI" }
 
-local known_stuff = {}
-for n in pairs(_G) do 
-  known_stuff[n] = n 
-end
 
 -------------------------------------------------------------
 --Midi Mappings
@@ -172,19 +168,14 @@ function sysex_handler(message)
   local m = words[1]
   table.remove(words, 1)
 
-  local success, result = pcall(_G[HANDER_PREFIX..m], words ) 
+  local success, result = pcall(_G[HANDLER_PREFIX..m], words ) 
 
   if not success then
-    print( ("There was an error calling %s: %s"):format( HANDER_PREFIX..m, result) )
+    print( ("There was an error calling %s: %s"):format( HANDLER_PREFIX..m, result) )
   end
 
 end
 
-
-function dispatch_to_handler(fname)     
-
-
-end
 
 function midi_handler(message)
   --[[
@@ -294,8 +285,8 @@ end
 
 function midi_handle(message)
 
-   local m = (HANDER_PREFIX .. "%d_%d"):format(message[2], message[3])
-   print(("MIDI handle:  %d %d %d"):format(message[1], message[2], message[3]))
+   local m = (HANDLER_PREFIX .. "%d_%d"):format(message[2], message[3])
+   print(("MIDI handler has message:  %d %d %d"):format(message[1], message[2], message[3]))
 
    -- Trouble. If a handler is not defined for the note
    -- then pcall kills us with stuff like this:
@@ -310,19 +301,19 @@ function midi_handle(message)
 
   --if known_stuff[m] then
     
-     dispatch_handler(m, message) 
--- end
+--   http://www.lua.org/pil/14.2.html
+  if rawget(_G, m) ~= nil then
+    print(" pcall " .. m )
+    local success, result = pcall(_G[m], message, midi_out_device ) 
+    if not success then
+      print( ("There was an error calling %s: %s"):format( m, result) )
+    end
+  else
+    print( ("* Cannot find %s in _G"):format(m) )
+  end
 end
 
 
-function dispatch_handler(fname, message) 
-local success, result = pcall(_G[fname], message, midi_out_device) 
-  if not success then
-     print( ("There was an error calling %s: %s"):format( fname, result) )
- end
-
-
-end
 
 -- The name of the device is not always appearing as it is set on the device.
 -- On Ububunto 10.4 it is appeneding " MIDI 1" to the device name
