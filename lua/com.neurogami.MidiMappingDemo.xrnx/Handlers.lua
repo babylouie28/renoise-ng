@@ -1,31 +1,30 @@
 HANDLER_PREFIX = "handler_"
 
-function handler_64_127(message, midi_out_device)
+function handler_64_on(message, midi_out_device)
   send_switch(5, 1)
   local msg = {0x0, message[2], message[3]}
   --midi_out_device:send(msg)
   midi_out_device:send(message)
 
-  print("     handler_64_127()   ")
+  print("     handler_64_on()   ")
 end
 
 
-function handler_64_0(message, midi_out_device)
-
+function handler_64_off(message, midi_out_device)
   midi_out_device:send(message)
-  print("     handler_64_0()   ")
+  print("     handler_64_off()   ")
 end
 
 
-function handler_65_127(message, midi_out_device)
-  print("     handler_65_127()   ")
+function handler_65_on(message, midi_out_device)
+  print("     handler_65_on()   ")
   midi_out_device:send(message)
   send_switch(5, 2)
 end
 
 
-function handler_65_0(message, midi_out_device)
-  print("     handler_65_0()   ")
+function handler_65_off(message, midi_out_device)
+  print("     handler_65_off()   ")
   midi_out_device:send(message)
 end
 

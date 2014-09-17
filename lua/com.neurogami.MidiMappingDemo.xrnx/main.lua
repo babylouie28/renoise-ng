@@ -21,7 +21,7 @@ local midi_out_device
 -- This particular demo was intended for use with a Teensy micro-controller 
 -- board that sends MIDI messages over USB.  Basically, it behaves as a 
 -- MIDI device and uses some code to interpret sensor input as MIDI triggers.
-local DEVICE_NAMES = {"Teensy MIDI NG", "Launchpad", "LoopBe Internal MIDI" }
+local DEVICE_NAMES = {"Teensy MIDI NG", "Launchpad", "QuNexus MIDI 1", "LoopBe Internal MIDI" }
 
 
 -------------------------------------------------------------
@@ -283,10 +283,20 @@ end
 
 -- Pull apart the MIDI message and create a function name, then call it
 
+function on_or_off(v)
+  if v > 0  then return "on" else return "off"  end
+end
+
 function midi_handle(message)
 
-   local m = (HANDLER_PREFIX .. "%d_%d"):format(message[2], message[3])
+   -- local m = (HANDLER_PREFIX .. "%d_%d"):format(message[2], message[3])
+   local m = (HANDLER_PREFIX .. "%d_%s"):format(message[2], on_or_off(message[3]))
+   
+   
    print(("MIDI handler has message:  %d %d %d"):format(message[1], message[2], message[3]))
+
+
+
 
    -- Trouble. If a handler is not defined for the note
    -- then pcall kills us with stuff like this:
@@ -333,7 +343,8 @@ for i,name in pairs(DEVICE_NAMES) do
   print(("Compare '%s' to '%s'"):format(name,  devices[i]))
     if string.find( devices[i], name) then
       print(("FOUND '%s'"):format(name))
-      miDevice = renoise.Midi.create_input_device(devices[i], midi_handler, sysex_handler)
+      -- miDevice = renoise.Midi.create_input_device(devices[i], midi_handler, sysex_handler)
+      renoise.Midi.create_input_device(devices[i], midi_handler, sysex_handler)
       midi_out_device = renoise.Midi.create_output_device(devices[i])
       break
     end
