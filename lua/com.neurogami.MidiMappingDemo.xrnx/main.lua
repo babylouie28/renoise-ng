@@ -5,10 +5,10 @@ com.neurogami.MidiMappingDemo.xrnx/main.lua
 
 print("com.neurogami.MidiMappingDemo devices")
 
+package.path = "../com.neurogami.SharedCode.xrnx/?.lua;" .. package.path
 
 require 'Utils'
 require 'Actions'
-require 'Handlers'
 
 local midi_out_device
 
@@ -21,7 +21,14 @@ local midi_out_device
 -- This particular demo was intended for use with a Teensy micro-controller 
 -- board that sends MIDI messages over USB.  Basically, it behaves as a 
 -- MIDI device and uses some code to interpret sensor input as MIDI triggers.
-local DEVICE_NAMES = {"Teensy MIDI NG", "Launchpad", "QuNexus MIDI 1", "LoopBe Internal MIDI" }
+local DEVICE_NAMES = {['Teensy MIDI NG']="Teensy", 
+                      ['Launchpad']="Launchpad", 
+                      ['QuNexus MIDI 1']="QuNexus",
+                      ['QuNexus']="QuNexus" } --, 
+--                      ['LoopBe Internal MIDI']="LoopBe" }
+
+
+
 
 
 -------------------------------------------------------------
@@ -290,28 +297,9 @@ end
 function midi_handle(message)
 
    -- local m = (HANDLER_PREFIX .. "%d_%d"):format(message[2], message[3])
-   local m = (HANDLER_PREFIX .. "%d_%s"):format(message[2], on_or_off(message[3]))
-   
-   
+   local m = (HANDLER_PREFIX .. "%d_%s"):format(message[2], on_or_off(message[3]))   
    print(("MIDI handler has message:  %d %d %d"):format(message[1], message[2], message[3]))
-
-
-
-
-   -- Trouble. If a handler is not defined for the note
-   -- then pcall kills us with stuff like this:
-   --   *** main.lua:287: variable 'handler_48_127' is not declared
-   --  You cannot even do this:
-   -- local meth = _G[m]
-
-
-
-   --   http://www.lua.org/pil/14.html
-   -- A runtime lookup by looping over _G seems expensive
-
-  --if known_stuff[m] then
-    
---   http://www.lua.org/pil/14.2.html
+  --   http://www.lua.org/pil/14.2.html
   if rawget(_G, m) ~= nil then
     print(" pcall " .. m )
     local success, result = pcall(_G[m], message, midi_out_device ) 
@@ -338,17 +326,38 @@ print("com.neurogami.MidiMappingDemo devices")
 
 tprint(devices, 2)
 
-for i,name in pairs(DEVICE_NAMES) do
-  for i= 1, #devices do
-  print(("Compare '%s' to '%s'"):format(name,  devices[i]))
+-- The plan is take a device name string for a detected
+-- device and only use it if that device is somehow configured.
+-- For now that mens it has an entry in DEVICE_NAMES
+function assign_midi_devices(target_device) do 
+print("See if we can use " .. target_device)
+
+  if DEVICE_NAMES[target_device] ~= nil then
+    local name = target_device
+    local mapping = DEVICE_NAMES[target_device] 
+
+     
+--for name,mapping in pairs(DEVICE_NAMES) do
+  
+for i= 1, #devices do
+    
+    print(("Compare '%s' to '%s' [handler file '%s']"):format(name,  devices[i],  mapping ))
     if string.find( devices[i], name) then
       print(("FOUND '%s'"):format(name))
       -- miDevice = renoise.Midi.create_input_device(devices[i], midi_handler, sysex_handler)
       renoise.Midi.create_input_device(devices[i], midi_handler, sysex_handler)
       midi_out_device = renoise.Midi.create_output_device(devices[i])
+      require( ("Handlers%s"):format( mapping ) )
       break
     end
   end
+
+end
+-- end
+
+
+end
+
 end
 
 
@@ -400,3 +409,77 @@ function skip(midi_message)
   end
 end
 ]]--
+
+--- GUI stuff
+
+renoise.tool():add_menu_entry {
+  name = "Main Menu:Tools:Neurogami:MIDI Mapping Demo:Select input device",
+  invoke = function() select_input_device() end 
+}
+
+
+function select_input_device()
+
+local vb = renoise.ViewBuilder()
+  local DEFAULT_MARGIN = renoise.ViewBuilder.DEFAULT_CONTROL_MARGIN
+  local CONTENT_SPACING = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING
+  local CONTENT_MARGIN = renoise.ViewBuilder.DEFAULT_CONTROL_MARGIN
+  local DIALOG_MARGIN = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN
+  
+  local devices = renoise.Midi.available_input_devices()
+
+  local device_selection_dialog = nil
+
+
+  local dialog_title = "Input devices"
+ local input_devices = table.create{"None"}
+   for k,v in ipairs(devices) do
+   input_devices:insert(v)
+  end
+
+  local dialog_content = vb:text {
+    text = "from the Renoise Scripting API"
+  }
+
+  local dialog_rows = vb:column { }
+
+  for k,v in ipairs(input_devices) do
+  
+
+      local _butt = vb:button {
+        text = v,
+        width = 120,
+        tooltip = 'Click to activate',
+        notifier = function(value)
+           print(("Using device %s"):format(v) )
+           assign_midi_devices(v)
+           device_selection_dialog:close()
+
+        end,
+      }
+      
+-- http://forum.renoise.com/index.php/topic/42418-trouble-with-the-dynamic-building-matrix-example-tool/
+      dialog_rows:add_child(_butt)
+ 
+end
+
+  dialog_rows:add_child( vb:button {
+        text = "Cancel",
+        width = 120,
+        tooltip = 'Cancel',
+        notifier = function(value)
+           print("Cancel")
+           device_selection_dialog:close()
+        end,
+      } )
+
+  local dialog_buttons = {"Cancel"}
+
+device_selection_dialog = renoise.app():show_custom_dialog(
+    dialog_title, dialog_rows)
+
+  -- eh voila. Not pretty, but at least something to start with ;) We're going
+  -- to make that a bit more pretty and advanced in the next example...
+
+end
+

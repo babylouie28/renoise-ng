@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>3</ApiVersion>
+  <AutoUpgraded>true</AutoUpgraded>
+  <Id>com.neurogami.SharedCode</Id>
+  <Version>1.0</Version>
+  <Author>Neurogami | james@neurogami.com  </Author>
+  <Name>Neurogami shared code</Name>
+  <Category>In Progress</Category>
+  <Description>Exists to be able to install code to be used by other scripts</Description>
+  <Homepage>http://renoise.neurogami.com</Homepage>
+</RenoiseScriptingTool>
