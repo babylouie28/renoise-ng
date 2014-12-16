@@ -3,13 +3,15 @@ class 'OscDevice'
 
 function OscDevice:__init()
   -- could pass a server ref or something else here, or simply do nothing
-  print(" * * * * * OscDevice:__init() * * * * * " )
+  print(" * * * * * OscJumper -  OscDevice:__init() * * * * * " )
 
   self.prefix = '/ng'
 
   self.client = nil
   self.server = nil
 
+  -- preferences.nodes.node2.port.value seems to refer to the default port used by the Renoise OSC server
+  -- Is this her to allow this tool to pass messages to the Renoise server?
   self.osc_client = OscClient("127.0.0.1", preferences.nodes.node2.port.value)
 
   if (self.osc_client == nil ) then 
@@ -254,7 +256,7 @@ class 'OscClient'
 
 function OscClient:__init(osc_host,osc_port)
 
-  print("OscClient:__init!")
+  print("OscJumper - OscClient:__init!")
 
   -- the socket connection, nil if not established
   self._connection = nil
@@ -262,22 +264,18 @@ function OscClient:__init(osc_host,osc_port)
   --print("*** about to connect to the internal osc_server",osc_host,osc_port,type(osc_host),type(osc_port))
   local client, socket_error = renoise.Socket.create_client(osc_host, osc_port, renoise.Socket.PROTOCOL_UDP)
   if (socket_error) then 
-    renoise.app():show_warning("Warning: Duplex failed to start the internal OSC client")
+    renoise.app():show_warning("Warning: OscJumper failed to start the internal OSC client")
     self._connection = nil
   else
     self._connection = client
-    print("*** started the internal osc_server",osc_host,osc_port)
+    print("+ + +  OscJumper started the internal OscClient",osc_host,osc_port)
   end
-
-
 
 end
 
 
 function OscClient:send(osc_msg)
-
   self._connection:send(osc_msg)
-
 end
 
 

@@ -742,10 +742,7 @@ end
 
             send_track_count = 0
             for i = 1,#renoise.song().tracks do
-              --if renoise.song().tracks[i].type == MASTER_TRACK then
-              --  master_track_index = i  
-             -- end
-
+        
               if renoise.song().tracks[i].type == renoise.Track.TRACK_TYPE_SEND  then
                 send_track_count = send_track_count + 1
                 print("Storing send track: " .. renoise.song().tracks[i].name)
