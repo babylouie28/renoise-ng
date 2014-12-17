@@ -1,19 +1,10 @@
 --------------------------------------------------------------------------------
--- Cells!
+-- Code swiped from Cells!
 --
 -- Copyright 2012 Martin Bealby
 --
 -- Preferences Code
 --------------------------------------------------------------------------------
-
-
---------------------------------------------------------------------------------
--- Constants
---------------------------------------------------------------------------------
--- RENDER_SAMPLE_RATES = {"22050", "44100", "48000", "88200", "96000"}
--- RENDER_BIT_DEPTHS   = {"16", "24", "32"}
--- RENDER_PRIORITY     = {"low", "realtime", "high"}
-
 
 
 --------------------------------------------------------------------------------
@@ -108,8 +99,6 @@ function pref_dialog_init()
   view_pref_dialog = vb:column {
     spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
     margin = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN,
-    
-
 
     vb:horizontal_aligner {
       mode = "justify",
@@ -159,9 +148,20 @@ function pref_dialog_init()
           preferences.nodes.node2.protocol.value = v
         end
       },
+    
     },
-
-
+    vb:horizontal_aligner {
+      mode = "justify",    
+      vb:button {
+        text = "Save & Close",
+        released = function()
+          save_preferences()
+          -- Do we need to do something with any running OSC servers?
+          pref_dialog:close()
+          renoise.app():show_status("OscJumper preferences saved.")
+        end
+      },
+    },
 
   }
 end
@@ -190,7 +190,7 @@ end
 -- Menu Entries
 --------------------------------------------------------------------------------
 
-
+-- Is this duplicating what happens in main.lua?
 renoise.tool():add_menu_entry {
   name = "Main Menu:Tools:Neurogami OSC Jumper:Configuration...",
   invoke = function() display_pref_dialog() end

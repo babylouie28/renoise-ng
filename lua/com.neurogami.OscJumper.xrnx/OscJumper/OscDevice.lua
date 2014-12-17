@@ -174,7 +174,6 @@ function OscDevice:add_message_handler(pattern, func)
   --if (self.handlers) then
   self.handlers[pattern] = func
   -- end
-
 end
 
 
@@ -215,8 +214,6 @@ function OscDevice:socket_message(socket, binary_data)
         -- strip the prefix before continuing
         value_str = string.sub(value_str,string.len(self.prefix)+1)
         pattern  = string.sub(pattern,string.len(self.prefix)+1)
-
-
       end
 
       if value_str then
@@ -228,10 +225,13 @@ function OscDevice:socket_message(socket, binary_data)
         if(self.handlers[pattern]) then
           print("Have a handler match on ", pattern)
           print("Have msg.arguments[1][1] ", msg.arguments[1][1])
-
-
           rPrint(msg.arguments, nil, "ARGS ");
-          self.handlers[pattern](msg.arguments[1].value, msg.arguments[2].value   )
+          local res = pcall( self.handlers[pattern], msg.arguments[1].value, msg.arguments[2].value    )
+          if res then
+            print("Handler worked!");
+              else
+            print("Handler  error!");
+          end
         else
           print(" * * * * *  No handler for  ", pattern, " * * * * ")
         end

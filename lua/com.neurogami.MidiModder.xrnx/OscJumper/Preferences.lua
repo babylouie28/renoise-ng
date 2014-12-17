@@ -181,7 +181,7 @@ function display_pref_dialog()
 
   -- Create new dialog
   pref_dialog_init()
-  pref_dialog = renoise.app():show_custom_dialog("Osc Jumper Preferences", view_pref_dialog, pref_dialog_keyhander)
+  pref_dialog = renoise.app():show_custom_dialog("MIDI Modder Preferences", view_pref_dialog, pref_dialog_keyhander)
 end
 
 
@@ -192,7 +192,7 @@ end
 
 
 renoise.tool():add_menu_entry {
-  name = "Main Menu:Tools:Neurogami OSC Jumper:Configuration...",
+  name = "Main Menu:Tools:Neurogami MIDI Modder:Configuration...",
   invoke = function() display_pref_dialog() end
 }
 

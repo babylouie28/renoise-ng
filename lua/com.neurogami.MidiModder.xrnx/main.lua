@@ -47,7 +47,7 @@ function createOSCServer()
 end
 
 renoise.tool():add_menu_entry {
-  name = "--- Main Menu:Tools:Neurogami OSC Jumper:Start OSC server ..",
+  name = "--- Main Menu:Tools:Neurogami MIDI Modder:Start OSC server ..",
   invoke = createOSCServer
 }
 

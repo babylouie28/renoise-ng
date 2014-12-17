@@ -4,15 +4,8 @@ com.neurogami.OscJumper.xrnx/main.lua
 
 
 require 'OscJumper/Utils'
-require 'OscJumper/Notifier'
+require 'OscJumper/OscDevice'
 require 'OscJumper/Preferences'
-
-
--- NOTE: You need to catch all OSC exceptions because they
--- seem to bork any further OSC behavior.
--- Alos need to see why sometimes the client gets a 
--- "Connection refused" error
-
 
 _AUTO_RELOAD_DEBUG = true
 
@@ -23,7 +16,8 @@ local osc_server, server_socket_error = nil
 
 local osc_device = OscDevice()
 
-function connectOSC()
+-- Is this ever used? Seems not
+function __connectOSC()
   osc_client, socket_error = renoise.Socket.create_client(
   "localhost", osc_client_port, renoise.Socket.PROTOCOL_UDP)
 
@@ -40,7 +34,7 @@ end
 
 
 function createOSCServer()
-    print("================================================== OscJumper! ==================================================")
+  print("================================================== OscJumper! ==================================================")
 
   osc_server, server_socket_error = renoise.Socket.create_server(
   "localhost", preferences.nodes.node1.port.value, renoise.Socket.PROTOCOL_UDP)
@@ -57,8 +51,8 @@ function createOSCServer()
 end
 
 renoise.tool():add_menu_entry {
-  name = "--- Main Menu:Tools:Neurogami OSC Jumper:Start OSC server ..",
-  invoke = createOSCServer
+  name = "--- Main Menu:Tools:Neurogami OSC Jumper:Start the OSC server ..",
+  invoke = createOSCServer 
 }
 
 require 'OscJumper/Handlers'

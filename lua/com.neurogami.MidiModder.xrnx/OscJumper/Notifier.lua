@@ -13,7 +13,7 @@ function OscDevice:__init()
   self.osc_client = OscClient("127.0.0.1", preferences.nodes.node2.port.value)
 
   if (self.osc_client == nil ) then 
-    renoise.app():show_warning("Warning: OSC Jumper failed to start the internal OSC client")
+    renoise.app():show_warning("Warning: MIDI Modder failed to start the internal OSC client")
     self.osc_client = nil
   else
     print("We have self.osc_client = ", self.osc_client )
