@@ -4,34 +4,17 @@ com.neurogami.OscJumper.xrnx/main.lua
 
 
 require 'OscJumper/Utils'
+require 'OscJumper/Rotator'
+
+attempt_rotate_setup()
+
 require 'OscJumper/OscDevice'
 require 'OscJumper/Preferences'
 
-_AUTO_RELOAD_DEBUG = true
-
-local osc_client_port = 7119
 
 local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
-
 local osc_device = OscDevice()
-
--- Is this ever used? Seems not
-function __connectOSC()
-  osc_client, socket_error = renoise.Socket.create_client(
-  "localhost", osc_client_port, renoise.Socket.PROTOCOL_UDP)
-
-  if (socket_error) then 
-    renoise.app():show_warning(("Failed to start the " .. 
-    "OSC client. Error: '%s'"):format(socket_error))
-    return
-  end
-
-  print("OscJumper has created osc_client on port ", osc_client_port)
-
-end
-
-
 
 function createOSCServer()
   print("================================================== OscJumper! ==================================================")
@@ -56,7 +39,4 @@ renoise.tool():add_menu_entry {
 }
 
 require 'OscJumper/Handlers'
-
 load_handlers(osc_device)
-
-

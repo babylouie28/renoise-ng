@@ -225,7 +225,9 @@ function OscDevice:socket_message(socket, binary_data)
         if(self.handlers[pattern]) then
           print("Have a handler match on ", pattern)
           print("Have msg.arguments[1][1] ", msg.arguments[1][1])
-          rPrint(msg.arguments, nil, "ARGS ");
+
+          -- rPrint(msg.arguments, nil, "ARGS ");
+          
           local res = pcall( self.handlers[pattern], msg.arguments[1].value, msg.arguments[2].value    )
           if res then
             print("Handler worked!");
