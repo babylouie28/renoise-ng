@@ -235,7 +235,7 @@ function OscDevice:socket_message(socket, binary_data)
           -- Create a table of message values to pass as the single argument to all handlers
           local vals = OscDevice:map_args(msg.arguments)
           --   rPrint(vals , nil, "vals  ");
-          local res, err = pcall( self.handlers[pattern], vals )
+          local res, err = pcall( self.handlers[pattern], unpack(vals) )
           if res then
             print("Handler worked!");
               else

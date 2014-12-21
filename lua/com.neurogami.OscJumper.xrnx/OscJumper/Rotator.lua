@@ -33,10 +33,7 @@ rotate_handlers = {
 
   { -- Marks a pattern loop range and  then sets the start of the loop as  the next pattern to play
   pattern = "/rotate/track",
-  handler = function(vals)
-    print("/rotate/track handler has vals ", vals)
-    local track_num = vals[1]
-    local lines     = vals[2]
+  handler = function(track_num, lines)
 
     -- need a way to get the current pattern or something so that
     -- this works on the right stuff

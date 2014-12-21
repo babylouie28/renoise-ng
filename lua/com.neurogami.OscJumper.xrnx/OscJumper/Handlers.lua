@@ -9,9 +9,7 @@
 handlers = { 
   { -- Marks a pattern loop range and  then sets the start of the loop as  the next pattern to play
   pattern = "/loop/schedule",
-  handler = function(args)
-    local range_start = args[1]
-    local range_end   = args[2]
+  handler = function(range_start, range_end)
     OscJumper.loop_schedule(range_start, range_end)
   end 
 }, 
@@ -21,8 +19,8 @@ handlers = {
   -- If the second arg is greater than -1 it schedules that as the next pattern to play, and turns on
   -- block loop for that pattern.
   pattern = "/pattern/into",
-  handler = function(args)
-    local pattern_index,  stick_to  = unpack(args)
+  handler = function(pattern_index,  stick_to )
+--    local pattern_index,  stick_to  = unpack(args)
     OscJumper.pattern_into(pattern_index, stick_to)
   end 
 } 
