@@ -1,4 +1,4 @@
---- Common util funcitons
+--- Utils.lua for helper functions
 function clamp_value(value, min_value, max_value)
     return math.min(max_value, math.max(value, min_value))
   end

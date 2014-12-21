@@ -8,14 +8,9 @@ local RANGE_SELECTION_IN_PATTERN = 5
 have_rotator = false
 
 function rotate_setup()
-
-package.path = "../com.renoise.PatternRotate.xrnx/?.lua;" .. package.path
-
-require "pattern_line_tools"
-require "main"
-
-
-
+  package.path = "../com.renoise.PatternRotate.xrnx/?.lua;" .. package.path
+  require "pattern_line_tools"
+  require "main"
 end
 
 
@@ -37,20 +32,27 @@ end
 rotate_handlers = {
 
   { -- Marks a pattern loop range and  then sets the start of the loop as  the next pattern to play
-    pattern = "/rotate/track",
-    handler = function(track_num, lines)
-      -- need a way to get the current pattern or something so that
-      -- this works on the right stuff
-      print("Rotate ",lines, " lines")
+  pattern = "/rotate/track",
+  handler = function(vals)
+    print("/rotate/track handler has vals ", vals)
+    local track_num = vals[1]
+    local lines     = vals[2]
 
-      --      local selected_track_index = song().selected_track_index
-      local song = renoise.song
+    -- need a way to get the current pattern or something so that
+    -- this works on the right stuff
+    print("Rotate ",lines, " lines")
+
+    --      local selected_track_index = song().selected_track_index
+    local song = renoise.song
+    if (track_num > -1 ) then
       song().selected_track_index = track_num
       local selected_track_index = song().selected_track_index
       print( "ROTATE: selected_track_index is now " , selected_track_index )
-      rotate(lines, RANGE_TRACK_IN_PATTERN, true)
+    end
+    
+    rotate(lines, RANGE_TRACK_IN_PATTERN, true)
 
- end 
+  end 
 }, 
 
 }

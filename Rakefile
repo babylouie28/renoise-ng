@@ -4,6 +4,10 @@ require 'zip/zip'
 require 'zip/zipfilesystem'
 require 'find'
 
+Dir.glob("tasks/*.rake") do |t|
+load t
+end
+
 desc "Copy over ./lua/GlobalOscActions.lua"
 task :global do
   warn "This is hardcoded for Ubuntu"

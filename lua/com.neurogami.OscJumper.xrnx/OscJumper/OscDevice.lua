@@ -1,8 +1,7 @@
-
+-- OscDevices.lua
 class 'OscDevice'
 
 function OscDevice:__init()
-  -- could pass a server ref or something else here, or simply do nothing
   print(" * * * * * OscJumper -  OscDevice:__init() * * * * * " )
 
   self.prefix = '/ng'
@@ -10,12 +9,10 @@ function OscDevice:__init()
   self.client = nil
   self.server = nil
 
-  -- preferences.nodes.node2.port.value seems to refer to the default port used by the Renoise OSC server
-  -- Is this her to allow this tool to pass messages to the Renoise server?
-  self.osc_client = OscClient("127.0.0.1", preferences.nodes.node2.port.value)
+  self.osc_client = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
 
   if (self.osc_client == nil ) then 
-    renoise.app():show_warning("Warning: OSC Jumper failed to start the internal OSC client")
+    renoise.app():show_warning("Warning: OscJumper failed to start the internal OSC client")
     self.osc_client = nil
   else
     print("We have self.osc_client = ", self.osc_client )
@@ -32,6 +29,17 @@ end
 function OscDevice:open()
   print("OscDevice:open()")
 end
+
+function OscDevice:map_args(osc_args)
+  local arg_vals = {}
+
+  for k,v in ipairs(osc_args) do
+    table.insert(arg_vals, v.value)
+  end
+ 
+  return arg_vals
+end
+
 
 
 function OscDevice:_msg_to_string(msg)
@@ -224,22 +232,19 @@ function OscDevice:socket_message(socket, binary_data)
         --
         if(self.handlers[pattern]) then
           print("Have a handler match on ", pattern)
-          print("Have msg.arguments[1][1] ", msg.arguments[1][1])
-
-          -- rPrint(msg.arguments, nil, "ARGS ");
-          
-          local res = pcall( self.handlers[pattern], msg.arguments[1].value, msg.arguments[2].value    )
+          -- Create a table of message values to pass as the single argument to all handlers
+          local vals = OscDevice:map_args(msg.arguments)
+          --   rPrint(vals , nil, "vals  ");
+          local res, err = pcall( self.handlers[pattern], vals )
           if res then
             print("Handler worked!");
               else
-            print("Handler  error!");
+            print("Handler  error: ", err);
           end
         else
           print(" * * * * *  No handler for  ", pattern, " * * * * ")
         end
 
-        --print("incoming OSC",os.clock(),value_str)
-        ----        self:receive_osc_message(value_str)
       end
 
     end
@@ -263,7 +268,6 @@ function OscClient:__init(osc_host,osc_port)
   -- the socket connection, nil if not established
   self._connection = nil
 
-  --print("*** about to connect to the internal osc_server",osc_host,osc_port,type(osc_host),type(osc_port))
   local client, socket_error = renoise.Socket.create_client(osc_host, osc_port, renoise.Socket.PROTOCOL_UDP)
   if (socket_error) then 
     renoise.app():show_warning("Warning: OscJumper failed to start the internal OSC client")
@@ -275,20 +279,8 @@ function OscClient:__init(osc_host,osc_port)
 
 end
 
-
 function OscClient:send(osc_msg)
   self._connection:send(osc_msg)
 end
 
 
--- How best to collect functions needed to act on renoise.song?
-function set_track_parameter(track_index, parameter_name, value)
-    -- sequencer + master + sends
-    local song = renoise.song
-    local num_tracks = song().sequencer_track_count + 1 + song().send_track_count
-
-    if (track_index >= 1 and track_index <= num_tracks) then
-      local parameter = song():track(track_index)[parameter_name]
-      parameter.value = clamp_value(value, parameter.value_min, parameter.value_max)
-    end
-  end
