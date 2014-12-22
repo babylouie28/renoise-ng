@@ -26,14 +26,14 @@ function create_osc_server()
     "OSC server. Error: '%s'"):format(socket_error))
     return
   else
-    print("OscJumper has created a osc_server on port ", configuration.osc_settings.internal.port.value )
+    print("OSC Jumper has created a osc_server on port ", configuration.osc_settings.internal.port.value )
     osc_server:run(osc_device)
   end
 
 end
 
 renoise.tool():add_menu_entry {
-  name = "--- Main Menu:Tools:Neurogami OscJumper:Start the OSC server ..",
+  name = "--- Main Menu:Tools:Neurogami OSC Jumper:Start the OSC server ..",
   invoke = create_osc_server
 }
 

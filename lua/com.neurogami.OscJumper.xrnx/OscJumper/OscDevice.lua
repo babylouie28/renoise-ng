@@ -2,7 +2,7 @@
 class 'OscDevice'
 
 function OscDevice:__init()
-  print(" * * * * * OscJumper -  OscDevice:__init() * * * * * " )
+  print(" * * * * * OSC Jumper -  OscDevice:__init() * * * * * " )
 
   self.prefix = '/ng'
 
@@ -12,7 +12,7 @@ function OscDevice:__init()
   self.osc_client = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
 
   if (self.osc_client == nil ) then 
-    renoise.app():show_warning("Warning: OscJumper failed to start the internal OSC client")
+    renoise.app():show_warning("Warning: OSC Jumper failed to start the internal OSC client")
     self.osc_client = nil
   else
     print("We have self.osc_client = ", self.osc_client )
@@ -263,18 +263,18 @@ class 'OscClient'
 
 function OscClient:__init(osc_host,osc_port)
 
-  print("OscJumper - OscClient:__init!")
+  print("OSC Jumper - OscClient:__init!")
 
   -- the socket connection, nil if not established
   self._connection = nil
 
   local client, socket_error = renoise.Socket.create_client(osc_host, osc_port, renoise.Socket.PROTOCOL_UDP)
   if (socket_error) then 
-    renoise.app():show_warning("Warning: OscJumper failed to start the internal OSC client")
+    renoise.app():show_warning("Warning: OSC Jumper failed to start the internal OSC client")
     self._connection = nil
   else
     self._connection = client
-    print("+ + +  OscJumper started the internal OscClient",osc_host,osc_port)
+    print("+ + +  OSC Jumper started the internal OscClient",osc_host,osc_port)
   end
 
 end

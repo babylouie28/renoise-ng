@@ -1,12 +1,12 @@
-# OscJumper 
+# OSC Jumper 
 
 ## Description
 
-OscJumper is an OSC-drive tool for jumping around patterns in a song.
+OSC Jumper is an OSC-drive tool for jumping around patterns in a song.
 
 You can learn about OSC (Open Sound Control) [here.](http://osc.justthebestparts.com)
 
-OscJumper understands the following OSC address patterns:
+OSC Jumper understands the following OSC address patterns:
 
 
     /ng/loop/schedule ii
@@ -16,7 +16,7 @@ and
     /ng//pattern/into ii
 
 
-If you have the [Rotate Pattern tool](http://www.renoise.com/tools/rotate-pattern) installed then OscJumper will also respond to
+If you have the [Rotate Pattern tool](http://www.renoise.com/tools/rotate-pattern) installed then OSC Jumper will also respond to
 
     /ng/rotate/track  ii
 
@@ -40,18 +40,18 @@ Rotation will be forward or backwards based on whether the lines number is posit
 
 ## Usage
 
-Once installed, the tool will add a new item to the Tools menu,  for "Neurogami OscJumper." This in turn provide two submenu items.  "Configuration" will show a small dialog box where you can set the IP address and port numbers for the tool and for the internal Renoise OSC server.
+Once installed, the tool will add a new item to the Tools menu,  for "Neurogami OSC Jumper." This in turn provide two submenu items.  "Configuration" will show a small dialog box where you can set the IP address and port numbers for the tool and for the internal Renoise OSC server.
 
-The Renoise OSC port match whatever Renoise is using (typically port 8000). The OscJumper port number needs to be another port number (e.g 8001).
+The Renoise OSC port match whatever Renoise is using (typically port 8000). The OSC Jumper port number needs to be another port number (e.g 8001).
 
-OscJumper needs to know the Renoise port number because OscJumper will pass through any OSC messages it does not know how to handle.  This allows you to send the default Renoise OSC message to the OscJumper OSC server.
+OSC Jumper needs to know the Renoise port number because OSC Jumper will pass through any OSC messages it does not know how to handle.  This allows you to send the default Renoise OSC message to the OSC Jumper OSC server.
 
-Once configured you use the other submenu item, "Start the OSC server" to start the OscJumper OSC server.  
+Once configured you use the other submenu item, "Start the OSC server" to start the OSC Jumper OSC server.  
 
 
 ## Author
 
-OscJumper was written by James Britt / Neurogami.
+OSC Jumper was written by James Britt / Neurogami.
 
 Source code can be found [here](https://github.com/Neurogami/renoise-ng/tree/master/lua/com.neurogami.OscJumper.xrnx).
 
