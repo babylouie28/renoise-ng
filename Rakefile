@@ -32,7 +32,29 @@ def zipit name, folder, input_filenames
       zipfile.add(filename, folder + '/' + filename)
     end
   end
+  copy_to_neurogami_dist zipfile_name
   sh "mv #{zipfile_name} ../dist/"
+end
+
+def ng_vhost
+
+    case  hostname 
+  when /james1/
+  %~/home/james/data/vhosts/2012.neurogami.com/~
+  else
+    raise "Undefined NG vhost for #{hostname}"
+  end
+
+
+end
+
+def hostname 
+  `hostname`.strip
+end
+
+def copy_to_neurogami_dist zipfile_name
+
+ sh  "cp #{zipfile_name} #{ng_vhost}/content/renoise-tools/ "
 end
 
 def files tool_folder, exlude_patterns = []
@@ -71,24 +93,6 @@ namespace :package do
 
     zipit name, folder, input_filenames
 
-
-    #zipfile_name = "../com.neurogami.OscJumper.xrnx"
-    #if File.exist? zipfile_name
-    #  sh "rm #{zipfile_name}"
-    #end
-
-
-    #Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
-    #  input_filenames.each do |filename|
-    #    # Two arguments:
-    #    # - The name of the file as it will appear in the archive
-    #    # - The original file, including the path to find it
-    #    zipfile.add(filename, folder + '/' + filename)
-    #  end
-
-    #  #  zipfile.get_output_stream("myFile") { |os| os.write "myFile contains just this" }
-    #end
-    #sh "mv #{zipfile_name} ../dist/"
   end
 
   desc "Package up MidiMapper"
