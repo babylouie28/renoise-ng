@@ -11,8 +11,8 @@
 -- Variables
 --------------------------------------------------------------------------------
 preferences = nil
-local pref_dialog = nil
-local view_pref_dialog = nil
+local template_dialog = nil
+local view_template_dialog = nil
   
 
 
@@ -67,10 +67,10 @@ end
 --------------------------------------------------------------------------------
 -- GUI Code
 --------------------------------------------------------------------------------
-function pref_dialog_keyhander(dialog, key)
+function template_dialog_keyhander(dialog, key)
   if key.name == "esc" then
     save_preferences()
-    pref_dialog:close()
+    template_dialog:close()
   else
     return key
   end
@@ -78,25 +78,13 @@ end
 
 
 
-function pref_dialog_init()
+function template_dialog_init()
   local vb = renoise.ViewBuilder()
-  
-  --
-  -- populate output devices table
-  --
-  local output_devices = {}
-  
-  output_devices = renoise.song().tracks[1].available_output_routings
-  table.remove(output_devices, 1) -- remove master routing
-  
-  -- Assign devices if only a single item is present
-  rprint(output_devices)
-  print('---')
   
   --
   -- UI
   --
-  view_pref_dialog = vb:column {
+  view_template_dialog = vb:column {
     spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
     margin = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN,
 
@@ -145,6 +133,7 @@ function pref_dialog_init()
 
     
     },
+    
     vb:horizontal_aligner {
       mode = "justify",    
       vb:button {
@@ -152,7 +141,7 @@ function pref_dialog_init()
         released = function()
           save_preferences()
           -- Do we need to do something with any running OSC servers?
-          pref_dialog:close()
+          template_dialog:close()
           renoise.app():show_status("OscJumper preferences saved.")
         end
       },
@@ -163,20 +152,19 @@ end
 
 
 
-function display_pref_dialog()
-  -- Show the preferences dialog
+function display_template_dialog()
  
   -- Remove any existing dialog
-  if pref_dialog then
-    pref_dialog = nil
+  if template_dialog then
+    template_dialog = nil
   end
   
   -- reload
   load_preferences()
 
   -- Create new dialog
-  pref_dialog_init()
-  pref_dialog = renoise.app():show_custom_dialog("New from template Preferences", view_pref_dialog, pref_dialog_keyhander)
+  template_dialog_init()
+  template_dialog = renoise.app():show_custom_dialog("New from template Preferences", view_template_dialog, template_dialog_keyhander)
 end
 
 
@@ -188,7 +176,7 @@ end
 -- Is this duplicating what happens in main.lua?
 renoise.tool():add_menu_entry {
   name = "Main Menu:Tools:Neurogami " .. NewFromTemplate.menu_prefix() .. ":Configuration...",
-  invoke = function() display_pref_dialog() end
+  invoke = function() display_template_dialog() end
 }
 
 

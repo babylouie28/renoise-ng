@@ -8,12 +8,14 @@ require 'NewFromTemplate/Core'
 require 'NewFromTemplate/Preferences'
 
 
-function intitialize_tool()
-  NewFromTemplate.get_file_list("/home/james/ownCloud/RenoiseSongs/")
+function create_new_song()
+ NewFromTemplate.prompt_user()
 end
 
 renoise.tool():add_menu_entry {
-  name = ("--- Main Menu:Tools:Neurogami " .. NewFromTemplate.menu_prefix() .. ":Intitialize .."),
-  invoke = intitialize_tool
+  name = ("--- Main Menu:Tools:Neurogami " .. NewFromTemplate.menu_prefix() .. ":Create new song"),
+  invoke = create_new_song
 }
+
+
 
