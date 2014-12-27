@@ -57,6 +57,7 @@ function U.file_put_contents(file_path, data)
     local ok=file_ref:write(data)
     io.flush(file_ref)
     io.close(file_ref)    
+    -- print("file_ref returned ", ok ) -- DEBUG
     return ok
   else
     return nil,err;
@@ -68,33 +69,34 @@ end
 function U.copy_file_to(source, target)      
   local error = nil
   local code = ERROR.OK
+  local ok = nil
+  local err = true
+
   if (not io.exists(source)) then    
     error = "The source file\n\n" .. source .. "\n\ndoes not exist"
     code = ERROR.FATAL
   end
-  -- if (not error and may_overwrite(target)) then
-  if (not error) then
+  if (not error and U.may_overwrite(target)) then
     local source_data = U.file_get_contents(source, true)    
-    local ok,err = U.file_put_contents(target, source_data)        
+    ok,err = U.file_put_contents(target, source_data)        
     error = err          
+    -- print("file_put_contents returned ok = ", ok )
   else 
     print("There was an error: ", error )
     code = ERROR.USER
   end
-  return not error, error, code
+  return ok, error, code
 end
 
 
 -- If file exists, popup a modal dialog asking permission to overwrite.
-local function may_overwrite(path)
+function U.may_overwrite(path)
   local overwrite = true
-  if (io.exists(path) and options.ConfirmOverwrite.value) then
-    local buttons = {"Overwrite", "Keep existing file" ,"Always Overwrite"}
+  if (io.exists(path) ) then
+    local buttons = {"Overwrite", "Keep existing file"}
     local choice = renoise.app():show_prompt("File exists", "The file\n\n " ..path .. " \n\n"
     .. "already exists. Overwrite existing file?", buttons)
-    if (choice==buttons[3]) then 
-      options.ConfirmOverwrite.value = false
-    end
+    
     overwrite = (choice~=buttons[2])
   end  
   return overwrite

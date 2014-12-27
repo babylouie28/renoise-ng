@@ -32,10 +32,9 @@ end
 -- https://github.com/davidm/lua-glob-pattern
 -- http://lua-users.org/wiki/DirTreeIterator
 function NewFromTemplate.get_file_list(folder_path) 
-  print("NewFromTemplate.get_file_list using ", folder_path )
-
+  -- print("NewFromTemplate.get_file_list using ", folder_path ) -- DEBUG
   local files = os.filenames(folder_path, default_extension )
-  rprint(files)
+  -- rprint(files) -- DEBUG
   return files
 end
 
@@ -50,11 +49,8 @@ end
 
 function NewFromTemplate.load_preferences()
     preferences = Prefs.load_preferences()
-    print("preferences  = ", preferences )
    template_folder = Prefs.templates_folder()
- print("template_folder  = ", template_folder )
    new_file_folder = Prefs.new_file_folder()
- print("new_file_folder  = ", new_file_folder )
 end
 
 -- Issue: This code needs the preferences data,
@@ -102,9 +98,9 @@ function NewFromTemplate.template_dialog_init()
         tooltip = "Template files",
         value = default_template_index,
 
-        -- Notifoer is only called if the user selects something on purpose.
+        -- Notifier is only called if the user selects something on purpose.
         notifier = function(idx)
-          print("Template file  ", template_files[idx] , " selected.")
+          -- print("Template file  ", template_files[idx] , " selected.") -- DEBUG
           selected_template = template_files[idx]
         end
       },
@@ -121,7 +117,7 @@ function NewFromTemplate.template_dialog_init()
         width = 390,
         notifier = function(v)
           new_file_name = v
-          print("* * new_file_name = ", new_file_name)
+          -- print("* * new_file_name = ", new_file_name) -- DEBUG
         end
 
       },
@@ -146,8 +142,8 @@ function NewFromTemplate.template_dialog_init()
 end
 
 function NewFromTemplate.generate_new_file(template_name, new_file_name) 
-  print("Create a new song by copying ", template_name, " to ", new_file_name, " (we hope)" )
-  print(" We have new_file_folder = ", new_file_folder )
+  print("Create a new song by copying ", template_name, " to ", new_file_name, " (we hope)" ) -- DEBUG
+  print(" We have new_file_folder = ", new_file_folder ) -- DEBUG
 
   new_file_name = Utils.trim(new_file_name)
   new_file_name = string.gsub(new_file_name, "\.xrns$", "")
@@ -156,15 +152,22 @@ function NewFromTemplate.generate_new_file(template_name, new_file_name)
   local from_file = template_folder .. path_slash .. template_name
   local to_file   = new_file_folder .. path_slash .. new_file_name
 
-  print("Copy '" .. from_file .. "' to '" .. to_file .. "'" )
+  print("Copy '" .. from_file .. "' to '" .. to_file .. "'" ) -- DEBUG
   local ok, err, code =  Utils.copy_file_to( from_file, to_file )
 
   if (err and code ~= ERROR.USER) then 
     renoise.app():show_error(err)  
     return
   end
-  renoise.app():show_message("Your new song has been created: \n\n" .. to_file)
-  renoise.app():load_song(to_file)
+  
+  print("copy_file_to OK  = ", ok) -- DEBUG
+
+  if (ok) then
+    renoise.app():show_message("Your new song has been created: \n\n" .. to_file)
+    renoise.app():load_song(to_file)
+  else
+    renoise.app():show_message("No new song was created.")
+  end
 end
 
 
