@@ -1,3 +1,4 @@
+local Utils = require 'NewFromTemplate/Utils'
 
 local P = {}
 
@@ -14,7 +15,7 @@ end
 
 function P.new_file_folder()
   P.load_preferences()
-  return  preferences.new_file_folder.value
+  return preferences.new_file_folder.value
 end
 
 function P.load_preferences()
@@ -26,15 +27,30 @@ function P.load_preferences()
   }
 
   preferences:load_from("config.xml")
+  P.clean_loaded_data()
   return preferences 
 end
 
+function P.clean_loaded_data()
+  if preferences ~= nil then
+    preferences.new_file_folder.value =  Utils.trim(preferences.new_file_folder.value)
+    preferences.templates_folder.value =  Utils.trim(preferences.templates_folder.value)
+    
+    preferences.new_file_folder.value =  string.gsub(preferences.new_file_folder.value, "\/$", "")
+    preferences.new_file_folder.value =  string.gsub(preferences.new_file_folder.value, "\\$", "")
+
+    preferences.templates_folder.value =  string.gsub(preferences.templates_folder.value, "\/$", "")
+    preferences.templates_folder.value =  string.gsub(preferences.templates_folder.value, "\\$", "")
+  end
+end
 
 function P.save_preferences()
   -- FIXME
   -- Nee to do some cleaning. Make sure strings are trimmed and
   -- remove trailing slashes
   if preferences ~= nil then
+    P.clean_loaded_data()
+
     preferences:save_as("config.xml")
   else
   end

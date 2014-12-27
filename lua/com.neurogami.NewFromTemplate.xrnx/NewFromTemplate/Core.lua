@@ -15,6 +15,14 @@ local new_file_folder = "" --  preferences.templates_folder.new_file_folder.valu
 
 local new_file_name = ""
 
+local path_slash = "/"
+
+if (os.platform() == "WINDOWS") then
+  path_slash = "\\"
+end
+
+
+
 -- TODO: THink about how ot better partition the code.
 -- OTOH, there's not much happeneing other than prompting for a temaplte and new file name,
 -- but perhaps the file-copying code could be placed into another module or file of some kind.
@@ -141,8 +149,12 @@ function NewFromTemplate.generate_new_file(template_name, new_file_name)
   print("Create a new song by copying ", template_name, " to ", new_file_name, " (we hope)" )
   print(" We have new_file_folder = ", new_file_folder )
 
-  local from_file = template_folder .. "/" .. template_name
-  local to_file   = new_file_folder .. "/" .. new_file_name
+  new_file_name = Utils.trim(new_file_name)
+  new_file_name = string.gsub(new_file_name, "\.xrns$", "")
+  new_file_name  = (new_file_name .. ".xrns")
+  
+  local from_file = template_folder .. path_slash .. template_name
+  local to_file   = new_file_folder .. path_slash .. new_file_name
 
   print("Copy '" .. from_file .. "' to '" .. to_file .. "'" )
   local ok, err, code =  Utils.copy_file_to( from_file, to_file )
@@ -151,7 +163,8 @@ function NewFromTemplate.generate_new_file(template_name, new_file_name)
     renoise.app():show_error(err)  
     return
   end
-  renoise.app():show_message("Your new Tool has been created: \n\n" .. to_file)
+  renoise.app():show_message("Your new song has been created: \n\n" .. to_file)
+  renoise.app():load_song(to_file)
 end
 
 

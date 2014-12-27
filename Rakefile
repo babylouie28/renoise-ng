@@ -5,14 +5,17 @@ require 'zip/zipfilesystem'
 require 'find'
 
 Dir.glob("tasks/*.rake") do |t|
-load t
+  load t
 end
+
+
 
 desc "Copy over ./lua/GlobalOscActions.lua"
 task :global do
   warn "This is hardcoded for Ubuntu"
   warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V2.8.2/Scripts/`
   warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V3.0.0/Scripts/`
+  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V3.0.1/Scripts/`
   warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V2.8.2/Scripts/`
   #  warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V3.0.0/Scripts/`
 
@@ -38,7 +41,7 @@ end
 
 def ng_vhost
 
-    case  hostname 
+  case  hostname 
   when /james1/
   %~/home/james/data/vhosts/2012.neurogami.com/~
   else
@@ -53,8 +56,7 @@ def hostname
 end
 
 def copy_to_neurogami_dist zipfile_name
-
- sh  "cp #{zipfile_name} #{ng_vhost}/content/renoise-tools/ "
+  sh  "cp #{zipfile_name} #{ng_vhost}/content/renoise-tools/ "
 end
 
 def files tool_folder, exlude_patterns = []
@@ -68,6 +70,13 @@ def files tool_folder, exlude_patterns = []
       end
     end
   end
+  
+  exlude_patterns.each do |re|
+     _.reject!{ |f|
+       f =~ re
+    }
+  end
+
   warn _.inspect
   _
 end
@@ -88,12 +97,19 @@ namespace :package do
     cd 'lua'
     name = 'OscJumper'
     folder = "com.neurogami.#{name}.xrnx"
-    #    input_filenames = %w{ main.lua manifest.xml OscJumper/Handlers.lua  OscJumper/Notifier.lua OscJumper/Preferences.lua   OscJumper/Utils.lua }
     input_filenames = files folder 
-
     zipit name, folder, input_filenames
-
   end
+
+  desc "Package up NewFromTemplate"
+  task :new_from_template do
+    cd 'lua'
+    name = 'NewFromTemplate'
+    folder = "com.neurogami.#{name}.xrnx"
+    input_filenames = files folder, [ /config.xml/ ] 
+    zipit name, folder, input_filenames
+  end
+
 
   desc "Package up MidiMapper"
   task :midimapper do

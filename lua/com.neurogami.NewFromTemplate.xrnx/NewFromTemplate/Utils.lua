@@ -25,7 +25,9 @@ function U.rPrint(s, l, i) -- recursive Print (structure, limit, indent)
   return l
 end	
 
-
+function U.trim(s)
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
 
 -- Taken from the CreateTool tool.
 -- Why does Renoise Lua not have os.copyfile?
