@@ -1451,7 +1451,7 @@ end
     arguments = { argument("track_index", "number"), 
     argument("instrument_index", "number") },
 
-
+    -- Does it matter what track is used if you are specifiying the instrument?
     handler = function(track_index, instrument_index)
       local bpm_int = renoise.song().transport.bpm  
       local bpm_string =  tostring(bpm_int)

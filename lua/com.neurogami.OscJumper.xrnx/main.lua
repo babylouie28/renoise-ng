@@ -22,7 +22,7 @@ function create_osc_server()
   renoise.Socket.PROTOCOL_UDP)
 
   if (server_socket_error) then 
-    renoise.app():show_warning(("Failed to start the " .. 
+    renoise.app():show_warning(("Oh noes! Failed to start the " .. 
     "OSC server. Error: '%s'"):format(socket_error))
     return
   else
@@ -34,6 +34,10 @@ end
 
 renoise.tool():add_menu_entry {
   name = "--- Main Menu:Tools:Neurogami OSC Jumper:Start the OSC server ..",
+  -- FIXME This starts tge server no matter if a ser is actually using the tool
+  -- Better to tie this to the starting of the OJ server.
+  --  Worse, if the config is wonky then the user gets an error message when installing the tool 
+  --  and every time the tool is loaded into the menu.
   invoke = create_osc_server
 }
 

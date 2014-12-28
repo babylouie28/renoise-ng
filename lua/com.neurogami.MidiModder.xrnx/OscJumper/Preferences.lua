@@ -1,37 +1,13 @@
---------------------------------------------------------------------------------
--- Cells!
---
--- Copyright 2012 Martin Bealby
---
--- Preferences Code
---------------------------------------------------------------------------------
-
-
---------------------------------------------------------------------------------
--- Constants
---------------------------------------------------------------------------------
--- RENDER_SAMPLE_RATES = {"22050", "44100", "48000", "88200", "96000"}
--- RENDER_BIT_DEPTHS   = {"16", "24", "32"}
--- RENDER_PRIORITY     = {"low", "realtime", "high"}
-
-
-
---------------------------------------------------------------------------------
--- Variables
---------------------------------------------------------------------------------
 preferences = nil
 local pref_dialog = nil
 local view_pref_dialog = nil
   
 
 
---------------------------------------------------------------------------------
--- Functions
---------------------------------------------------------------------------------
 function load_preferences()
   -- initialise default and overwrite with settings from the config file
 
-  preferences = renoise.Document.create("OscJumperParameters") {
+  preferences = renoise.Document.create("MidiModderConfiguration") {
 
     nodes = {                       -- network node connections
       node1 = {

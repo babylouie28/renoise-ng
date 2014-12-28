@@ -3,9 +3,9 @@ com.neurogami.MidiModder.xrnx/main.lua
 ============================================================================]]--
 
 
-require 'OscJumper/Utils'
-require 'OscJumper/Notifier'
-require 'OscJumper/Preferences'
+require 'MidiModder/Utils'
+require 'MidiModder/Notifier'
+require 'MidiModder/Preferences'
 
 
 
@@ -51,7 +51,7 @@ renoise.tool():add_menu_entry {
   invoke = createOSCServer
 }
 
-require 'OscJumper/Handlers'
+require 'MidiModder/Handlers'
 
 load_handlers(osc_device)
 
