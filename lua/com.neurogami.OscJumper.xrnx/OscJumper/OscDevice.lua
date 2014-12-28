@@ -1,6 +1,8 @@
 -- OscDevices.lua
 class 'OscDevice'
 
+-- TODO See where this is getting called when the tool is loaded.
+-- It needs to only run when the user starts the tool, not on load.
 function OscDevice:__init()
   print(" * * * * * OSC Jumper -  OscDevice:__init() * * * * * " )
 
@@ -14,8 +16,8 @@ function OscDevice:__init()
   if (self.osc_client == nil ) then 
     renoise.app():show_warning("OscDevice Warning: OSC Jumper failed to start the internal OSC client")
     self.osc_client = nil
-  else
-    print("We have self.osc_client = ", self.osc_client )
+--  else
+--    print("We have self.osc_client = ", self.osc_client )
   end
 
   self.message_queue = nil
@@ -44,14 +46,11 @@ end
 
 function OscDevice:_msg_to_string(msg)
   print("OscDevice:_msg_to_string()",msg)
-
   local rslt = msg.pattern
   for k,v in ipairs(msg.arguments) do
     rslt = ("%s %s"):format(rslt, tostring(v.value))
   end
-
   return rslt
-
 end
 
 

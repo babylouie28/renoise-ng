@@ -3,11 +3,11 @@
   <ApiVersion>3</ApiVersion>
   <AutoUpgraded>true</AutoUpgraded>
   <Id>com.neurogami.OscJumper</Id>
-  <Version>1.0</Version>
+  <Version>1.2</Version>
   <Author>Neurogami | james@neurogami.com  </Author>
   <Name>Neurogami OSC Jumper</Name>
   <Category>OSC</Category>
-  <Description>Listend for OSC messages to jump around among patterns and loops</Description>
+  <Description>Listens for OSC messages to jump around among patterns and loops</Description>
   <Homepage>http://neurogami.com</Homepage>
 </RenoiseScriptingTool>
 

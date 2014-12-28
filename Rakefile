@@ -8,15 +8,17 @@ Dir.glob("tasks/*.rake") do |t|
   load t
 end
 
+V2 = '2.8.2'
+V3 = '3.0.1'
 
 
 desc "Copy over ./lua/GlobalOscActions.lua"
 task :global do
   warn "This is hardcoded for Ubuntu"
-  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V2.8.2/Scripts/`
-  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V3.0.0/Scripts/`
-  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V3.0.1/Scripts/`
-  warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V2.8.2/Scripts/`
+  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V#{V2}/Scripts/`
+  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V#{V3}/Scripts/`
+  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V#{V3}/Scripts/`
+  warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V#{V2}/Scripts/`
   #  warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V3.0.0/Scripts/`
 
 end
