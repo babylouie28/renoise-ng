@@ -1,4 +1,7 @@
 // This is the real one
+// This is supposed to send OSC messages that the server should in turn use to trigger
+// keyboard events so as to manipulate Adobe Illustrator
+
 Control.ui = { blockSize: 0.085, 
   sliderY: 0.72, 
   xstart    : 0.05,

@@ -1,15 +1,11 @@
 --[[======================================================
-com.neurogami.OscJumper.xrnx/main.lua
+com.neurogami.BeatMasher.xrnx/main.lua
 =======================================================]]--
 
-require 'OscJumper/Utils'
-require 'OscJumper/Rotator'
-
-attempt_rotate_setup()
-
-require 'OscJumper/Core'
-require 'OscJumper/OscDevice'
-require 'OscJumper/Configuration'
+require 'BeatMasher/Utils'
+require 'BeatMasher/Core'
+require 'BeatMasher/OscDevice'
+require 'BeatMasher/Configuration'
 
 local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
@@ -28,16 +24,16 @@ function create_osc_server()
     "OSC server. Error: '%s'"):format(server_socket_error))
     return
   else
-    print("OSC Jumper has created a osc_server on port ", configuration.osc_settings.internal.port.value )
+    print("Beat Masher has created a osc_server on port ", configuration.osc_settings.internal.port.value )
     osc_server:run(osc_device)
   end
 
 end
 
+
 renoise.tool():add_menu_entry {
-  name = "--- Main Menu:Tools:Neurogami OSC Jumper:Start the OSC server ..",
+  name = "--- Main Menu:Tools:Neurogami BeatMasher:Start the OSC server ..",
   invoke = create_osc_server
 }
 
-require 'OscJumper/Handlers'
-
+require 'BeatMasher/Handlers'

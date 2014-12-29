@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BeatMasherParameters doc_version="0">
+  <osc_settings>
+    <renoise>
+      <port>8000</port>
+      <protocol>2</protocol>
+      <ip>0.0.0.0</ip>
+    </renoise>
+    <internal>
+      <port>8002</port>
+      <protocol>2</protocol>
+      <ip>0.0.0.0</ip>
+    </internal>
+  </osc_settings>
+</BeatMasherParameters>
