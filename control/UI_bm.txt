@@ -1,0 +1,72 @@
+The "Play" screen (default)
+
+[bpm!]  [(!)]  [ * ]  [ < ]  [ [] ]
+
+Speaks BPM
+        start/stop song
+                Toggle edit mode
+                        Undo last change
+                              ??? Seems to have no OSC associated
+
+[_____________________________________]
+          Slider to set the BPM
+
+ [ C ]  [ D ]  [ E ]  [ F ]  [ G ]
+    Triggers a note of this value. 
+    Instrument depends on selected track
+-------------------------------------
+|     |     |     |     |     |     |
+|     |     |     |     |     |     |
+|     |     |     |     |     |     |
+|     |     |     |     |     |     |
+|     |     |     |     |     |     |
+|     |     |     |     |     |     |
+|     |     |     |     |     |     |
+------------------------------------
+
+       Track volume sliders (5 of them)
+
+
+[ @ ] [ @ ] [ @ ] [ @ ] [ @ ]
+These should select a track.  How does this effect
+what instrument is sounded from the above note buttons?
+
+It should be sending /renoise/trigger/note_on currentTrack, currentInstrument , note, 125
+What sets currentInstrument? Seems to be derived from current track, so it assumes tracks == intrument
+(more or less).  E.g. track 1 will always be using intrument 0, track 2 uses intrument 1, etc.
+
+
+[Refresh ][Menu][Play][Edit][Load]
+
+Refreshes the GUI by fetching it again from its source Web server
+          Shows the Control menu
+                Loads the first screen
+                        Loads the edit screen
+                            Loads the "load" screen
+
+
+The 'Edit" screen
+
+[reset]    Resets the song to initial state
+
+[!!!] [!!!] [!!!] [!!!] [!!!]
+  Clears the selected track
+ -----------------------------
+|    |    |    |    |    |    |
+|    |    |    |    |    |    |
+|    |    |    |    |    |    |
+|    |    |    |    |    |    |
+|    |    |    |    |    |    |
+|    |    |    |    |    |    |
+|    |    |    |    |    |    |
+ -----------------------------
+
+ Track output delay sliders (5 of them)
+
+[   ] [   ] [   ] [   ] [   ]
+
+  Track delay reset buttons.
+
+
+
+

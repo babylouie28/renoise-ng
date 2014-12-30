@@ -21,24 +21,20 @@ function BeatMasher.song_track_clear(track_number)
   if (track_index >= 1 and track_index <= #tracks) then
     renoise.song().patterns[1].tracks[track_index]:clear()
   end
-
 end
 
 
 function BeatMasher.song_save_version()
   print("song_save_version is not ready") -- FIXME
-
 end
 
 
 function BeatMasher.pattern_rotate(track_num, num_lines)
   print("pattern_rotate(track_num, num_lines) is not ready") -- FIXME
-
 end
 
 function BeatMasher.song_load_by_id(id_number)
   print("song_load_by_id(id_number) is not ready") -- FIXME
-
 end
 
 
