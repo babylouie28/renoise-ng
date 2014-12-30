@@ -1,12 +1,16 @@
 # Beat Masher
 
-Designed to handle special OSC messages sent by a [Control]() application.
+Designed to handle special OSC messages sent by a [Control](http://charlie-roberts.com/Control/) application.
 
 You should load up  asonf that has assorted percussion instruments for tracks one through five.
 
-Instrument 16 (10 in hex) should be assigned the ["numbers" instrument]().
+Instrument 16 (10 in hex) should be assigned the ["numbers" instrument](https://github.com/Neurogami/renoise-ng/tree/master/intruments).
 
 The Control program is meant to manipulate the song to help generate different kinds of backing beats for use when jamming.
+
+** VERY MUCH IN ALPHA. **
+
+
 
 
 # Usage
