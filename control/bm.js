@@ -221,10 +221,12 @@ trackSelectControl : function(idx, x, y){
                            "requiresTouchDown": false,
                            "min": 0,
                            "max": 1,
-                           "ontouchstart": "if (this.value != this.min)  { Control.selectTrack("+idx+"); oscManager.sendOSC( [ '/ng/song/track/" + idx + "/select']) } else {Control.unselectTracks();  oscManager.sendOSC( [ '/ng/song/track/0/select'] ) }",
+                           "ontouchstart": "if (this.value != this.min)  { Control.selectTrack("+idx+"); " + 
+                              "oscManager.sendOSC( [ '/ng/track/select', 'i', " + idx + "]) } else {Control.unselectTracks(); " + 
+                              " oscManager.sendOSC( [ '/ng/track/select', 'i', -1] ) }",
                            });
                        // Note: It seems that all events send OSC messages.  For this one it sends /trackSelect<idx>. 
-                       // It gets ignored by Renoise.
+                       // It gets ignored by Renoise.  The message we WANT to send does not appear in Renoise.
                      },
 
 commonControls : function(pageName) { 

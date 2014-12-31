@@ -15,6 +15,12 @@ function BeatMasher.song_undo()
 end
 
 
+function BeatMasher.track_select(track_number)
+  print("track_select(", track_number, ") ") 
+  renoise.song().selected_track_index = track_number
+end
+
+
 function BeatMasher.song_track_clear(track_number)
   print("song_track_clear(", track_number, ") ") 
   local tracks = renoise.song().tracks
@@ -26,11 +32,6 @@ end
 
 function BeatMasher.song_save_version()
   print("song_save_version is not ready") -- FIXME
-end
-
-
-function BeatMasher.pattern_rotate(track_num, num_lines)
-  print("pattern_rotate(track_num, num_lines) is not ready") -- FIXME
 end
 
 function BeatMasher.song_load_by_id(id_number)
@@ -53,9 +54,7 @@ function BeatMasher.speak_bpm(client_renoise, track_index, instrument_index)
     print(tostring(track_index))
     print( ("Try to speak %s" ):format(bpm_string))
 
-
     -- /renoise_response/transport/bpm
-
 
     if  bpm_int < 100  then 
       print( ("Under 100: Split up  %s" ):format(bpm_string) )

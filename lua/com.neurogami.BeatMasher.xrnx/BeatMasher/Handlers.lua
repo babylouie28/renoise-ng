@@ -21,7 +21,12 @@ handlers = {
     end 
   },
 
-
+{
+    pattern = "/track/select",
+    handler = function(track_number)
+      BeatMasher.track_select(track_number)
+    end 
+  },
   {
     pattern = "/song/track/clear",
     handler = function(track_number)
@@ -37,15 +42,6 @@ handlers = {
       BeatMasher.song_save_version()
     end 
   },
-
-
-  {
-    pattern = "/pattern/rotate ",
-    handler = function(track_num, num_lines)
-      BeatMasher.pattern_rotate(track_num, num_lines)
-    end 
-  },
-
 
   {
     pattern = "/song/load_by_id",

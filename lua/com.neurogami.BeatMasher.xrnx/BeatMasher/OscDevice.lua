@@ -253,7 +253,7 @@ function OscDevice:socket_message(socket, binary_data)
         if (not have_pref) then 
           print(" * * * * *  Proxy on  ", pattern, " , with pattern = ", pattern, " * * * * ")
           if (have_rns_pref)then
-            print(" # # # renoise OSC: ", msg, " # # # ")
+            print(" # # # renoise OSC: ", value_str, " # # # ")
             self.osc_client:send(msg)
           end
           return 
