@@ -37,9 +37,96 @@ function BeatMasher.song_load_by_id(id_number)
   print("song_load_by_id(id_number) is not ready") -- FIXME
 end
 
+-- 
+function BeatMasher.speak_bpm(client_renoise, track_index, instrument_index)
+  print("speak_bpm") -- FIXME
 
-function BeatMasher.speak_bpm()
-  print("speak_bpm is not ready") -- FIXME
+    local OscMessage = renoise.Osc.Message
+    local OscBundle = renoise.Osc.Bundle
+
+    local bpm_int = renoise.song().transport.bpm  
+    local bpm_string =  tostring(bpm_int)
+    --                   0    1    2   3    4    5   6   7   8   9 
+    local midi_notes = { 48, 49,  50,  51,  52,  53, 54, 55, 56, 57}
+    local d1, d2, d3
+    print("triggered BPM query ")
+    print(tostring(track_index))
+    print( ("Try to speak %s" ):format(bpm_string))
+
+
+    -- /renoise_response/transport/bpm
+
+
+    if  bpm_int < 100  then 
+      print( ("Under 100: Split up  %s" ):format(bpm_string) )
+      d1,d2 = bpm_string:match('(%d)(%d)')
+      print( ("Speak %s %s, track %d, intr %s "):format(d1, d2, track_index, instrument_index) )
+      
+      
+      client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} 
+      }))        
+      sleep(1)
+      client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  
+      } )  )
+
+
+      client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} 
+      }))
+      sleep(1)
+      client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  
+      }))
+
+    else
+      print( ("100 or greater: Split up  %s" ):format(bpm_string) )
+      d1,d2,d3 = bpm_string:match('(%d)(%d)(%d)')
+      print( ("Speak %s %s %s"):format(d1, d2, d3) )
+
+      client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} }))        
+        sleep(1)
+        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]} 
+        } )  )
+
+
+        client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} 
+        }))
+        sleep(1)
+        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]} 
+        }))
+
+
+        client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}, {tag="i", value=125}
+        }))
+        sleep(1)
+        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}  
+        }))
+
+      end
+
+--[[
+
+TODO: Some of these handlers should be sending a reply
+back to the client to provide status messages.
+
+      print("Send info OSC message")
+      client:send(
+      OscMessage("/info", { 
+        {tag="s", value=tostring(renoise.song().transport.bpm)} 
+      })
+      )
+      print("OSC message sent")
+  
+]]--
+
 end
 
 

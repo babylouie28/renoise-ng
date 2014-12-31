@@ -3,20 +3,31 @@ com.neurogami.BeatMasher.xrnx/main.lua
 =======================================================]]--
 
 require 'BeatMasher/Utils'
+require 'BeatMasher/Rotator'
+
+attempt_rotate_setup()
+
+
 require 'BeatMasher/Core'
 require 'BeatMasher/OscDevice'
 require 'BeatMasher/Configuration'
 
 local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
-local osc_device = nil;  
+local osc_device = nil
+
+RENOISE_OSC = nil
 
 function create_osc_server()
   osc_server, server_socket_error = renoise.Socket.create_server(
   configuration.osc_settings.internal.ip.value, 
   configuration.osc_settings.internal.port.value, 
   renoise.Socket.PROTOCOL_UDP)
+  
   osc_device = OscDevice()
+
+  RENOISE_OSC = osc_device:renoise_osc()
+
   load_handlers(osc_device)
 
   if (server_socket_error) then 

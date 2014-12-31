@@ -21,4 +21,11 @@ function clamp_value(value, min_value, max_value)
 	end
 	return l
 end	
- 
+
+-- http://lua-users.org/wiki/SleepFunction
+local clock = os.clock
+function sleep(n)  -- seconds
+  local t0 = clock()
+  while clock() - t0 <= n do end
+end
+

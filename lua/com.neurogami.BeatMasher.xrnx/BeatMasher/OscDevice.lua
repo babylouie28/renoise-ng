@@ -22,9 +22,12 @@ function OscDevice:__init()
   self.bundle_messages = false
   self.handlers = table.create{}
   self:open()
+  print("Finished creating OscDevice instance")
 end
 
-
+function OscDevice:renoise_osc()
+  return self.osc_client
+end
 
 function OscDevice:open()
   print("OscDevice:open()")
@@ -177,7 +180,37 @@ function OscDevice:_msg_to_string(msg)
 
 end
 
+--[[
 
+The problem: 
+
+Some handlers will want to send back OSC messages, either to Renoise or
+to some calling client, or maybe yet some other OSC server.
+
+Right now the code is such that address patterns are used as keys to functions.
+
+The functions are assumed to take only the args passed in the OSC message.
+
+In many cases this is fine.  However, if a handler wants to do some
+of its own OSC stuff it will need reference to some OSC device.
+
+Rather than have each handler create devices as needed it seems better
+to have them all instantiated once and then referenced as needed.
+
+Possible solutions:
+
+- Every hander takes an extra argument, a reference to to dispatching OSC device, and
+can in turn ask this object for any other OSC devices as needed.
+
+- Handlers are stored as addr_patt => {func, [osc_device1, osc_device2, ...]
+or something.  Then ... what? What was the idea for this?
+
+- Make all OSC server refs global.
+
+Why is there a problem called osc_device:renoise_osc(), but no trouble
+calling osc_device:add_message_handler in the Handler file?
+
+]]--
 function OscDevice:add_message_handler(pattern, func)
   --if (self.handlers) then
   self.handlers[pattern] = func
@@ -241,7 +274,7 @@ function OscDevice:socket_message(socket, binary_data)
           if res then
             print("Handler worked!");
               else
-            print("Handler  error: ", err);
+            print("Handler error: ", err);
           end
         else
           print(" * * * * *  No handler for  ", pattern, " * * * * ")
