@@ -66,9 +66,16 @@ The ones shown here are what the Control app will send.
 
 James Britt / Neurogami - james@neurogami.com
 
-# Licence
+## Licence
 
 MIT License.
+
+
+Feed your head
+
+Hack your world
+
+Live curious
 
 
 

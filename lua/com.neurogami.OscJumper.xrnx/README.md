@@ -57,4 +57,15 @@ Source code can be found [here](https://github.com/Neurogami/renoise-ng/tree/mas
 
 Send questions and comments to james@neurogami.com
 
+## Licence
+
+MIT License.
+
+
+Feed your head
+
+Hack your world
+
+Live curious
+
 

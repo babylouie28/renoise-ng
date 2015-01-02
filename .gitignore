@@ -1,3 +1,5 @@
 .rvmrc
+._
+haz_var.txt
 update-local-installs.rb
 lua/com.neurogami.NewFromTemplate.xrnx/config.xml
