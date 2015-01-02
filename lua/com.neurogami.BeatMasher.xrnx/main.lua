@@ -32,7 +32,7 @@ function create_osc_server()
 
   if (server_socket_error) then 
     renoise.app():show_warning(("Oh noes! Failed to start the " .. 
-    "OSC server. Error: '%s'"):format(server_socket_error))
+    "BeatMasher OSC server. Error: '%s'"):format(server_socket_error))
     return
   else
     print("Beat Masher has created a osc_server on port ", configuration.osc_settings.internal.port.value )
