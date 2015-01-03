@@ -40,6 +40,7 @@ function create_osc_server()
     osc_server:run(osc_device)
   end
 
+  OscJumper.start_status_poller()
 end
 
 
@@ -49,4 +50,5 @@ renoise.tool():add_menu_entry {
 }
 
 require 'OscJumper/Handlers'
+
 
