@@ -22,6 +22,15 @@ function load_osc_config()
         port = 8000,
         protocol = 2,               
       },
+
+      --- This should match what is used by Renoise 
+      --  so the tool can pass along messages using 
+      --  its own OSC client
+      controller = {     
+        ip = "0.0.0.0",
+        port = 8010,
+        protocol = 2,               
+      },
     },
   }
 

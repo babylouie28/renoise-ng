@@ -11,19 +11,36 @@ function OscDevice:__init()
   self.client = nil
   self.server = nil
 
-  self.osc_client = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
+  self.osc_renoise_client    = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
+  self.osc_controller_client = OscClient(configuration.osc_settings.controller.ip.value, configuration.osc_settings.controller.port.value)
 
-  if (self.osc_client == nil ) then 
+  if (self.osc_renoise_client == nil ) then 
     renoise.app():show_warning("OscDevice Warning: OSC Jumper failed to start the internal OSC client")
-    self.osc_client = nil
---  else
---    print("We have self.osc_client = ", self.osc_client )
+  --  self.osc_renoise_client = nil -- Why?
   end
+
+  if (self.osc_controller_client == nil ) then 
+    renoise.app():show_warning("OscDevice Warning: OSC Jumper failed to start the controller OSC client")
+--    self.osc_controller_client = nil
+  else
+    print("We have self.osc_controller_client = ", self.osc_controller_client )
+  end
+
 
   self.message_queue = nil
   self.bundle_messages = false
   self.handlers = table.create{}
   self:open()
+end
+
+
+function OscDevice:renoise_osc()
+  return self.osc_renoise_client
+end
+
+
+function OscDevice:controller_osc()
+  return self.osc_controller_client
 end
 
 
@@ -41,8 +58,6 @@ function OscDevice:map_args(osc_args)
  
   return arg_vals
 end
-
-
 
 function OscDevice:_msg_to_string(msg)
   print("OscDevice:_msg_to_string()",msg)
@@ -215,7 +230,7 @@ function OscDevice:socket_message(socket, binary_data)
         local prefix_str = string.sub(value_str,0,string.len(self.prefix))
         if (prefix_str~=self.prefix) then 
           print(" * * * * *  Proxy on  ", pattern, " * * * * ")
-          self.osc_client:send(msg)
+          self.osc_renoise_client:send(msg)
           return 
         end
         -- strip the prefix before continuing
