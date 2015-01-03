@@ -20,10 +20,17 @@ handlers = {
   -- block loop for that pattern.
   pattern = "/pattern/into",
   handler = function(pattern_index,  stick_to )
---    local pattern_index,  stick_to  = unpack(args)
     OscJumper.pattern_into(pattern_index, stick_to)
   end 
-} 
+} ,
+
+{
+pattern = "/sequence_pos",
+  handler = function()
+    OscJumper.sequence_pos()
+  end
+
+}
 
 } -- end of handlers 
 

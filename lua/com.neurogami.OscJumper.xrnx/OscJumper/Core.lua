@@ -41,3 +41,13 @@ function  OscJumper.pattern_into(pattern_index, stick_to)
     renoise.song().transport.loop_range = {pos_start, pos_end}
   end
 end
+
+function OscJumper.sequence_pos()
+
+  --  local lines_passed = 0 --global buffer!
+  --    local song = renoise.song()
+  --   local edit_pos = song.transport.edit_pos
+  --  local patterns = song.patterns
+  local sequence_pos = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
+  print("OscJumper.sequence_pos: ", sequence_pos)
+end
