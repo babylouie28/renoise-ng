@@ -125,6 +125,41 @@ function init_osc_config_dialog()
       },
     
     },
+
+   vb:horizontal_aligner {
+      mode = "justify",
+      vb:text {
+        text = "Controller:                 ",
+        tooltip = "Controller OSC server settings",
+      },
+      vb:textfield {
+        text = configuration.osc_settings.controller.ip.value,
+        tooltip = "Controller OSC server IP",
+        notifier = function(v)
+          configuration.osc_settings.controller.ip.value = v
+        end
+      },
+
+      vb:valuebox {
+        min = 4000,
+        max = 65535,
+        value = configuration.osc_settings.controller.port.value,
+        tooltip = "Controller OSC server port",
+        notifier = function(v)
+          configuration.osc_settings.controller.port.value = v
+        end
+      },
+      vb:popup {
+        items = {"TCP", "UDP"},
+        value = configuration.osc_settings.controller.protocol.value,
+        tooltip = "Controller OSC server protocol",
+        notifier = function(v)
+          configuration.osc_settings.controller.protocol.value = v
+        end
+      },
+    
+    },
+
     vb:horizontal_aligner {
       mode = "justify",    
       vb:button {
