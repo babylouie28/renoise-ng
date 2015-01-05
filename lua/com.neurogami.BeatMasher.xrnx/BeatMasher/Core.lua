@@ -38,15 +38,28 @@ function BeatMasher.song_load_by_id(id_number)
   print("song_load_by_id(id_number) is not ready") -- FIXME
 end
 
+function BeatMasher.trigger_note(client_renoise, instrument, track, note,  velocity)
+      local OscMessage = renoise.Osc.Message
+      client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+        {tag="i", value=track}, {tag="i", value=instrument}, {tag="i", value=note}, {tag="i", value=velocity} 
+      }))        
+      sleep(1.5) 
+      client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+       {tag="i", value=track}, {tag="i", value=instrument}, {tag="i", value=note} 
+      } )  )
+
+end
+
+
 -- 
 function BeatMasher.speak_bpm(client_renoise, track_index, instrument_index)
   print("speak_bpm") -- FIXME
 
     local OscMessage = renoise.Osc.Message
-    local OscBundle = renoise.Osc.Bundle
+    local OscBundle  = renoise.Osc.Bundle
+    local bpm_int    = renoise.song().transport.bpm  
+    local bpm_string = tostring(bpm_int)
 
-    local bpm_int = renoise.song().transport.bpm  
-    local bpm_string =  tostring(bpm_int)
     --                   0    1    2   3    4    5   6   7   8   9 
     local midi_notes = { 48, 49,  50,  51,  52,  53, 54, 55, 56, 57}
     local d1, d2, d3
@@ -63,11 +76,11 @@ function BeatMasher.speak_bpm(client_renoise, track_index, instrument_index)
       
       
       client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} 
+        {tag="i", value=instrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} 
       }))        
       sleep(1)
       client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  
+        {tag="i", value=intrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  
       } )  )
 
 

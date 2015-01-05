@@ -50,6 +50,13 @@ handlers = {
     end 
   },
 
+    {
+    pattern = "/trigger/note",
+    handler = function(instrument, track, note,  velocity)
+      BeatMasher.trigger_note(RENOISE_OSC, instrument, track, note,  velocity)
+    end 
+  },
+
   {
     pattern = "/speak/bpm",
     handler = function()

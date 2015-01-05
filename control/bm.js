@@ -67,8 +67,10 @@ keyboardButton : function(idx, x, y) { return( {
                      "backgroundColor": "#F0F",
                      "stroke": "#333",
                      "mode":"momentary",
-                     "ontouchstart": "oscManager.sendOSC( [ '/renoise/trigger/note_on',  'iiii', Control.renoise.currentTrack, Control.renoise.currentInstrument, " + Control.renoise.midiNotes[idx] + ", 125])",
-                     "ontouchend":   "oscManager.sendOSC( [ '/renoise/trigger/note_off', 'iii',  Control.renoise.currentTrack, Control.renoise.currentInstrument " + Control.renoise.midiNotes[idx] + " ] )",
+                      "ontouchstart": "oscManager.sendOSC( [ '/renoise/trigger/note_on',  'iiii', Control.renoise.currentTrack, Control.renoise.currentInstrument, " + 
+                           Control.renoise.midiNotes[idx] + ", 125])",
+                     "ontouchend":    "oscManager.sendOSC( [ '/renoise/trigger/note_off',  'iiii', Control.renoise.currentTrack, Control.renoise.currentInstrument, " + 
+                           Control.renoise.midiNotes[idx] + "])",
                      } );
                  },
 

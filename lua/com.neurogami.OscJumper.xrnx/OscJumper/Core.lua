@@ -8,6 +8,7 @@ function OscJumper.status_poller()
     local OscMessage = renoise.Osc.Message
     local OscBundle = renoise.Osc.Bundle
 
+    
   OscJumper.sequence_pos()
   print("OscJumper.status_poller. OscJumper.current_pattern = ", OscJumper.current_pattern )
 
@@ -69,10 +70,12 @@ end
 
 function OscJumper.sequence_pos()
 
+
   --  local lines_passed = 0 --global buffer!
   --    local song = renoise.song()
   --   local edit_pos = song.transport.edit_pos
   --  local patterns = song.patterns
-  OscJumper.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
+  --   OscJumper.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
+  OscJumper.current_pattern  = renoise.SongPos().sequence
   print("OscJumper.sequence_pos: ", OscJumper.current_pattern)
 end
