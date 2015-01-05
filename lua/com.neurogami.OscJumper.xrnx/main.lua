@@ -2,7 +2,12 @@
 com.neurogami.OscJumper.xrnx/main.lua
 =======================================================]]--
 
+RENOISE_OSC    = nil
+CONTROLLER_OSC = nil
+
+
 require 'OscJumper/Utils'
+require 'OscJumper/Status'
 require 'OscJumper/Rotator'
 
 attempt_rotate_setup()
@@ -15,8 +20,6 @@ local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
 local osc_device = nil;  
 
-RENOISE_OSC    = nil
-CONTROLLER_OSC = nil
 
 function create_osc_server()
   osc_server, server_socket_error = renoise.Socket.create_server(
@@ -40,7 +43,7 @@ function create_osc_server()
     osc_server:run(osc_device)
   end
 
-  OscJumper.start_status_poller()
+  Status.start_status_poller()
 end
 
 

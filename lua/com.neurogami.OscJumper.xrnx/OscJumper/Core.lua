@@ -2,29 +2,7 @@
 OscJumper = {}
 
 
-OscJumper.current_pattern = 0 
 
-function OscJumper.status_poller()
-    local OscMessage = renoise.Osc.Message
-    local OscBundle = renoise.Osc.Bundle
-
-    
-  OscJumper.sequence_pos()
-  print("OscJumper.status_poller. OscJumper.current_pattern = ", OscJumper.current_pattern )
-
-  CONTROLLER_OSC:send( OscMessage("/ng/current_pattern", { 
-          {tag="i", value=OscJumper.current_pattern} 
-        }))
-end
-
-
--- TODO Make this configurable/controllable via OSC
-function OscJumper.start_status_poller()
-  if(renoise.tool():has_timer(OscJumper.status_poller)) then
-    renoise.tool():remove_timer(OscJumper.status_poller)
-  end
-  renoise.tool():add_timer(OscJumper.status_poller, 500)
-end
 
 
 function OscJumper.loop_schedule(range_start, range_end)
@@ -68,14 +46,4 @@ function  OscJumper.pattern_into(pattern_index, stick_to)
   end
 end
 
-function OscJumper.sequence_pos()
 
-
-  --  local lines_passed = 0 --global buffer!
-  --    local song = renoise.song()
-  --   local edit_pos = song.transport.edit_pos
-  --  local patterns = song.patterns
-  --   OscJumper.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
-  OscJumper.current_pattern  = renoise.SongPos().sequence
-  print("OscJumper.sequence_pos: ", OscJumper.current_pattern)
-end
