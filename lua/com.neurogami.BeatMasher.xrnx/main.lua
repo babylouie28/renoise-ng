@@ -2,11 +2,14 @@
 com.neurogami.BeatMasher.xrnx/main.lua
 =======================================================]]--
 
+RENOISE_OSC    = nil
+CONTROLLER_OSC = nil
+
 require 'BeatMasher/Utils'
+require 'BeatMasher/Status'
 require 'BeatMasher/Rotator'
 
 attempt_rotate_setup()
-
 
 require 'BeatMasher/Core'
 require 'BeatMasher/OscDevice'
@@ -15,8 +18,6 @@ require 'BeatMasher/Configuration'
 local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
 local osc_device = nil
-
-RENOISE_OSC = nil
 
 function create_osc_server()
   osc_server, server_socket_error = renoise.Socket.create_server(
@@ -27,6 +28,7 @@ function create_osc_server()
   osc_device = OscDevice()
 
   RENOISE_OSC = osc_device:renoise_osc()
+  CONTROLLER_OSC = osc_device:controller_osc()
 
   load_handlers(osc_device)
 
@@ -39,6 +41,7 @@ function create_osc_server()
     osc_server:run(osc_device)
   end
 
+  Status.start_status_poller()
 end
 
 

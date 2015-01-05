@@ -38,7 +38,6 @@ function OscDevice:renoise_osc()
   return self.osc_renoise_client
 end
 
-
 function OscDevice:controller_osc()
   return self.osc_controller_client
 end

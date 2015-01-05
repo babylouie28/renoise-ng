@@ -10,13 +10,22 @@ function OscDevice:__init()
   self.server = nil
 
   self.osc_client = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
-
+  self.osc_controller_client = OscClient(configuration.osc_settings.controller.ip.value, configuration.osc_settings.controller.port.value)
+  
   if (self.osc_client == nil ) then 
     renoise.app():show_warning("Warning: BeatMasher failed to start the internal OSC client")
-    self.osc_client = nil
+--    self.osc_client = nil
   else
     print("We have self.osc_client = ", self.osc_client )
   end
+
+    if (self.osc_controller_client == nil ) then 
+    renoise.app():show_warning("OscDevice Warning: OSC Jumper failed to start the controller OSC client")
+--    self.osc_controller_client = nil
+  else
+    print("We have self.osc_controller_client = ", self.osc_controller_client )
+  end
+
 
   self.message_queue = nil
   self.bundle_messages = false
@@ -27,6 +36,10 @@ end
 
 function OscDevice:renoise_osc()
   return self.osc_client
+end
+
+function OscDevice:controller_osc()
+  return self.osc_controller_client
 end
 
 function OscDevice:open()
