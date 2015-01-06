@@ -3,4 +3,8 @@
 haz_var.txt
 update-local-installs.rb
 dev-notes.md
+cruft
 lua/com.neurogami.NewFromTemplate.xrnx/config.xml
+osc-repl-*
+tasks
+__*
