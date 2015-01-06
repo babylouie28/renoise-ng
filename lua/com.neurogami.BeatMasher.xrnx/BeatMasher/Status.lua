@@ -36,10 +36,11 @@ function Status.stop_status_poller()
 end
 
 
-function Status.start_status_poller()
+function Status.start_status_poller(interval)
+  interval = interval or 500
   Status.stop_status_poller()
   Status.is_polling = true
   print("\t* * * * * * Status.start_status_poller() * * * * * * " )
-  renoise.tool():add_timer(Status.status_poller, 3000)
+  renoise.tool():add_timer(Status.status_poller, interval)
 end
 

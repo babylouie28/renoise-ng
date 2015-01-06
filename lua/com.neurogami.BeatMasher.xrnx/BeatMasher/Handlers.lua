@@ -9,9 +9,10 @@
 handlers = { 
 {
     pattern = "/set_status_polling",
-    handler = function(bool)
+    handler = function(bool, interval)
+      interval = interval or 500 
       print("Handler for /set_status_polling is being passed type ", type(bool) )
-      BeatMasher.set_status_polling(bool)
+      BeatMasher.set_status_polling(bool, interval)
     end 
   }, 
 
