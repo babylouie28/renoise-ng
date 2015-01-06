@@ -47,9 +47,14 @@ function OscDevice:open()
 end
 
 function OscDevice:map_args(osc_args)
+  print("map args ...")
   local arg_vals = {}
 
   for k,v in ipairs(osc_args) do
+   local vtype = type(v.value)
+   local val = v.value
+    print( "+    +    + OscDevice:map_args has ", val, " of type ", vtype )
+
     table.insert(arg_vals, v.value)
   end
  

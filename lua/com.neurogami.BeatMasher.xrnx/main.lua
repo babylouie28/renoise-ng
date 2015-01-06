@@ -41,7 +41,7 @@ function create_osc_server()
     osc_server:run(osc_device)
   end
 
-  Status.start_status_poller()
+--  Status.start_status_poller()
 end
 
 

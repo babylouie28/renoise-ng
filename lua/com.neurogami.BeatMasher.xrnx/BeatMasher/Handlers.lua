@@ -7,6 +7,14 @@
 
 -- Some example handlers.  They invoke methods defined in Core.lua
 handlers = { 
+{
+    pattern = "/set_status_polling",
+    handler = function(bool)
+      print("Handler for /set_status_polling is being passed type ", type(bool) )
+      BeatMasher.set_status_polling(bool)
+    end 
+  }, 
+
   {
     pattern = "/song/reset",
     handler = function()

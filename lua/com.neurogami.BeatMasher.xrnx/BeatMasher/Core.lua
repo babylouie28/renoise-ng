@@ -9,6 +9,20 @@ function BeatMasher.song_reset()
 end
 
 
+function BeatMasher.set_status_polling(bool)
+  print("-------------- BeatMasher.set_status_polling(", bool, ") -  bool is type ",type(bool),"------------- ")
+ if (bool == true) then
+      print("       bool == true      start the status poller!")
+   Status.start_status_poller()
+ else
+      print("  bool == false           STOP THE STATUS POLLER!")
+   Status.stop_status_poller()
+
+ end
+
+end
+
+
 function BeatMasher.song_undo()
   print("song_undo") 
   renoise.song():undo()
