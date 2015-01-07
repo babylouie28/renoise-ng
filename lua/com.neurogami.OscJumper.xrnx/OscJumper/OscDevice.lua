@@ -1,27 +1,25 @@
 -- OscDevices.lua
 class 'OscDevice'
 
--- TODO See where this is getting called when the tool is loaded.
--- It needs to only run when the user starts the tool, not on load.
 function OscDevice:__init()
-  print(" * * * * * OSC Jumper -  OscDevice:__init() * * * * * " )
+  print(" * * * * * ", TOOL_NAME, " -  OscDevice:__init() * * * * * " )
 
   self.prefix = '/ng'
 
   self.client = nil
   self.server = nil
 
-  self.osc_renoise_client    = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
+  self.osc_client = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
   self.osc_controller_client = OscClient(configuration.osc_settings.controller.ip.value, configuration.osc_settings.controller.port.value)
-
-  if (self.osc_renoise_client == nil ) then 
-    renoise.app():show_warning("OscDevice Warning: OSC Jumper failed to start the internal OSC client")
-  --  self.osc_renoise_client = nil -- Why?
+  
+  if (self.osc_client == nil ) then 
+    renoise.app():show_warning("Warning: ", TOOL_NAME, " failed to start the internal OSC client")
+  else
+    print("We have self.osc_client = ", self.osc_client )
   end
 
-  if (self.osc_controller_client == nil ) then 
+    if (self.osc_controller_client == nil ) then 
     renoise.app():show_warning("OscDevice Warning: OSC Jumper failed to start the controller OSC client")
---    self.osc_controller_client = nil
   else
     print("We have self.osc_controller_client = ", self.osc_controller_client )
   end
@@ -31,18 +29,16 @@ function OscDevice:__init()
   self.bundle_messages = false
   self.handlers = table.create{}
   self:open()
+  print("Finished creating OscDevice instance")
 end
 
-
 function OscDevice:renoise_osc()
-  return self.osc_renoise_client
+  return self.osc_client
 end
 
 function OscDevice:controller_osc()
   return self.osc_controller_client
 end
-
-
 
 function OscDevice:open()
   print("OscDevice:open()")
@@ -59,7 +55,6 @@ function OscDevice:map_args(osc_args)
 end
 
 function OscDevice:_msg_to_string(msg)
-  print("OscDevice:_msg_to_string()",msg)
   local rslt = msg.pattern
   for k,v in ipairs(msg.arguments) do
     rslt = ("%s %s"):format(rslt, tostring(v.value))
@@ -70,7 +65,6 @@ end
 
 function OscDevice:socket_error(error_message)
   print("OscDevice:socket_error(error_message): %s", error_message)
-  -- An error happened in the servers background thread.
 end
 
 function OscDevice:socket_accepted(socket)
@@ -190,21 +184,21 @@ function OscDevice:_msg_to_string(msg)
 
 end
 
+--[[
 
+
+]]--
 function OscDevice:add_message_handler(pattern, func)
-  --if (self.handlers) then
   self.handlers[pattern] = func
-  -- end
 end
 
 
 
 
 function OscDevice:socket_message(socket, binary_data)
-
   print("OscDevice:socket_message(socket, binary_data), %s",binary_data)
 
-  --- local prefix = '/renoise'
+  local rns_prefix = '/renoise'
 
   -- A message was received from a client: The passed socket is a ready
   -- to use connection for TCP connections. For UDP, a "dummy" socket is
@@ -226,33 +220,35 @@ function OscDevice:socket_message(socket, binary_data)
       -- (only if defined) check the prefix:
       -- ignore messages that doesn't match our prefix
       if (self.prefix) then
-        local prefix_str = string.sub(value_str,0,string.len(self.prefix))
-        if (prefix_str~=self.prefix) then 
-          print(" * * * * *  Proxy on  ", pattern, " * * * * ")
-          self.osc_renoise_client:send(msg)
+        local have_pref  = string.find(value_str, (self.prefix .. "/"), 1, true)
+        local have_rns_pref  = string.find(value_str, "/renoise/", 1, true)
+        print("----------- ", value_str, " has prefix str? ", have_pref, ". Have have_rns_pref? ", have_rns_pref , " --------------")
+
+        if (not have_pref) then 
+          print(" * * * * *  Proxy on  ", pattern, " , with pattern = ", pattern, " * * * * ")
+          if (have_rns_pref)then
+            print(" # # # renoise OSC: ", value_str, " # # # ")
+            self.osc_client:send(msg)
+          end
           return 
         end
+        
         -- strip the prefix before continuing
+
         value_str = string.sub(value_str,string.len(self.prefix)+1)
         pattern  = string.sub(pattern,string.len(self.prefix)+1)
       end
 
       if value_str then
         print(" value_str = ",value_str )
-        ---- Now we need to parse the string stuff and act on it.
-        -- Suppose we have a hash that maps patterns to methods. Can Lua call
-        -- methods dynamically?
-        --
         if(self.handlers[pattern]) then
-          print("Have a handler match on ", pattern)
-          -- Create a table of message values to pass as the single argument to all handlers
+          print("\n_________________________________________________\nHave a handler match on ", pattern)
           local vals = OscDevice:map_args(msg.arguments)
-          --   rPrint(vals , nil, "vals  ");
           local res, err = pcall( self.handlers[pattern], unpack(vals) )
           if res then
             print("Handler worked!");
               else
-            print("Handler  error: ", err);
+            print("Handler error: ", err);
           end
         else
           print(" * * * * *  No handler for  ", pattern, " * * * * ")
@@ -276,18 +272,18 @@ class 'OscClient'
 
 function OscClient:__init(osc_host,osc_port)
 
-  print("OSC Jumper - OscClient:__init!")
+  print( TOOL_NAME, " - OscClient:__init!")
 
   -- the socket connection, nil if not established
   self._connection = nil
 
   local client, socket_error = renoise.Socket.create_client(osc_host, osc_port, renoise.Socket.PROTOCOL_UDP)
   if (socket_error) then 
-    renoise.app():show_warning("OscClient: Warning: OSC Jumper failed to start the internal OSC client. ", socket_error)
+    renoise.app():show_warning("Warning: ", TOOL_NAME, " failed to start the internal OSC client")
     self._connection = nil
   else
     self._connection = client
-    print("OscClient: OSC Jumper started the internal OscClient",osc_host,osc_port)
+    print("+ + +  ", TOOL_NAME, " started the internal OscClient",osc_host,osc_port)
   end
 
 end
@@ -295,5 +291,4 @@ end
 function OscClient:send(osc_msg)
   self._connection:send(osc_msg)
 end
-
 

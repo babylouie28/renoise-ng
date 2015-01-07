@@ -2,7 +2,7 @@
 class 'OscDevice'
 
 function OscDevice:__init()
-  print(" * * * * * BeatMasher -  OscDevice:__init() * * * * * " )
+  print(" * * * * * ", TOOL_NAME, " -  OscDevice:__init() * * * * * " )
 
   self.prefix = '/ng'
 
@@ -13,7 +13,7 @@ function OscDevice:__init()
   self.osc_controller_client = OscClient(configuration.osc_settings.controller.ip.value, configuration.osc_settings.controller.port.value)
   
   if (self.osc_client == nil ) then 
-    renoise.app():show_warning("Warning: BeatMasher failed to start the internal OSC client")
+    renoise.app():show_warning("Warning: ", TOOL_NAME, " failed to start the internal OSC client")
 --    self.osc_client = nil
   else
     print("We have self.osc_client = ", self.osc_client )
@@ -47,38 +47,26 @@ function OscDevice:open()
 end
 
 function OscDevice:map_args(osc_args)
-  print("map args ...")
   local arg_vals = {}
 
   for k,v in ipairs(osc_args) do
-   local vtype = type(v.value)
-   local val = v.value
-    print( "+    +    + OscDevice:map_args has ", val, " of type ", vtype )
-
     table.insert(arg_vals, v.value)
   end
  
   return arg_vals
 end
 
-
-
 function OscDevice:_msg_to_string(msg)
-  print("OscDevice:_msg_to_string()",msg)
-
   local rslt = msg.pattern
   for k,v in ipairs(msg.arguments) do
     rslt = ("%s %s"):format(rslt, tostring(v.value))
   end
-
   return rslt
-
 end
 
 
 function OscDevice:socket_error(error_message)
   print("OscDevice:socket_error(error_message): %s", error_message)
-  -- An error happened in the servers background thread.
 end
 
 function OscDevice:socket_accepted(socket)
@@ -200,46 +188,16 @@ end
 
 --[[
 
-The problem: 
-
-Some handlers will want to send back OSC messages, either to Renoise or
-to some calling client, or maybe yet some other OSC server.
-
-Right now the code is such that address patterns are used as keys to functions.
-
-The functions are assumed to take only the args passed in the OSC message.
-
-In many cases this is fine.  However, if a handler wants to do some
-of its own OSC stuff it will need reference to some OSC device.
-
-Rather than have each handler create devices as needed it seems better
-to have them all instantiated once and then referenced as needed.
-
-Possible solutions:
-
-- Every hander takes an extra argument, a reference to to dispatching OSC device, and
-can in turn ask this object for any other OSC devices as needed.
-
-- Handlers are stored as addr_patt => {func, [osc_device1, osc_device2, ...]
-or something.  Then ... what? What was the idea for this?
-
-- Make all OSC server refs global.
-
-Why is there a problem called osc_device:renoise_osc(), but no trouble
-calling osc_device:add_message_handler in the Handler file?
 
 ]]--
 function OscDevice:add_message_handler(pattern, func)
-  --if (self.handlers) then
   self.handlers[pattern] = func
-  -- end
 end
 
 
 
 
 function OscDevice:socket_message(socket, binary_data)
-   print("||||||||||||||||||||||||||||||||||||||||||||||||||||||") -- DEBUG
   print("OscDevice:socket_message(socket, binary_data), %s",binary_data)
 
   local rns_prefix = '/renoise'
@@ -316,18 +274,18 @@ class 'OscClient'
 
 function OscClient:__init(osc_host,osc_port)
 
-  print("BeatMasher - OscClient:__init!")
+  print( TOOL_NAME, " - OscClient:__init!")
 
   -- the socket connection, nil if not established
   self._connection = nil
 
   local client, socket_error = renoise.Socket.create_client(osc_host, osc_port, renoise.Socket.PROTOCOL_UDP)
   if (socket_error) then 
-    renoise.app():show_warning("Warning: BeatMasher failed to start the internal OSC client")
+    renoise.app():show_warning("Warning: ", TOOL_NAME, " failed to start the internal OSC client")
     self._connection = nil
   else
     self._connection = client
-    print("+ + +  BeatMasher started the internal OscClient",osc_host,osc_port)
+    print("+ + +  ", TOOL_NAME, " started the internal OscClient",osc_host,osc_port)
   end
 
 end

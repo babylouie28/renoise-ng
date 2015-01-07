@@ -5,8 +5,17 @@
 --  such as by a MIDI-mapping interface. 
 
 
--- Some example handlers.  They invoke methods defined in Core.lua
 handlers = { 
+  {
+    pattern = "/set_status_polling",
+    handler = function(bool, interval)
+      interval = interval or 500 
+      print("Handler for /set_status_polling is being passed type ", type(bool) )
+      OscJumper.set_status_polling(bool, interval)
+    end 
+  }, 
+
+
   { -- Marks a pattern loop range and  then sets the start of the loop as  the next pattern to play
   pattern = "/loop/schedule",
   handler = function(range_start, range_end)
@@ -25,7 +34,7 @@ handlers = {
 } ,
 
 {
-pattern = "/sequence_pos",
+  pattern = "/sequence_pos",
   handler = function()
     OscJumper.sequence_pos()
   end
@@ -43,10 +52,10 @@ function load_handlers(osc_device)
     for i, h in ipairs(rotate_handlers) do
       osc_device:add_message_handler( h.pattern, h.handler )  
     end
-      print("        ADDED ROTATE HANDLERS")
-    else
-      print("Cannot add roate handlers because have_rotator is false")
-    end
+    print("        ADDED ROTATE HANDLERS")
+  else
+    print("Cannot add roate handlers because have_rotator is false")
+  end
 end
 
 

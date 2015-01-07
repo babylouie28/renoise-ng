@@ -23,7 +23,7 @@ function attempt_rotate_setup()
     print("Seem to have loaded code from com.renoise.PatternRotate.xrnx")
   else
     have_rotator = false
-    print("WARNING: OscJumper failed to load code from com.renoise.PatternRotate.xrnx." )
+    print("WARNING: " .. TOOL_NAME .. " failed to load code from com.renoise.PatternRotate.xrnx." )
   end
 end
 

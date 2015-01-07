@@ -5,15 +5,17 @@ com.neurogami.BeatMasher.xrnx/main.lua
 RENOISE_OSC    = nil
 CONTROLLER_OSC = nil
 
-require 'BeatMasher/Utils'
-require 'BeatMasher/Status'
-require 'BeatMasher/Rotator'
+TOOL_NAME = "BeatMasher"
+
+require (TOOL_NAME .. '/Utils')
+require (TOOL_NAME .. '/Status')
+require (TOOL_NAME .. '/Rotator')
 
 attempt_rotate_setup()
 
-require 'BeatMasher/Core'
-require 'BeatMasher/OscDevice'
-require 'BeatMasher/Configuration'
+require (TOOL_NAME .. '/Core')
+require (TOOL_NAME .. '/OscDevice')
+require (TOOL_NAME .. '/Configuration')
 
 local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
@@ -34,20 +36,18 @@ function create_osc_server()
 
   if (server_socket_error) then 
     renoise.app():show_warning(("Oh noes! Failed to start the " .. 
-    "BeatMasher OSC server. Error: '%s'"):format(server_socket_error))
+    TOOL_NAME .. " OSC server. Error: '%s'"):format(server_socket_error))
     return
   else
-    print("Beat Masher has created a osc_server on port ", configuration.osc_settings.internal.port.value )
+    print(TOOL_NAME, " has created a osc_server on port ", configuration.osc_settings.internal.port.value )
     osc_server:run(osc_device)
   end
 
---  Status.start_status_poller()
 end
 
-
 renoise.tool():add_menu_entry {
-  name = "--- Main Menu:Tools:Neurogami BeatMasher:Start the OSC server ..",
+  name = "--- Main Menu:Tools:Neurogami " .. TOOL_NAME .. ":Start the OSC " .. TOOL_NAME .. " server ..",
   invoke = create_osc_server
 }
 
-require 'BeatMasher/Handlers'
+require (TOOL_NAME .. '/Handlers')

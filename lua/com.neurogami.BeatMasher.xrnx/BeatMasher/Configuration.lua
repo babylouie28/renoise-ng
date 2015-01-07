@@ -4,10 +4,10 @@ configuration = nil
 local configuration_dialog = nil
 local view_osc_config_dialog = nil
   
-local config_file = "beat_masher_config.xml"
+local config_file = TOOL_NAME .. "_CONFIG.xml"
 
 function load_osc_config()
-  configuration = renoise.Document.create("BeatMasherParameters") {
+  configuration = renoise.Document.create(TOOL_NAME .. "Parameters") {
 
     osc_settings = {
       -- This is the OSC server so we can talk to the tool
@@ -33,7 +33,6 @@ function load_osc_config()
   }
 
   local res = configuration:load_from(config_file)
-  print( "res = ", res)
 end
 
 function save_osc_config()
@@ -166,7 +165,7 @@ function init_osc_config_dialog()
         released = function()
           save_osc_config()
           configuration_dialog:close()
-          renoise.app():show_status("OscExample configuration saved.")
+          renoise.app():show_status( TOOL_NAME .. " configuration saved.")
         end
       },
     },
@@ -181,13 +180,12 @@ function display_osc_config_dialog()
   
   load_osc_config()
   init_osc_config_dialog()
-  configuration_dialog = renoise.app():show_custom_dialog("BeatMasher Preferences", view_osc_config_dialog, configuration_dialog_keyhander)
+  configuration_dialog = renoise.app():show_custom_dialog(TOOL_NAME .. " Preferences", view_osc_config_dialog, configuration_dialog_keyhander)
 end
 
 renoise.tool():add_menu_entry {
-  name = "Main Menu:Tools:Neurogami BeatMasher:Configuration...",
+  name = "Main Menu:Tools:Neurogami " .. TOOL_NAME .. ":Configuration...",
   invoke = function() display_osc_config_dialog() end
 }
 
 load_osc_config()
-

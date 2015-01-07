@@ -5,7 +5,7 @@ local configuration_dialog = nil
 local view_osc_config_dialog = nil
   
 function load_osc_config()
-  configuration = renoise.Document.create("OscJumperConfiguration") {
+  configuration = renoise.Document.create(TOOL_NAME .. "Configuration") {
 
     osc_settings = {
       -- This is the OSC server so we can talk to the tool
@@ -59,12 +59,12 @@ function init_osc_config_dialog()
     vb:horizontal_aligner {
       mode = "justify",
       vb:text {
-        text = "OSC Jumper:               ",
-        tooltip = "OSC Jumper OSC server settings",
+        text = TOOL_NAME .. ":               ",
+        tooltip = TOOL_NAME .. " OSC server settings",
       },
       vb:textfield {
         text = configuration.osc_settings.internal.ip.value,
-        tooltip = "OSC Jumper server IP",
+        tooltip = TOOL_NAME .. " server IP",
         notifier = function(v)
           configuration.osc_settings.internal.ip.value = v
         end
@@ -74,7 +74,7 @@ function init_osc_config_dialog()
         min = 4000,
         max = 65535,
         value = configuration.osc_settings.internal.port.value,
-        tooltip = "OSC Jumper server port",
+        tooltip = TOOL_NAME .. " server port",
         notifier = function(v)
           configuration.osc_settings.internal.port.value = v
         end
@@ -82,7 +82,7 @@ function init_osc_config_dialog()
       vb:popup {
         items = {"TCP", "UDP"},
         value = configuration.osc_settings.internal.protocol.value,
-        tooltip = "OSC Jumper server protocol",
+        tooltip = TOOL_NAME .. " server protocol",
         notifier = function(v)
           configuration.osc_settings.internal.protocol.value = v
         end
@@ -164,7 +164,7 @@ function init_osc_config_dialog()
         released = function()
           save_osc_config()
           configuration_dialog:close()
-          renoise.app():show_status("OscExample configuration saved.")
+          renoise.app():show_status(TOOL_NAME .. " configuration saved.")
         end
       },
     },
@@ -179,11 +179,11 @@ function display_osc_config_dialog()
   
   load_osc_config()
   init_osc_config_dialog()
-  configuration_dialog = renoise.app():show_custom_dialog("OSC Jumper Preferences", view_osc_config_dialog, configuration_dialog_keyhander)
+  configuration_dialog = renoise.app():show_custom_dialog(TOOL_NAME .. " Preferences", view_osc_config_dialog, configuration_dialog_keyhander)
 end
 
 renoise.tool():add_menu_entry {
-  name = "Main Menu:Tools:Neurogami OSC Jumper:Configuration...",
+  name = "Main Menu:Tools:Neurogami " .. TOOL_NAME .. ":Configuration...",
   invoke = function() display_osc_config_dialog() end
 }
 
