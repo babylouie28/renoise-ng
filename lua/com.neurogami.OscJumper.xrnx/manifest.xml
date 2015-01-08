@@ -3,7 +3,7 @@
   <ApiVersion>3</ApiVersion>
   <AutoUpgraded>true</AutoUpgraded>
   <Id>com.neurogami.OscJumper</Id>
-  <Version>1.2</Version>
+  <Version>1.3</Version>
   <Author>Neurogami | james@neurogami.com  </Author>
   <Name>Neurogami OSC Jumper</Name>
   <Category>OSC</Category>
