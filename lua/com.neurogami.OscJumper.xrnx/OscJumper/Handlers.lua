@@ -7,11 +7,18 @@
 
 handlers = { 
   {
-    pattern = "/set_status_polling",
-    handler = function(bool, interval)
+    pattern = "/add_poll",
+    handler = function(poll_id, code, interval)
       interval = interval or 500 
-      print("Handler for /set_status_polling is being passed type ", type(bool) )
-      OscJumper.set_status_polling(bool, interval)
+      print("Handler /add_poll has '" .. poll_id .. "', '" .. code .. "' " .. interval) 
+      Status.add_poll(poll_id, code, interval)
+    end 
+  }, 
+
+    {
+    pattern = "/remove_poll",
+    handler = function(poll_id)
+      Status.remove_poll(poll_id)
     end 
   }, 
 
