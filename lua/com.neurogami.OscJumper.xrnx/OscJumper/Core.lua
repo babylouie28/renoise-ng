@@ -2,17 +2,6 @@
 OscJumper = {}
 
 
-function OscJumper.set_status_polling(bool, interval)
-  print("-------------- ", TOOL_NAME, ".set_status_polling(", bool, ") -  bool is type ",type(bool),"------------- ")
- if (bool == true) then
-      print("       bool == true      start the status poller!")
-   Status.start_status_poller(interval)
- else
-  print("  bool == false           STOP THE STATUS POLLER!")
-   Status.stop_status_poller()
- end
-
-end
 
 
 function OscJumper.loop_schedule(range_start, range_end)
