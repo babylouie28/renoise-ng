@@ -1,7 +1,20 @@
 -- Core.lua 
+
+require "OscJumper/Utils"
+
 OscJumper = {}
 
-
+function Status.solo_vol(track_index, column_index)
+  local track = renoise.song().tracks[track_index]
+  local note_cols_num = track.visible_note_columns
+  for i = 1,note_cols_num  do
+    if (i == column_index ) then
+      track:mute_column(i, false)
+    else
+      track:mute_column(i, true)
+    end
+  end
+end
 
 
 function OscJumper.loop_schedule(range_start, range_end)

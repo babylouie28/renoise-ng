@@ -1,5 +1,5 @@
 
-local U = {}
+U = {}
 
 --- Common util funcitons
 function U.clamp_value(value, min_value, max_value)
@@ -32,7 +32,7 @@ end
 -- Taken from the CreateTool tool.
 -- Why does Renoise Lua not have os.copyfile?
 
-local ERROR = {OK=1, FATAL=2, USER=3}
+ERROR = {OK=1, FATAL=2, USER=3}
 
 -- Reads entire file into a string
 -- (this function is binary safe)
