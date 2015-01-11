@@ -7,10 +7,8 @@
 
 handlers = { 
 
-{  -- The goal is to select a track and have only one of the
-   -- multiple note columns be unmuted.
-   
-    pattern = "/solo_vol",
+  {  
+    pattern = "/track/notes/solo_column",
     handler = function(track_index, column_index)
       Status.solo_vol(track_index, column_index)
     end 
@@ -26,7 +24,7 @@ handlers = {
     end 
   }, 
 
-    {
+  {
     pattern = "/remove_poll",
     handler = function(poll_id)
       Status.remove_poll(poll_id)
