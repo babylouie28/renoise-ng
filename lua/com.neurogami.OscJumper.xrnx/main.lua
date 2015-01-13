@@ -15,6 +15,8 @@ attempt_rotate_setup()
 require (TOOL_NAME .. '/Core')
 require (TOOL_NAME .. '/OscDevice')
 require (TOOL_NAME .. '/Configuration')
+require (TOOL_NAME .. '/VolumeJumper')
+
 
 local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
@@ -48,5 +50,14 @@ renoise.tool():add_menu_entry {
   name = "--- Main Menu:Tools:Neurogami " .. TOOL_NAME .. ":Start the OSC " .. TOOL_NAME .. " server ..",
   invoke = create_osc_server
 }
+
+-- TRACK RAND VOL STUFF
+renoise.tool():add_menu_entry {
+  name = "Pattern Editor:Track Operations:Neurogami Volume Jumper",
+  invoke = volume_jumper_config
+}
+
+
+
 
 require (TOOL_NAME .. '/Handlers')
