@@ -8,12 +8,20 @@
 handlers = { 
 
   {  
-    pattern = "/track/notes/solo_column",
+    pattern = "/track/notes/solo_column_timer",
     handler = function(track_index, column_index)
-      Status.solo_vol(track_index, column_index)
+      print(" ***** Call OscJumper.solo_vol_timer(track_index, column_index) ********")
+      OscJumper.solo_vol_timer(track_index, column_index)
     end 
   }, 
 
+
+  {  
+    pattern = "/track/notes/solo_column",
+    handler = function(track_index, column_index)
+      OscJumper.solo_vol(track_index, column_index)
+    end 
+  }, 
 
   {
     pattern = "/add_poll",

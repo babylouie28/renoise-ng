@@ -198,7 +198,6 @@ end
 function OscDevice:socket_message(socket, binary_data)
   print("OscDevice:socket_message(socket, binary_data), %s",binary_data)
 
-  local rns_prefix = '/renoise'
 
   -- A message was received from a client: The passed socket is a ready
   -- to use connection for TCP connections. For UDP, a "dummy" socket is
