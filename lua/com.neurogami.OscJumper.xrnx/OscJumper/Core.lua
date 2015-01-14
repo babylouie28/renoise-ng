@@ -8,20 +8,9 @@ OscJumper = {}
 OscJumper.timers = {}
 
 function OscJumper.solo_vol_timer(track_index, column_index)
-  
   print("------- OscJumper.solo_vol_timer(", track_index, ", ", column_index, ", ) ------------" )
-
   local interval = 500
 
-  --[[
-  
-The plan:
-
-Build the string for a function that can be added as a timer
-to swap volumn soloing
-
-  --]]
-  --
   local func_string = [[   print("Timer for track ]] ..track_index .. [[ ")
   local track = renoise.song().tracks[]] .. track_index .. [[]
   local note_cols_num = track.visible_note_columns
@@ -33,7 +22,7 @@ to swap volumn soloing
   if (not have_solo) then
       print("NO SOLO ...")
     if (odds > rand_num ) then
-            print("SET UP SWAP...")
+      print("SET UP SWAP...")
       for i = 1,note_cols_num  do
         if (i == ]] .. column_index .. [[ ) then
           track:mute_column(i, false)
@@ -43,7 +32,7 @@ to swap volumn soloing
       end 
     end
   else
-                print("SOLO IS IN PLAY")
+      print("SOLO IS IN PLAY")
     odds = 50
     if (odds > rand_num ) then
       print("STOP THE SOLO")
