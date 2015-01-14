@@ -10,6 +10,7 @@ local configuration_dialog
 
 local SIMPLE_SPACE = 32
 local INPUT_FIELD_WIDTH = 32
+local DEFAULT_NOTE_COL_ODDS = 20
 
 function configuration_dialog_keyhander(dialog, key)
   if key.name == "esc" then
@@ -60,7 +61,7 @@ end
 function volume_jumper_config() 
   print("volume_jumper_config() ")
 
-  local timer_interval = 1000
+  local timer_interval = 5000
   local trigger_percentage = 10
   local solo_stop_percentage = 30
   local track_index = renoise.song().selected_track_index
@@ -135,6 +136,8 @@ function volume_jumper_config()
 
   for i = 2,note_cols_num  do
 
+    note_column_odds[i] = DEFAULT_NOTE_COL_ODDS
+
     local horiz_note_vol_form = vb:horizontal_aligner {
       mode = "justify",
       vb:text {
@@ -142,7 +145,7 @@ function volume_jumper_config()
         tooltip = "",
       },
       vb:textfield {
-        text = "20",
+        text = ("" .. note_column_odds[i]),
         tooltip = "Odds of selection",
         width = INPUT_FIELD_WIDTH,
         notifier = function(v)
@@ -193,7 +196,35 @@ function volume_jumper_config()
   configuration_dialog = renoise.app():show_custom_dialog("Volume Jumper", view_voljumper_config_dialog, configuration_dialog_keyhander)
 end
 
+function normalize_volume_jumper_track_col_odds(track_index)
+  local raw_column_odds = volume_jumper_track_col_odds[track_index]
+print("normalize_volume_jumper_track_col_odds")
+
+
+ local sum = 0
+    for k,v in pairs(raw_column_odds) do
+        sum = sum + v
+    end
+
+    print(" ---- Have sum ", sum)
+
+  --[[ 
+  
+What needs to happen:
+Sum all the values (associated with a column) 
+For each value, divide by the total to get the percentage.
+Replace that original value with the percentage.
+
+
+
+  --]]
+
+end
+
 function select_note_col(track_index)
+  local raw_column_odds = volume_jumper_track_col_odds[track_index]
+
+
   return 2
 end
 
@@ -207,23 +238,22 @@ end
 
 function assign_vol_column_timers(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
 
+  print("assign_vol_column_timers. note_column_odds = ", note_column_odds )
+  rPrint(note_column_odds)
+
   volume_jumper_track_col_odds[track_index] = note_column_odds
   volume_jumper_track_odds[track_index] = trigger_percentage
   volume_jumper_track_stop_odds[track_index] = solo_stop_percentage
 
+  normalize_volume_jumper_track_col_odds(track_index)
 
-  -- NEED TO ADD SOMETHING TO DETERMINE WHEN TO STOP THE SOLOED COLUMN !!!!
 
   local func_string = [[   
-
   print("Multitimer for track ]] ..track_index .. [[ ")
-
   local track = renoise.song().tracks[]] .. track_index .. [[]
-
   local have_solo = track:column_is_muted(1)
   local rand_num = math.random(100)
   local note_cols_num = track.visible_note_columns
-
   local odds = volume_jumper_track_odds[]] .. track_index .. [[] 
   local stop_odds = volume_jumper_track_stop_odds[]] .. track_index .. [[]
   if (not have_solo) then
