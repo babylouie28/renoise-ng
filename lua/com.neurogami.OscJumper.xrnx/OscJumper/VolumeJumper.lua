@@ -2,6 +2,7 @@
 
 volume_jumper_timers = {}
 volume_jumper_track_col_odds = {}
+volume_jumper_normalized_col_odds = {}
 volume_jumper_track_odds = {}
 volume_jumper_track_stop_odds = {}
 volume_jumper_track_timer_interval = {}
@@ -199,8 +200,9 @@ end
 
 function normalize_volume_jumper_track_col_odds(track_index)
   local raw_column_odds = volume_jumper_track_col_odds[track_index]
-  print("normalize_volume_jumper_track_col_odds")
+  local normalized = {}
 
+  print("normalize_volume_jumper_track_col_odds")
 
   local sum = 0
   for k,v in pairs(raw_column_odds) do
@@ -208,15 +210,20 @@ function normalize_volume_jumper_track_col_odds(track_index)
   end
 
   for k,v in pairs(raw_column_odds) do
-    raw_column_odds[k] = v/sum
+    normalized[k] = v/sum
   end
 
+  rPrint()
   sum = 0
-  for k,v in pairs(raw_column_odds) do
-    raw_column_odds[k] = raw_column_odds[k] + sum
-    sum = sum + raw_column_odds[k]
+  for k,v in pairs(normalized ) do
+    normalized [k] = normalized [k] + sum
+    sum = sum + normalized [k]
   end
 
+  volume_jumper_normalized_col_odds[track_index]  = normalized 
+
+  print(" Should have now created volume_jumper_normalized_col_odds[track_index]  ")
+  rPrint(volume_jumper_normalized_col_odds[track_index]  )
 end
 
 function select_note_col(track_index)
@@ -234,11 +241,12 @@ function select_note_col(track_index)
   --  First hit means a win.
   --
   print("------------ select_note_col for ", track_index, " -------------")
-  local column_odds = volume_jumper_track_col_odds[track_index]
 
+  print(" SELECT A COLUMN USING volume_jumper_normalized_col_odds[track_index] ")
+  rPrint(volume_jumper_normalized_col_odds[track_index])
 
+  local column_odds = volume_jumper_normalized_col_odds[track_index]
   print("column_odds = ", column_odds )
-
   local r =  math.random()
 
   for col,v in pairs(column_odds) do
@@ -248,7 +256,7 @@ function select_note_col(track_index)
     end
   end
 
-  return 2
+  return 1 -- What's the best behavior if no other mtch comes up?
 end
 
 function clear_vol_column_timers(track_index)
