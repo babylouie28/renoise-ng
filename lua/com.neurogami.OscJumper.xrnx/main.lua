@@ -53,7 +53,7 @@ renoise.tool():add_menu_entry {
 
 -- TRACK RAND VOL STUFF
 renoise.tool():add_menu_entry {
-  name = "Pattern Editor:Track Operations:Neurogami Volume Jumper",
+  name = "Pattern Editor:Neurogami Note Column Jumper ...",
   invoke = volume_jumper_config
 }
 

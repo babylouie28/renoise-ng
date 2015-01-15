@@ -44,7 +44,7 @@ function solo_note_column(track_index)
   local track = renoise.song().tracks[track_index]
   local note_cols_num = track.visible_note_columns
 
-  print("solo_note_column(", track_index ,"). column_odds = ", column_odds )
+  print("********** solo_note_column(", track_index ,"). column_odds = ", column_odds )
 
   local r = math.random()
 
@@ -198,32 +198,54 @@ end
 
 function normalize_volume_jumper_track_col_odds(track_index)
   local raw_column_odds = volume_jumper_track_col_odds[track_index]
-print("normalize_volume_jumper_track_col_odds")
+  print("normalize_volume_jumper_track_col_odds")
 
 
- local sum = 0
-    for k,v in pairs(raw_column_odds) do
-        sum = sum + v
-    end
+  local sum = 0
+  for k,v in pairs(raw_column_odds) do
+    sum = sum + v
+  end
 
-    print(" ---- Have sum ", sum)
+  for k,v in pairs(raw_column_odds) do
+    raw_column_odds[k] = v/sum
+  end
 
-  --[[ 
-  
-What needs to happen:
-Sum all the values (associated with a column) 
-For each value, divide by the total to get the percentage.
-Replace that original value with the percentage.
-
-
-
-  --]]
+  sum = 0
+  for k,v in pairs(raw_column_odds) do
+    raw_column_odds[k] = raw_column_odds[k] + sum
+    sum = sum + raw_column_odds[k]
+  end
 
 end
 
 function select_note_col(track_index)
-  local raw_column_odds = volume_jumper_track_col_odds[track_index]
+  -- The assumption is that the values have  already beeen normalized
+  -- so that they represent a series of values from 0.0 to 1.0.
+  -- This function needs to get a rand in that range and then see
+  -- where it best fits.
+  -- Suppose we have four  odds values:  0.05, 0.55, 0.70, and 1.0
+  -- The odds for any given columns is the size of different between it and
+  -- the previous number.
+  -- That is,  we have a 0.3 gap for the last col, but only 0.05 for the first,
+  -- and 0.5 for the second, and 0.15 for the third.
+  -- If the rand is, say 0.61, the code needs to look at each of these
+  -- "odds"  values and see if it is less than the number.
+  --  First hit means a win.
+  --
+  print("------------ select_note_col for ", track_index, " -------------")
+  local column_odds = volume_jumper_track_col_odds[track_index]
 
+
+  print("column_odds = ", column_odds )
+
+  local r =  math.random()
+
+  for col,v in pairs(column_odds) do
+    print("col", col, " = ", v )
+    if (r < v) then
+        return col
+    end
+  end
 
   return 2
 end
@@ -274,7 +296,7 @@ function assign_vol_column_timers(timer_interval, trigger_percentage, track_inde
 
 
   if(OscJumper.timers[track_index] and renoise.tool():has_timer( OscJumper.timers[track_index] ) ) then
-    print("Remove the poller " .. track_index " ...")
+    print("Remove the poller " ,track_index, " ...")
     renoise.tool():remove_timer( OscJumper.timers[track_index] )
   end
 
