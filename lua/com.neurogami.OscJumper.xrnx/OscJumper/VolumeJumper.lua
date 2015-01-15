@@ -4,6 +4,7 @@ volume_jumper_timers = {}
 volume_jumper_track_col_odds = {}
 volume_jumper_track_odds = {}
 volume_jumper_track_stop_odds = {}
+volume_jumper_track_timer_interval = {}
 
 local view_voljumper_config_dialog 
 local configuration_dialog
@@ -39,21 +40,10 @@ function solo_note_column_volume(track_index, note_column_index)
 end
 
 function solo_note_column(track_index)
-  local jump_odds   = volume_jumper_track_odds[track_index]
-  local column_odds = volume_jumper_track_col_odds[track_index]
-  local track = renoise.song().tracks[track_index]
-  local note_cols_num = track.visible_note_columns
-
-  print("********** solo_note_column(", track_index ,"). column_odds = ", column_odds )
-
+  --local track = renoise.song().tracks[track_index]
+  -- local note_cols_num = track.visible_note_columns
   local r = math.random()
-
-  -- FIXME Need to code the real function to 
-  -- return a column number based on the percentages
-  -- The function needs to account for
-  -- actual location: col 1 always the "no solo" value
   local col_to_solo = select_note_col(track_index)
-
   solo_note_column_volume(track_index, col_to_solo )
 
 end
@@ -61,13 +51,16 @@ end
 function volume_jumper_config() 
   print("volume_jumper_config() ")
 
-  local timer_interval = 5000
-  local trigger_percentage = 10
-  local solo_stop_percentage = 30
   local track_index = renoise.song().selected_track_index
-  local track = renoise.song().tracks[track_index]
-  local note_cols_num = track.visible_note_columns
 
+  local timer_interval =  volume_jumper_track_timer_interval[track_index] or  5000
+  local trigger_percentage = volume_jumper_track_odds[track_index] or 25
+  local solo_stop_percentage = volume_jumper_track_stop_odds[track_index] or 30
+
+  local track = renoise.song().tracks[track_index]
+
+  local note_cols_num = track.visible_note_columns
+  local note_cols_odds = volume_jumper_track_col_odds[track_index] or {}
   local vb = renoise.ViewBuilder()
 
   view_voljumper_config_dialog = vb:column {
@@ -75,6 +68,15 @@ function volume_jumper_config()
     spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
     margin = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN,
 
+    --[[
+    
+
+    FIXME!!!!
+
+    Must add something so that when you go back to a track that already has a column jumper
+    in place the GUI shows the current values rather than always showing the defaults.
+
+    --]]
     vb:horizontal_aligner {
       mode = "justify",
       vb:text {
@@ -127,7 +129,6 @@ function volume_jumper_config()
         end
       },
 
-
     }, -- end of horiz aligner
 
   } -- end of vb:colum
@@ -136,7 +137,7 @@ function volume_jumper_config()
 
   for i = 2,note_cols_num  do
 
-    note_column_odds[i] = DEFAULT_NOTE_COL_ODDS
+    note_column_odds[i] = note_cols_odds[i] or DEFAULT_NOTE_COL_ODDS
 
     local horiz_note_vol_form = vb:horizontal_aligner {
       mode = "justify",
@@ -263,6 +264,7 @@ function assign_vol_column_timers(timer_interval, trigger_percentage, track_inde
   print("assign_vol_column_timers. note_column_odds = ", note_column_odds )
   rPrint(note_column_odds)
 
+  volume_jumper_track_timer_interval[track_index] = timer_interval
   volume_jumper_track_col_odds[track_index] = note_column_odds
   volume_jumper_track_odds[track_index] = trigger_percentage
   volume_jumper_track_stop_odds[track_index] = solo_stop_percentage
