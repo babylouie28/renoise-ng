@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>3</ApiVersion>
+  <AutoUpgraded>true</AutoUpgraded>
+  <Id>com.neurogami.RandyNoteColumns</Id>
+  <Version>1.3</Version>
+  <Author>Neurogami | james@neurogami.com  </Author>
+  <Name>Neurogami Randy Note Columns</Name>
+  <Category>OSC</Category>
+  <Description>Manages the semi-random soloing of note columns</Description>
+  <Homepage>http://neurogami.com</Homepage>
+</RenoiseScriptingTool>
+

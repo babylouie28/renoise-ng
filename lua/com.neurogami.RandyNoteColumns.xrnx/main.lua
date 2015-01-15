@@ -1,22 +1,17 @@
 --[[======================================================
-com.neurogami.OscJumper.xrnx/main.lua
+com.neurogami.RandyNoteColumns.xrnx/main.lua
 =======================================================]]--
 
 RENOISE_OSC    = nil
 CONTROLLER_OSC = nil
-TOOL_NAME = "OscJumper"
+TOOL_NAME = "RandyNoteColumns"
 
 require (TOOL_NAME .. '/Utils')
 require (TOOL_NAME .. '/Status')
-require (TOOL_NAME .. '/Rotator')
-
-attempt_rotate_setup()
 
 require (TOOL_NAME .. '/Core')
 require (TOOL_NAME .. '/OscDevice')
-require (TOOL_NAME .. '/Configuration')
-require (TOOL_NAME .. '/VolumeJumper')
-
+require (TOOL_NAME .. '/GUI')
 
 local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
@@ -51,6 +46,10 @@ renoise.tool():add_menu_entry {
   invoke = create_osc_server
 }
 
-
+-- TRACK RAND VOL STUFF
+renoise.tool():add_menu_entry {
+  name = "Pattern Editor:Neurogami Randy Note Columns ...",
+  invoke = volume_jumper_config
+}
 
 require (TOOL_NAME .. '/Handlers')
