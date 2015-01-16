@@ -46,33 +46,35 @@ The idea is that for any given track, a function is setup to be called at fixed 
 
 The first tool parameter is the timer interval, in milliseconds.  
 
-The second parameter is the percentage likelihood (currently as a number for 0 to 100) that the note column should change from the default first column to one of the other note columns. This is the "percentage for triggering".
+The second parameter is the percentage likelihood (currently as a number for 0 to 100) that the note column should change from the default first column to one of the other note columns. This is the "Likelihood for switching".
 
 Each time the timer function is called it grabs a random number from 1 to 100. If this number is lower than the provided percentage for triggering then the code picks what other column to solo.  If there is only one other column then that's the one that comes to life.
 
-The third parameter is the odds (again, a number from 1 to 100) of reverting back to the first note column if it's not currently playing. This is the "percentage for unsoloing."
+The third parameter is the odds (again, a number from 1 to 100) of reverting back to the first note column if it's not currently playing. This is the "Likelihood for resuming default."
 
-The remaining  parameters are for relative odds of the non-first note columns being selected.  If, for example, the track has three note columns then you'll see fields for "Note column 2" and Note column 3".
+The remaining  parameters are for relative odds of the non-first note columns being selected.  If, for example, the track has three note columns then you'll see fields for "Note column 2 switching weight" and Note column 3 switching weight."
 
-Whatever numbers you put there get normalized so that they represent percentages that total 1.0. 
+Whatever numbers you put there get normalized so that they add up to 100. 
 
-For example, if you entered 30 and 40 for the two columns they'd get converted to 0.43 and 0.57.
+For example, if you entered 30 and 40 for the two columns they'd get converted internally to 43 and 57.  
 
-Yeah, the UI needs to change to make this a little more intuitive.  But it works.
+This means that if a switch is to occur there will be a 43% chance of selecting column 2, and a 57% chance of picking column 3.
 
 So, recap: Decide how often the function passed to the timer gets called.  On each call the function looks to see if note column one is muted. If not, it checks a random number to see if it should mute the first note column and un-mute on of the others. If there is more than one other column to switch to then the assigned relatively odds are used to see which one to pick.
 
-If the first note column is already muted then that second percentage option is used to decide if current;y playing note column should be muted and the first note column restored.
+If the first note column is already muted then that second percentage option is used to decide if currently soloed note column should be muted and the first note column restored.
  
 A use case might go like this:
 
-Set up a track with a snare drum. The first note column is a steady 4/4.  A second note column, mute by default, has a drum roll. A third note column, also mute by default, just adds a secondary snap.
+Set up a track with a snare drum. The first note column is a steady 4/4.  A second note column, mute by default, has a drum roll or triplets. A third note column, also mute by default, just adds a secondary snap (e.g. 2/4 beat).
 
-You only want the snare to alter every so often, so you set the timer interval to 1000 milliseconds and the "percentage for triggering" to 20.   This means once a second (more or less) the function will get called, and on each call there's a 20% change that if the first note column is playing then it will be switched out for either the 2nd or 3rd note column.
+You only want the snare to alter every so often, so you set the timer interval to 1000 milliseconds and the likelihood for switching to 20.   This means once a second (more or less) the associated function will get called, and on each call there's a 20% chance that if the first note column is playing then it will be switched out for either the 2nd or 3rd note column.
 
-You would prefer the extra snap come in a little more often then the roll, so you set the note column values to 30 and 50 because you are poor at math and those numbers just feel right.  The code will convert them to the percentages 0.37 and 0.63, meaning the extra snap is almost-but-not-quite twice as likely to picked as the drum roll.
+You would prefer the extra snap come in a little more often then the roll, so you set the note column values to 30 and 50 because you are poor at math and those numbers just feel right.  Internally the code will convert them to 37% and 63%, meaning the extra snap is almost-but-not-quite twice as likely to be picked as the drum roll.
 
-Since the timer function gets called every second, if either the second or third note column is playing then it will remain playing for a full second. Since you don't want this to go on very long you set the "percentage for unsoloing" to 90.  In practice then you may have this switch-up lasting two second, and just maybe three, but changes are it will jump back to the first note column almost every time,
+Since the timer function gets called every second, if either the second or third note column is playing then it will remain playing for a full second (i.e things stay the same until the timer function gets called again). 
+
+Since you don't want this to go on very long you set the "Likelihood for resuming default" value to 90.  In practice then you may have this switch-up lasting two second, and just maybe three, but changes are it will jump back to the first note column almost every time,
 
 You then click on "Apply" to add the timer function and start the fun.
 

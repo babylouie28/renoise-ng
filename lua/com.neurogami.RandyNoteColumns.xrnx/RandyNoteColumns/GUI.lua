@@ -1,14 +1,16 @@
-
 local view_voljumper_config_dialog 
 local configuration_dialog
 
 local SIMPLE_SPACE = 32
 local INPUT_FIELD_WIDTH = 32
+local VALUEBOX_WIDTH = 72
 local DEFAULT_NOTE_COL_ODDS = 20
 
 function configuration_dialog_keyhander(dialog, key)
   if key.name == "esc" then
     configuration_dialog:close()
+  elseif key.name == "tab" then
+    print("             TAB             ")
   else
     return key
   end
@@ -30,6 +32,7 @@ function volume_jumper_config()
   local note_cols_odds = RandyNoteColumns.volume_jumper_track_col_odds[track_index] or {}
   local vb = renoise.ViewBuilder()
 
+
   view_voljumper_config_dialog = vb:column {
 
     spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
@@ -38,7 +41,7 @@ function volume_jumper_config()
     vb:horizontal_aligner {
       mode = "justify",
       vb:text {
-        text = "ms for timer interval",
+        text = "Milliseconds for timer interval",
         tooltip = "ms for timer interval",
       },
       vb:space { width = SIMPLE_SPACE },
@@ -54,53 +57,103 @@ function volume_jumper_config()
     vb:horizontal_aligner {
       mode = "justify",
 
+
       vb:text {
-        text = "Percentage for triggering (1 to 100)",
-        tooltip = "Percentage for triggering (1 to 100)",
+        text = "Likelihood for switching (0 to 100)",
+        tooltip = "Enter a number from 0 to 100. Higher number means more likely to change note column",
       },
       vb:space { width = SIMPLE_SPACE },
-      vb:textfield {
-        text = ("" .. trigger_percentage),
-        tooltip = "ms for timer interval",
-        width = INPUT_FIELD_WIDTH,
+
+      vb:valuebox {
+        value = trigger_percentage,
+
+        min = 0,
+        max = 100,
+
+        width = VALUEBOX_WIDTH,
+
+        tooltip = "Enter a number from 0 to 100. Higher number means more likely to change note column",
+
+        tostring = function(value) 
+          local _ = value
+          if (_ > 100 ) then  _ = 100 end
+          if (_ < 0 ) then  _ = 0 end
+          return tonumber(_)
+        end,
+
+        tonumber = function(str) 
+          local _ = tonumber(str)
+          if (_ > 100 ) then  _ = 100 end
+          if (_ < 0 ) then  _ = 0 end
+          return _
+        end,
+
+
         notifier = function(v)
-          trigger_percentage = tonumber(v)
+          local _ = tonumber(v)
+          if (_ > 100 ) then  _ = 100 end
+          if (_ < 0 ) then  _ = 0 end
+          trigger_percentage = _ -- Will not update the value shown.
+
+
+
+          -- This works but also triggers a self-reference loop error. Which makes sense
+          --   local my_trigger_percentage = vb.views.trigger_percentage
+          --   my_trigger_percentage.text = ("" .. trigger_percentage)
+
         end
       },
-
     },
     vb:horizontal_aligner {
       mode = "justify",
 
       vb:text {
-        text = "Percentage for unsoloing  (1 to 100)",
-        tooltip = "Percentage for unsoloing (1 to 100)",
+        text = "Likelihood for resuming default  (1 to 100)",
+        tooltip = "Likelihood for resuming default  (1 to 100)",
       },
 
       vb:space { width = SIMPLE_SPACE },
-      vb:textfield {
-        text = ("" .. solo_stop_percentage),
+      vb:valuebox {
+        value = solo_stop_percentage,
         tooltip =  "% for unsolo",
-        width = INPUT_FIELD_WIDTH,
+        min = 0,
+        max = 100,
+
+        width = VALUEBOX_WIDTH,
+
+
+        tostring = function(value) 
+          local _ = value
+          if (_ > 100 ) then  _ = 100 end
+          if (_ < 0 ) then  _ = 0 end
+          return tonumber(_)
+        end,
+
+        tonumber = function(str) 
+          local _ = tonumber(str)
+          if (_ > 100 ) then  _ = 100 end
+          if (_ < 0 ) then  _ = 0 end
+          return _
+        end,
         notifier = function(v)
-          solo_stop_percentage = tonumber(v)
+          local _ = tonumber(v)
+          if (_ > 100 ) then  _ = 100 end
+          if (_ < 0 ) then  _ = 0 end
+          solo_stop_percentage = _
         end
       },
-
-    }, -- end of horiz aligner
-
-  } -- end of vb:colum
+    }, -- end of horizontal aligner
+  } -- end of vb:column
 
   local note_column_odds = {}
 
+  local default_value = math.floor(100/(note_cols_num-1))
   for i = 2,note_cols_num  do
-
-    note_column_odds[i] = note_cols_odds[i] or DEFAULT_NOTE_COL_ODDS
-
+    note_column_odds[i] = note_cols_odds[i] or default_value 
     local horiz_note_vol_form = vb:horizontal_aligner {
       mode = "justify",
       vb:text {
-        text = string.format("Note column %d", i),
+        text = string.format("Note column %d switching weight", i),
         tooltip = "",
       },
       vb:textfield {
@@ -113,9 +166,7 @@ function volume_jumper_config()
       },
 
     } -- end of horiz aligner
-
     view_voljumper_config_dialog:add_child(horiz_note_vol_form)
-
   end  -- end of note volume columns 
 
   local action_buttons = vb:horizontal_aligner {
@@ -125,7 +176,8 @@ function volume_jumper_config()
       color = {227,255,150 },
       released = function()
         configuration_dialog:close()
-        RandyNoteColumns.assign_vol_column_timers(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage )
+        RandyNoteColumns.assign_vol_column_timers(timer_interval, 
+        trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
       end
     },
     vb:space {
@@ -154,4 +206,3 @@ function volume_jumper_config()
   view_voljumper_config_dialog:add_child(action_buttons)
   configuration_dialog = renoise.app():show_custom_dialog("Randy Note Columns", view_voljumper_config_dialog, configuration_dialog_keyhander)
 end
-
