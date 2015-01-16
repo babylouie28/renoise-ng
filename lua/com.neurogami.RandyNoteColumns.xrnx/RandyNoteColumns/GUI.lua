@@ -184,7 +184,7 @@ function volume_jumper_config()
       width = SIMPLE_SPACE
     },
     vb:button {
-      text = "Clear existing timers",
+      text = "Clear existing timer",
       color = {200, 255, 255 },
       released = function()
         configuration_dialog:close()
