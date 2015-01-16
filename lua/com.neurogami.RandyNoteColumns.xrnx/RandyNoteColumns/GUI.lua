@@ -100,7 +100,7 @@ function volume_jumper_config()
     local horiz_note_vol_form = vb:horizontal_aligner {
       mode = "justify",
       vb:text {
-        text = string.format("Volume column %d", i),
+        text = string.format("Note column %d", i),
         tooltip = "",
       },
       vb:textfield {
@@ -152,6 +152,6 @@ function volume_jumper_config()
     },
   }
   view_voljumper_config_dialog:add_child(action_buttons)
-  configuration_dialog = renoise.app():show_custom_dialog("Volume Jumper", view_voljumper_config_dialog, configuration_dialog_keyhander)
+  configuration_dialog = renoise.app():show_custom_dialog("Randy Note Columns", view_voljumper_config_dialog, configuration_dialog_keyhander)
 end
 

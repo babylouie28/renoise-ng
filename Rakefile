@@ -17,8 +17,9 @@ task :global do
   warn "This is hardcoded for Ubuntu"
   warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V#{V2}/Scripts/`
   warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V#{V3}/Scripts/`
-  warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V#{V3}/Scripts/`
+  
   warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V#{V2}/Scripts/`
+  warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V#{V3}/Scripts/`
   #  warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V3.0.0/Scripts/`
 
 end
@@ -42,15 +43,12 @@ def zipit name, folder, input_filenames
 end
 
 def ng_vhost
-
   case  hostname 
   when /james1/
-  %~/home/james/data/vhosts/2012.neurogami.com/~
+  %~/home/james/data/vhosts/2012.neurogami.com~
   else
     raise "Undefined NG vhost for #{hostname}"
   end
-
-
 end
 
 def hostname 
@@ -58,7 +56,7 @@ def hostname
 end
 
 def copy_to_neurogami_dist zipfile_name
-  sh  "cp #{zipfile_name} #{ng_vhost}/content/renoise-tools/ "
+  sh "cp #{zipfile_name} #{ng_vhost}/content/renoise-tools/ "
 end
 
 def files tool_folder, exlude_patterns = []
@@ -90,6 +88,15 @@ namespace :package do
     cd 'lua'
     name = 'SharedCode'
     folder = "com.neurogami.#{name}.xrnx" 
+    input_filenames = files folder 
+    zipit name, folder, input_filenames
+  end
+
+  desc "Package up RandyNoteColumns"
+  task :randy_notes do
+    cd 'lua'
+    name = 'RandyNoteColumns'
+    folder = "com.neurogami.#{name}.xrnx"
     input_filenames = files folder 
     zipit name, folder, input_filenames
   end
