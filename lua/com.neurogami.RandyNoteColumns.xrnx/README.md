@@ -50,7 +50,7 @@ The second parameter is the percentage likelihood (currently as a number for 0 t
 
 Each time the timer function is called it grabs a random number from 1 to 100. If this number is lower than the provided percentage for triggering then the code picks what other column to solo.  If there is only one other column then that's the one that comes to life.
 
-The third parameter is the odds (again, a number from 1 to 100) of reverting back to the first note column if it's not currently playing.
+The third parameter is the odds (again, a number from 1 to 100) of reverting back to the first note column if it's not currently playing. This is the "percentage for unsoloing."
 
 The remaining  parameters are for relative odds of the non-first note columns being selected.  If, for example, the track has three note columns then you'll see fields for "Note column 2" and Note column 3".
 
@@ -76,21 +76,9 @@ Since the timer function gets called every second, if either the second or third
 
 You then click on "Apply" to add the timer function and start the fun.
 
+You will likely need to play around with different values to get something that sounds right to you. To change an existing timer function just bring up the UI again and edit the values, then click "Apply" to replace the current timer with a new function with the new values.
 
-
-
-
-
-
-
-
-Percetnage for triggering
-
-Percentage for unsoloing
-
-
-For each note column (other than the first column) there's a field for the relative odds of selection.  There
-
+To remove an existing timer function for a given track you bring up the UI and click the "clear existing timers" button. It will clear the timer for the currently selected track.
 
 ## Author
 
