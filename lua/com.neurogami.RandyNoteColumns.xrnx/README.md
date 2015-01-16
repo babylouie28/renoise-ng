@@ -4,6 +4,7 @@
 
 Randy Note Columns works with a track's note columns.  It will set up a Renoise timer function that will randomly select a note column to play solo for that track.  The select note column will then stay solo for some random interval.
 
+Download a packaged version from the [Neurogami code page.]([http://neurogami.com/code/)
 
 ### Background 
 
@@ -80,6 +81,8 @@ You then click on "Apply" to add the timer function and start the fun.
 You will likely need to play around with different values to get something that sounds right to you. To change an existing timer function just bring up the UI again and edit the values, then click "Apply" to replace the current timer with a new function with the new values.
 
 To remove an existing timer function for a given track you bring up the UI and click the "clear existing timer" button. It will clear the timer for the currently selected track.
+
+
 
 ## Author
 
