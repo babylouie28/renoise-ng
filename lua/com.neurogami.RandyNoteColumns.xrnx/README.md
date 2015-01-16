@@ -4,7 +4,7 @@
 
 Randy Note Columns works with a track's note columns.  It will set up a Renoise timer function that will randomly select a note column to play solo for that track.  The select note column will then stay solo for some random interval.
 
-Download a packaged version from the [Neurogami code page.]([http://neurogami.com/code/)
+Download a packaged version from the [Neurogami code page.](http://neurogami.com/code/)
 
 ### Background 
 
