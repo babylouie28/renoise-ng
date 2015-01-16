@@ -38,7 +38,7 @@ Click on the track, then right-click to get the context menu.
 
 Click on "Neurogami Randy Note Columns" to get a pop-up window for setting parameters.
 
-![Track menu](../../images/ng-rnc003.png "Randy Column Notes!")
+![Track menu](../../images/randy-config-window.png "Randy Column Notes!")
 
 The tool is still evolving so the UI is likely to change.  But the basics are in place.
 
