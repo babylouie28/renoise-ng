@@ -3,7 +3,7 @@ local configuration_dialog
 
 local SIMPLE_SPACE = 32
 local INPUT_FIELD_WIDTH = 32
-local VALUEBOX_WIDTH = 72
+local VALUEBOX_WIDTH = 56
 local DEFAULT_NOTE_COL_ODDS = 20
 
 function configuration_dialog_keyhander(dialog, key)
@@ -75,14 +75,14 @@ function volume_jumper_config()
         tooltip = "Enter a number from 0 to 100. Higher number means more likely to change note column",
 
         tostring = function(value) 
-          local _ = value
+          local _ = math.floor(tonumber(value))
           if (_ > 100 ) then  _ = 100 end
           if (_ < 0 ) then  _ = 0 end
-          return tonumber(_)
+          return ("" .. _)
         end,
 
         tonumber = function(str) 
-          local _ = tonumber(str)
+          local _ = math.floor(tonumber(str))
           if (_ > 100 ) then  _ = 100 end
           if (_ < 0 ) then  _ = 0 end
           return _
@@ -121,20 +121,20 @@ function volume_jumper_config()
 
         width = VALUEBOX_WIDTH,
 
-
         tostring = function(value) 
-          local _ = value
+          local _ = math.floor(tonumber(value))
           if (_ > 100 ) then  _ = 100 end
           if (_ < 0 ) then  _ = 0 end
-          return tonumber(_)
+          return ("" .. _)
         end,
 
         tonumber = function(str) 
-          local _ = tonumber(str)
+          local _ = math.floor(tonumber(str))
           if (_ > 100 ) then  _ = 100 end
           if (_ < 0 ) then  _ = 0 end
           return _
         end,
+
         notifier = function(v)
           local _ = tonumber(v)
           if (_ > 100 ) then  _ = 100 end
