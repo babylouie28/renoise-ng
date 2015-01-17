@@ -5,6 +5,11 @@ local SIMPLE_SPACE = 32
 local INPUT_FIELD_WIDTH = 32
 local VALUEBOX_WIDTH = 56
 local DEFAULT_NOTE_COL_ODDS = 20
+local TITLE = "Randy Note Columns v0.6"
+
+
+print("Loaded ", TITLE)
+
 
 function configuration_dialog_keyhander(dialog, key)
   if key.name == "esc" then
@@ -202,7 +207,20 @@ function volume_jumper_config()
         configuration_dialog:close()
       end
     },
+    vb:space{
+      width = SIMPLE_SPACE
+    },
+
+    vb:button {
+      text = "Save",
+      color = {100, 200, 100 },
+      released = function()
+        RandyNoteColumns.save_all()
+        configuration_dialog:close()
+      end
+    },
   }
   view_voljumper_config_dialog:add_child(action_buttons)
-  configuration_dialog = renoise.app():show_custom_dialog("Randy Note Columns", view_voljumper_config_dialog, configuration_dialog_keyhander)
+  configuration_dialog = renoise.app():show_custom_dialog(TITLE, view_voljumper_config_dialog, configuration_dialog_keyhander)
+
 end

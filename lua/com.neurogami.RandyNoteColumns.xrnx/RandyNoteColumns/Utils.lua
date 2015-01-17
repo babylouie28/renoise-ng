@@ -22,3 +22,11 @@ function clamp_value(value, min_value, max_value)
 	return l
 end	
  
+-- https://helloacm.com/split-a-string-in-lua/
+function split(s, delimiter)
+    local result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match);
+    end
+    return result;
+end

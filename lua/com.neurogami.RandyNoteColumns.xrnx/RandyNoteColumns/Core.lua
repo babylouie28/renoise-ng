@@ -2,6 +2,26 @@
 
 require "RandyNoteColumns/Utils"
 
+--[[
+
+Notes on saving the current set of rand values.
+
+Option 1: Add a button to save the settings for the current track
+
+Option 2: Add a button that saves everything for the whole song (no matter what track you happen to have selected)
+
+The advantage to #2 is that the full contents of all the RandyNoteColumns.volume_jumper_* stuff gets saved/loaded.
+
+There's no need to pick and choose.  Save it out using the current song file 
+name (or some derivative) and allow reloading based on the same.
+
+Is there a reason to save per track?  
+
+Is there a reaosn both can't coexist?
+
+
+
+--]]
 RandyNoteColumns = {}
 
 RandyNoteColumns.timers = {}
@@ -11,6 +31,33 @@ RandyNoteColumns.volume_jumper_normalized_col_odds = {}
 RandyNoteColumns.volume_jumper_track_odds = {}
 RandyNoteColumns.volume_jumper_track_stop_odds = {}
 RandyNoteColumns.volume_jumper_track_timer_interval = {}
+
+
+function RandyNoteColumns.save_all()
+
+  local fname = renoise.song().file_name
+  print("save_all has fname ", fname)
+  
+
+  local parts = split(fname, "/")
+  local xname = parts[#parts]
+  print("xname = ", xname)
+
+  if next(RandyNoteColumns.volume_jumper_track_col_odds) == nil then
+    print("There are no time values to save.")
+    return
+  end
+  local conf_name = "RandyConfig"
+  -- "unsupported observable list entry type. only booleans, numbers or strings are supported."
+  local configuration = renoise.Document.create(conf_name ) {
+--    volume_jumper_track_col_odds = RandyNoteColumns.volume_jumper_track_col_odds,-- There's an issue saving tables of table ...
+  --  volume_jumper_normalized_col_odds = RandyNoteColumns.volume_jumper_normalized_col_odds,  -- Cannot save floats it seems.
+   volume_jumper_track_odds = RandyNoteColumns.volume_jumper_track_odds,
+   volume_jumper_track_stop_odds = RandyNoteColumns.volume_jumper_track_stop_odds,
+    volume_jumper_track_timer_interval = RandyNoteColumns.volume_jumper_track_timer_interval
+  }
+  configuration:save_as(conf_name .. "_" ..  xname .. ".xml")
+end
 
 function RandyNoteColumns.solo_note_column_volume(track_index, note_column_index)
   local track = renoise.song().tracks[track_index]
@@ -55,13 +102,13 @@ function RandyNoteColumns.normalize_volume_jumper_track_col_odds(track_index)
 end
 
 function RandyNoteColumns.select_note_col(track_index)
-  
+
   local column_odds = RandyNoteColumns.volume_jumper_normalized_col_odds[track_index]
   local r =  math.random()
 
   for col,v in pairs(column_odds) do
     if (r < v) then
-        return col
+      return col
     end
   end
 
