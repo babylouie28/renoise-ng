@@ -6,6 +6,10 @@ Randy Note Columns works with a track's note columns.  It will set up a Renoise 
 
 Download a packaged version from the [Neurogami code page.](http://neurogami.com/code/)
 
+** Note **
+
+This is still evolving.  There may be stuff that is a bit wonky.
+
 ### Background 
 
 Many years ago, in the time of Windows XP, there was a company named Sseyo (yes, spelled like that) who released a product called Koan.

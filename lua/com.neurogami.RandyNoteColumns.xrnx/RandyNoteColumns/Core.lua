@@ -24,6 +24,8 @@ Is there a reaosn both can't coexist?
 --]]
 RandyNoteColumns = {}
 
+function RandyNoteColumns.start_fresh()
+
 RandyNoteColumns.timers = {}
 RandyNoteColumns.volume_jumper_timers = {}
 RandyNoteColumns.volume_jumper_track_col_odds = {}
@@ -32,6 +34,44 @@ RandyNoteColumns.volume_jumper_track_odds = {}
 RandyNoteColumns.volume_jumper_track_stop_odds = {}
 RandyNoteColumns.volume_jumper_track_timer_interval = {}
 
+end
+
+
+-- Handle clean up when loading a new song
+
+local notifier = {}
+
+function notifier.add(observable, n_function)
+  if not observable:has_notifier(n_function) then
+    observable:add_notifier(n_function)
+  end
+end
+
+function notifier.remove(observable, n_function)
+  if observable:has_notifier(n_function) then
+    observable:remove_notifier(n_function)
+  end
+end
+
+
+-- Set up song opening & closing observables
+local new_doc_observable = renoise.tool().app_new_document_observable
+local close_doc_observable = renoise.tool().app_release_document_observable
+
+
+-- Set up notifier functions that are called when song opened or closed
+local function open_song()
+  print("A new song was opened")
+   RandyNoteColumns.start_fresh()
+end
+
+
+-- Add the notifiers
+notifier.add(new_doc_observable, open_song)
+
+
+
+--
 
 function RandyNoteColumns.save_all()
 

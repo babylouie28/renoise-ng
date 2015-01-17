@@ -5,7 +5,7 @@ local SIMPLE_SPACE = 32
 local INPUT_FIELD_WIDTH = 32
 local VALUEBOX_WIDTH = 56
 local DEFAULT_NOTE_COL_ODDS = 20
-local TITLE = "Randy Note Columns v0.6"
+local TITLE = "Randy Note Columns v1.4"
 
 
 print("Loaded ", TITLE)
