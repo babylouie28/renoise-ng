@@ -10,35 +10,13 @@ function dump(...)
 end
 
 
-
-
---[[
-
-Notes on saving the current set of rand values.
-
-Option 1: Add a button to save the settings for the current track
-
-Option 2: Add a button that saves everything for the whole song (no matter what track you happen to have selected)
-
-The advantage to #2 is that the full contents of all the RandyNoteColumns.volume_jumper_* stuff gets saved/loaded.
-
-There's no need to pick and choose.  Save it out using the current song file 
-name (or some derivative) and allow reloading based on the same.
-
-Is there a reason to save per track?  
-
-Is there a reaosn both can't coexist?
-
-
-
---]]
 RandyNoteColumns = {}
 
 configuration = nil
 
 RandyNoteColumns.CONFIG_PREFIX = "RandyConfig"
-function RandyNoteColumns.start_fresh()
 
+function RandyNoteColumns.start_fresh()
   RandyNoteColumns.timers = {}
   RandyNoteColumns.volume_jumper_timers = {}
   RandyNoteColumns.volume_jumper_track_col_odds = {}
@@ -46,9 +24,6 @@ function RandyNoteColumns.start_fresh()
   RandyNoteColumns.volume_jumper_track_odds = {}
   RandyNoteColumns.volume_jumper_track_stop_odds = {}
   RandyNoteColumns.volume_jumper_track_timer_interval = {}
-
---  RandyNoteColumns.load_all()
-
 end
 
 
@@ -87,8 +62,16 @@ notifier.add(new_doc_observable, open_song)
 
 -- ******************************************************************
 
-function RandyNoteColumns.save_all()
 
+function RandyNoteColumns.reload_all_timers()
+  print("RandyNoteColumns.reload_all_timers() ... ")
+  rPrint(RandyNoteColumns.volume_jumper_track_timer_interval)
+  for track_index, interval in pairs(RandyNoteColumns.volume_jumper_track_timer_interval) do
+    RandyNoteColumns.construct_and_deploy_timer(track_index)
+  end
+end
+
+function RandyNoteColumns.save_all()
 
   if next(RandyNoteColumns.volume_jumper_track_col_odds) == nil then
     print("There are no time values to save.")
@@ -136,8 +119,10 @@ function RandyNoteColumns.load_all()
     RandyNoteColumns.volume_jumper_track_odds = loadstring(configuration.volume_jumper_track_odds.value)()  
     RandyNoteColumns.volume_jumper_track_stop_odds = loadstring(configuration.volume_jumper_track_stop_odds.value)()  
     RandyNoteColumns.volume_jumper_track_timer_interval = loadstring(configuration.volume_jumper_track_timer_interval.value)() 
+    RandyNoteColumns.reload_all_timers()
   else
     print("Cannot find ", RandyNoteColumns.config_file_for_current_song())
+    renoise.app():show_message("Cannot find any configuration file for this song.")
   end
 end
 
@@ -209,15 +194,20 @@ function RandyNoteColumns.clear_vol_column_timers(track_index)
 end
 
 
-function RandyNoteColumns.assign_vol_column_timers(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
-
+function RandyNoteColumns.assign_note_column_timer(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
 
   RandyNoteColumns.volume_jumper_track_timer_interval[track_index] = timer_interval
   RandyNoteColumns.volume_jumper_track_col_odds[track_index] = note_column_odds
   RandyNoteColumns.volume_jumper_track_odds[track_index] = trigger_percentage
   RandyNoteColumns.volume_jumper_track_stop_odds[track_index] = solo_stop_percentage
-
   RandyNoteColumns.normalize_volume_jumper_track_col_odds(track_index)
+
+  RandyNoteColumns.construct_and_deploy_timer(track_index)
+end
+
+
+function RandyNoteColumns.construct_and_deploy_timer(track_index)
+  print(" - - - - RandyNoteColumns.construct_and_deploy_timer(", track_index, ")")
 
   local func_string = [[   
   local track = renoise.song().tracks[]] .. track_index .. [[]
@@ -238,6 +228,7 @@ function RandyNoteColumns.assign_vol_column_timers(timer_interval, trigger_perce
   end
   ]]
 
+  local timer_interval = RandyNoteColumns.volume_jumper_track_timer_interval[track_index]
   if(RandyNoteColumns.timers[track_index] and renoise.tool():has_timer( RandyNoteColumns.timers[track_index] ) ) then
     renoise.tool():remove_timer( RandyNoteColumns.timers[track_index] )
   end

@@ -43,10 +43,11 @@ function create_osc_server()
 
 end
 
-renoise.tool():add_menu_entry {
-  name = "--- Main Menu:Tools:Neurogami " .. TOOL_NAME .. ":Start the OSC " .. TOOL_NAME .. " server ..",
-  invoke = create_osc_server
-}
+-- Not ready.
+--renoise.tool():add_menu_entry {
+--  name = "--- Main Menu:Tools:Neurogami " .. TOOL_NAME .. ":Start the OSC " .. TOOL_NAME .. " server ..",
+ -- invoke = create_osc_server
+-- }
 
 -- TRACK RAND VOL STUFF
 renoise.tool():add_menu_entry {

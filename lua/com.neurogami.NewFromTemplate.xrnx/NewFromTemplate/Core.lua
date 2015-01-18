@@ -63,10 +63,8 @@ function NewFromTemplate.prompt_user()
     template_dialog = nil
   end
 
-  -- reload
-  NewFromTemplate.load_preferences() -- FIXME need to make real
+  NewFromTemplate.load_preferences() 
 
-  -- Create new dialog
   NewFromTemplate.template_dialog_init()
   template_dialog = renoise.app():show_custom_dialog("New from template", view_template_dialog, NewFromTemplate.template_dialog_keyhander)
 end

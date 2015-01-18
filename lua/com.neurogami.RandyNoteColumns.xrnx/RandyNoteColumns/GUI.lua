@@ -6,7 +6,7 @@ local INPUT_FIELD_WIDTH = 32
 local VALUEBOX_WIDTH = 56
 local DEFAULT_NOTE_COL_ODDS = 20
 local TITLE = "Randy Note Columns v1.4"
-
+local MARGIN = 8
 
 print("Loaded ", TITLE)
 
@@ -166,52 +166,69 @@ function volume_jumper_config()
     view_voljumper_config_dialog:add_child(horiz_note_vol_form)
   end  -- end of note volume columns 
 
-  local action_buttons = vb:horizontal_aligner {
-    mode = "center",    
-    vb:button {
-      text = "Apply",
-      color = {227,255,150 },
-      released = function()
-        configuration_dialog:close()
-        RandyNoteColumns.assign_vol_column_timers(timer_interval, 
-        trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
-      end
-    },
-    vb:space {
-      width = SIMPLE_SPACE
-    },
-    vb:button {
-      text = "Clear existing timer",
-      color = {200, 255, 255 },
-      released = function()
-        configuration_dialog:close()
-        RandyNoteColumns.clear_vol_column_timers(track_index)
-      end
-    },
-    vb:space{
-      width = SIMPLE_SPACE
-    },
+  local action_buttons = vb:column {
+    vb:horizontal_aligner {
+      margin = MARGIN,
+      mode = "center",    
+      vb:button {
+        text = "Apply",
+        -- color = {227,255,150 },
+        released = function()
+          configuration_dialog:close()
+          RandyNoteColumns.assign_note_column_timer(timer_interval, trigger_percentage, track_index, 
+          note_column_odds, solo_stop_percentage)
+        end
+      },
+      vb:space {
+        width = SIMPLE_SPACE
+      },
+      vb:button {
+        text = "Clear existing timer",
+        -- color = {220, 225, 255 },
+        released = function()
+          configuration_dialog:close()
+          RandyNoteColumns.clear_vol_column_timers(track_index)
+        end
+      },
+      vb:space{
+        width = SIMPLE_SPACE
+      },
 
-    vb:button {
-      text = "Cancel",
-      color = {255, 200, 200 },
-      released = function()
-        configuration_dialog:close()
-      end
-    },
-    vb:space{
-      width = SIMPLE_SPACE
-    },
+      vb:button {
+        text = "Cancel",
+        -- color = {255, 100, 100 },
+        released = function()
+          configuration_dialog:close()
+        end
+      },
 
-    vb:button {
-      text = "Save",
-      color = {100, 200, 100 },
-      released = function()
-        RandyNoteColumns.save_all()
-        configuration_dialog:close()
-      end
+
+    },  -- end H aligner
+
+    vb:horizontal_aligner {
+      mode = "center",    
+      margin = MARGIN,
+      vb:button {
+        text = "Load all",
+        released = function()
+          RandyNoteColumns.load_all()
+          configuration_dialog:close()
+        end
+      },
+      vb:space{
+        width = SIMPLE_SPACE
+      },
+
+      vb:button {
+        text = "Save all",
+        released = function()
+          RandyNoteColumns.save_all()
+          configuration_dialog:close()
+        end
+      },
     },
   }
+
   view_voljumper_config_dialog:add_child(action_buttons)
   configuration_dialog = renoise.app():show_custom_dialog(TITLE, view_voljumper_config_dialog, configuration_dialog_keyhander)
 
