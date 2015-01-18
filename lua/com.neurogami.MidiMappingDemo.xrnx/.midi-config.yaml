@@ -1,9 +1,0 @@
----
-# :device: 1
-:initial_messages:    #     schema :channel, :low, :high
- - "!NGjump 3 2 "
- - 'MIDIMessage::PitchBend.new(0, 0x00, 0x70)'
- - 1 55 100
- - 1 55
- - 1 46 127
- - 1 46 
