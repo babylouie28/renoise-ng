@@ -2,7 +2,7 @@
 
 Designed to handle special OSC messages sent by a [Control](http://charlie-roberts.com/Control/) application.
 
-You should load up  asonf that has assorted percussion instruments for tracks one through five.
+You should load upa song that has assorted percussion instruments for tracks one through five.
 
 Instrument 16 (10 in hex) should be assigned the ["numbers" instrument](https://github.com/Neurogami/renoise-ng/tree/master/intruments).
 
@@ -10,7 +10,7 @@ The Control program is meant to manipulate the song to help generate different k
 
 ** VERY MUCH IN ALPHA. **
 
-
+This tool seems to duplicate things that are done by OSC Jumper.  It may end up with OSC Jumper being the single repository for all interesting OSC handlers, with no need for a specialized Beat Masher tool.
 
 
 # Usage
@@ -40,7 +40,6 @@ These are the messages that can be sent from the Control app.
     /renoise/song/track/<number>/output_delay
 
     /renoise/song/track/<number>/postfx_volume
-
 
     /ng/song/track/clear track_number
 
