@@ -16,16 +16,15 @@ Many years ago, in the time of Windows XP, there was a company named Sseyo (yes,
 
 Koan was a tool for generating music.  You provided assorted parameters (tempo, scale, odds for this or that change occurring), hit a button, and out came music. (Koan is now gone; Sseyo has transmogrified into Intermorphic, who now offer Noatikl, the Koan replacement.)
 
-This is a gross simplification.  The range of options was terrific; so much so that getting it produce decent results was a challenge.  Things tended towards either quite predictable or simply meandering.  (Not that these are always bad qualities ...)
+This is a gross simplification.  The range of options was terrific; so much so that getting it to produce decent results was a challenge.  Things tended towards either quite predictable or simply meandering.  (Not that these are always bad qualities ...)
 
-There was one  feature that stood out for creating interesting backing tracks.  You could define, say, a drum pattern, but provide alternate takes (so to speak) for each instrument.  For these alternate takes you could assign the odds of each playing.  You might have a steady snare drum as the main track but provide some alternate takes that offered a few flourishes (rolls, rim hits).  When you played the piece there was a somewhat more natural result because of the periodic variation within the overall steady behavior.
+There was one feature that stood out for creating interesting backing tracks.  You could define, say, a drum pattern, but provide alternate takes (so to speak) for each instrument.  For these alternate takes you could assign the odds of each playing.  You might have a steady snare drum as the main track but provide some alternate takes that offered a few flourishes (rolls, rim hits).  When you played the piece there was a somewhat more natural result because of the periodic variation within the overall steady behavior.
 
-Randy Column Notes attempts to provide a similar feature for Renoise.  It assumes that a given track has multiple column notes, but that only one note column should be active at a time; all other should be muted.  
+Randy Note Columns attempts to provide a similar feature for Renoise.  It assumes that a given track has multiple column notes, but that only one note column should be active at a time; all others should be muted.  
 
 The first column is assumed to be the default.  All the others are the randy columns.
 
 You can have as many of these sorts of track setups as you like.  Because of the "one column un-muted at a time" requirement these tracks cannot be polyphonic. 
-
 
 ## Usage
 
@@ -86,6 +85,20 @@ You will likely need to play around with different values to get something that 
 
 To remove an existing timer function for a given track you bring up the UI and click the "clear existing timer" button. It will clear the timer for the currently selected track.
 
+
+### Saving and loading
+
+When you load a song all existing Randy timers are cleared.  If you have a set of parameters you like and want to reuse in the future you can save them using the  "Save all" button.
+
+This saves the settings for _all_ of the column-switching timers for all of the tracks in the current song.  The settings are saved to a file based on the file name of the current song.
+
+To reload these settings use the "Load all" button.  It looks for a saved configuration file based on the name of the currently loaded song. If it finds on it loads the settings and reestablishes all of the timers.
+
+
+
+## Still to come
+
+This is some half-baked OSC stuff in the code. What's planned is an OSC interface for setting/removing the note-jumping timers.
 
 
 ## Author
