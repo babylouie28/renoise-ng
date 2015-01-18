@@ -1,6 +1,16 @@
 -- Core.lua 
 
 require "RandyNoteColumns/Utils"
+require "RandyNoteColumns/Dumper"
+
+-- Define a shortcut function for testing
+-- See http://lua-users.org/wiki/DataDumper
+function dump(...)
+  print(DataDumper(...), "\n---")
+end
+
+
+
 
 --[[
 
@@ -24,19 +34,25 @@ Is there a reaosn both can't coexist?
 --]]
 RandyNoteColumns = {}
 
+configuration = nil
+
+RandyNoteColumns.CONFIG_PREFIX = "RandyConfig"
 function RandyNoteColumns.start_fresh()
 
-RandyNoteColumns.timers = {}
-RandyNoteColumns.volume_jumper_timers = {}
-RandyNoteColumns.volume_jumper_track_col_odds = {}
-RandyNoteColumns.volume_jumper_normalized_col_odds = {}
-RandyNoteColumns.volume_jumper_track_odds = {}
-RandyNoteColumns.volume_jumper_track_stop_odds = {}
-RandyNoteColumns.volume_jumper_track_timer_interval = {}
+  RandyNoteColumns.timers = {}
+  RandyNoteColumns.volume_jumper_timers = {}
+  RandyNoteColumns.volume_jumper_track_col_odds = {}
+  RandyNoteColumns.volume_jumper_normalized_col_odds = {}
+  RandyNoteColumns.volume_jumper_track_odds = {}
+  RandyNoteColumns.volume_jumper_track_stop_odds = {}
+  RandyNoteColumns.volume_jumper_track_timer_interval = {}
+
+--  RandyNoteColumns.load_all()
 
 end
 
 
+-- ******************************************************************
 -- Handle clean up when loading a new song
 
 local notifier = {}
@@ -62,41 +78,67 @@ local close_doc_observable = renoise.tool().app_release_document_observable
 -- Set up notifier functions that are called when song opened or closed
 local function open_song()
   print("A new song was opened")
-   RandyNoteColumns.start_fresh()
+  RandyNoteColumns.start_fresh()
 end
 
 
 -- Add the notifiers
 notifier.add(new_doc_observable, open_song)
 
-
-
---
+-- ******************************************************************
 
 function RandyNoteColumns.save_all()
 
-  local fname = renoise.song().file_name
-  print("save_all has fname ", fname)
-  
-
-  local parts = split(fname, "/")
-  local xname = parts[#parts]
-  print("xname = ", xname)
 
   if next(RandyNoteColumns.volume_jumper_track_col_odds) == nil then
     print("There are no time values to save.")
     return
   end
-  local conf_name = "RandyConfig"
-  -- "unsupported observable list entry type. only booleans, numbers or strings are supported."
-  local configuration = renoise.Document.create(conf_name ) {
---    volume_jumper_track_col_odds = RandyNoteColumns.volume_jumper_track_col_odds,-- There's an issue saving tables of table ...
-  --  volume_jumper_normalized_col_odds = RandyNoteColumns.volume_jumper_normalized_col_odds,  -- Cannot save floats it seems.
-   volume_jumper_track_odds = RandyNoteColumns.volume_jumper_track_odds,
-   volume_jumper_track_stop_odds = RandyNoteColumns.volume_jumper_track_stop_odds,
-    volume_jumper_track_timer_interval = RandyNoteColumns.volume_jumper_track_timer_interval
+
+  configuration = renoise.Document.create(RandyNoteColumns.CONFIG_PREFIX  ) {
+    volume_jumper_track_col_odds =  DataDumper(RandyNoteColumns.volume_jumper_track_col_odds),
+    volume_jumper_normalized_col_odds =  DataDumper(RandyNoteColumns.volume_jumper_normalized_col_odds), 
+    volume_jumper_track_odds =  DataDumper(RandyNoteColumns.volume_jumper_track_odds),
+    volume_jumper_track_stop_odds =  DataDumper(RandyNoteColumns.volume_jumper_track_stop_odds),
+    volume_jumper_track_timer_interval =  DataDumper(RandyNoteColumns.volume_jumper_track_timer_interval)
   }
-  configuration:save_as(conf_name .. "_" ..  xname .. ".xml")
+  configuration:save_as(RandyNoteColumns.config_file_for_current_song())
+end
+
+function RandyNoteColumns.config_file_for_current_song()
+  local fname = renoise.song().file_name
+  local parts = split(fname, "/")
+  local xname = parts[#parts]
+  return RandyNoteColumns.CONFIG_PREFIX  .. "_" ..  xname .. ".xml"
+end
+
+function RandyNoteColumns.have_config_file() 
+  local file_name = os.currentdir() .. "/" .. RandyNoteColumns.config_file_for_current_song()
+  print(file_name)
+  local f=io.open(file_name,"r")
+  if f~=nil then io.close(f) return true else return false end
+end
+
+function RandyNoteColumns.load_all()
+  if RandyNoteColumns.have_config_file() then
+    configuration  =  renoise.Document.create(RandyNoteColumns.CONFIG_PREFIX  ) {
+      volume_jumper_track_col_odds = DataDumper("foo"),
+      volume_jumper_normalized_col_odds = DataDumper("foo"),
+      volume_jumper_track_odds =  DataDumper("foo"),
+      volume_jumper_track_stop_odds =  DataDumper("foo"),
+      volume_jumper_track_timer_interval =  DataDumper("foo"),
+    }
+
+    configuration:load_from(RandyNoteColumns.config_file_for_current_song())
+
+    RandyNoteColumns.volume_jumper_track_col_odds = loadstring(configuration.volume_jumper_track_col_odds.value )()
+    RandyNoteColumns.volume_jumper_normalized_col_odds = loadstring(configuration.volume_jumper_normalized_col_odds.value)() 
+    RandyNoteColumns.volume_jumper_track_odds = loadstring(configuration.volume_jumper_track_odds.value)()  
+    RandyNoteColumns.volume_jumper_track_stop_odds = loadstring(configuration.volume_jumper_track_stop_odds.value)()  
+    RandyNoteColumns.volume_jumper_track_timer_interval = loadstring(configuration.volume_jumper_track_timer_interval.value)() 
+  else
+    print("Cannot find ", RandyNoteColumns.config_file_for_current_song())
+  end
 end
 
 function RandyNoteColumns.solo_note_column_volume(track_index, note_column_index)

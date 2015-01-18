@@ -93,19 +93,11 @@ function volume_jumper_config()
           return _
         end,
 
-
         notifier = function(v)
           local _ = tonumber(v)
           if (_ > 100 ) then  _ = 100 end
           if (_ < 0 ) then  _ = 0 end
-          trigger_percentage = _ -- Will not update the value shown.
-
-
-
-          -- This works but also triggers a self-reference loop error. Which makes sense
-          --   local my_trigger_percentage = vb.views.trigger_percentage
-          --   my_trigger_percentage.text = ("" .. trigger_percentage)
-
+          trigger_percentage = _ 
         end
       },
     },
@@ -166,7 +158,7 @@ function volume_jumper_config()
         tooltip = "Odds of selection",
         width = INPUT_FIELD_WIDTH,
         notifier = function(v)
-          note_column_odds[i] = tonumber(v)
+          note_column_odds["" .. i] = tonumber(v)
         end
       },
 
