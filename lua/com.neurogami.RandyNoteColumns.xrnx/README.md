@@ -122,6 +122,12 @@ The downside is that if you want to use Randy Note Columns via OSC you have to i
 
 The removal of duplication, however, seems like a much bigger gain.
 
+There's an interesting result taking this approach.  Timers created using the GUI exist independant of those created using the OSC API.  The code is shared, but instantiated by two different tools.
+
+In practical use this probably won't matter; you will likely be using one or the other but not both at the same time.
+
+However, it would be interesting to find a way to share data among tools.
+
 ## Author
 
 Randy Note Columns was written by James Britt / Neurogami.

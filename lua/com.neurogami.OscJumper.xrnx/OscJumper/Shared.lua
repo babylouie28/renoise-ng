@@ -81,14 +81,22 @@ rotate_handlers = {
 }
 
 randy_handlers = {
-  { -- Marks a pattern loop range and  then sets the start of the loop as  the next pattern to play
-  pattern = "/randy/test",
-  handler = function(track_index, timer_interval, trigger_percentage,  solo_stop_percentage, ... )
+
+  {
+    pattern = "/randy/clear_track_note_timer",
+    handler = function(track_index)
+      print("/randy/clear_track_note_timer ", track_index )
+      RandyNoteColumns.clear_note_column_timers(track_index)
+    end
+  },
+  {
+    pattern = "/randy/add_track_note_timer",
+    handler = function(track_index, timer_interval, trigger_percentage,  solo_stop_percentage, ... )
 
     -- need a way to get the current pattern or something so that
     -- this works on the right stuff
-    print("Randy test for track_index ", track_index )
- 
+    print("/randy/add_track_note_timer ", track_index )
+
     local note_column_odds = {} 
 
     -- arg seems to be magic, in that the last value is the arg count.
@@ -96,25 +104,25 @@ randy_handlers = {
     print("We have note_column_odds: ", note_column_odds )
 
     for i,v in ipairs(arg) do
-        note_column_odds[i+1] = v 
-      end
---[[
+      note_column_odds[i+1] = v 
+    end
+    --[[
 
-What is the proper way to pass along a series of values?
+    What is the proper way to pass along a series of values?
 
-Arrays in OSC v1:  Not part of the core types, but the spec describes conventions used by some implementations.
+    Arrays in OSC v1:  Not part of the core types, but the spec describes conventions used by some implementations.
 
-Does Renoise understand arrays in OSC? None of the default hhandlers use arrays. Nor does osc-repl (right now).
+    Does Renoise understand arrays in OSC? None of the default hhandlers use arrays. Nor does osc-repl (right now).
 
-One hack: Pass a variable number of args with the OSC message, and just pass all of them to the handler
+    One hack: Pass a variable number of args with the OSC message, and just pass all of them to the handler
 
     http://www.lua.org/pil/5.2.html
 
-In principle this may be violating some OSC thing, in that you are 
+    In principle this may be violating some OSC thing, in that you are 
 
---]]
+    --]]
 
-  RandyNoteColumns.assign_note_column_timer(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
+    RandyNoteColumns.assign_note_column_timer(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
 
   end 
 }, 

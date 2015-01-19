@@ -147,7 +147,7 @@ function volume_jumper_config()
   local default_value = math.floor(100/(note_cols_num-1))
   for i = 2,note_cols_num  do
     note_column_odds[i] = note_cols_odds[i] or default_value 
-    local horiz_note_vol_form = vb:horizontal_aligner {
+    local horiz_note_note_form = vb:horizontal_aligner {
       mode = "justify",
       vb:text {
         text = string.format("Note column %d switching weight", i),
@@ -163,7 +163,7 @@ function volume_jumper_config()
       },
 
     } -- end of horiz aligner
-    view_voljumper_config_dialog:add_child(horiz_note_vol_form)
+    view_voljumper_config_dialog:add_child(horiz_note_note_form)
   end  -- end of note volume columns 
 
   local action_buttons = vb:column {
@@ -187,7 +187,7 @@ function volume_jumper_config()
         -- color = {220, 225, 255 },
         released = function()
           configuration_dialog:close()
-          RandyNoteColumns.clear_vol_column_timers(track_index)
+          RandyNoteColumns.clear_note_column_timers(track_index)
         end
       },
       vb:space{

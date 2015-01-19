@@ -55,3 +55,9 @@ renoise.tool():add_menu_entry {
 
 
 require (TOOL_NAME .. '/Handlers')
+
+renoise.ng = renoise.ng or {}
+renoise.ng[TOOL_NAME] =  TOOL_NAME
+rPrint(renoise.ng)
+
+-- Even though this is done in two different tools, each only sees what they created

@@ -186,7 +186,7 @@ function RandyNoteColumns.reset_note_volumes(track_index)
   RandyNoteColumns.solo_note_column_volume(track_index, 1)
 end
 
-function RandyNoteColumns.clear_vol_column_timers(track_index)
+function RandyNoteColumns.clear_note_column_timers(track_index)
   print("Clear timer for track ", track_index )
   if(RandyNoteColumns.timers[track_index] and renoise.tool():has_timer( RandyNoteColumns.timers[track_index] ) ) then
     print("-- REMVOVING ...", RandyNoteColumns.timers[track_index] ) 

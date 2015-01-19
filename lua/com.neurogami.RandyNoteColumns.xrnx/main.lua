@@ -57,3 +57,12 @@ renoise.tool():add_menu_entry {
 
 RandyNoteColumns.start_fresh()
 require (TOOL_NAME .. '/Handlers')
+
+
+-- experiment to see if we can create true Renoise-global data
+--
+
+renoise.ng = renoise.ng or {}
+renoise.ng[TOOL_NAME] =  TOOL_NAME 
+
+rPrint(renoise.ng)
