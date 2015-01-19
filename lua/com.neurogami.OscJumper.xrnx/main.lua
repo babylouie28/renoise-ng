@@ -8,9 +8,10 @@ TOOL_NAME = "OscJumper"
 
 require (TOOL_NAME .. '/Utils')
 require (TOOL_NAME .. '/Status')
-require (TOOL_NAME .. '/Rotator')
+require (TOOL_NAME .. '/Shared')
 
 attempt_rotate_setup()
+attempt_randy_setup()
 
 require (TOOL_NAME .. '/Core')
 require (TOOL_NAME .. '/OscDevice')

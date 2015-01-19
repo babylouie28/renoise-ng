@@ -80,6 +80,14 @@ function load_handlers(osc_device)
   else
     print("Cannot add roate handlers because have_rotator is false")
   end
+
+  if (have_randy) then
+    for i, h in ipairs(randy_handlers) do
+      osc_device:add_message_handler( h.pattern, h.handler )  
+    end
+    print("        ADDED RANDY HANDLERS")
+  else
+    print("Cannot add randy handlers because have_randy is false")
+  end
+
 end
-
-

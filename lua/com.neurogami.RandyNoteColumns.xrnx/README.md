@@ -98,8 +98,29 @@ To reload these settings use the "Load all" button.  It looks for a saved config
 
 ## Still to come
 
-This is some half-baked OSC stuff in the code. What's planned is an OSC interface for setting/removing the note-jumping timers.
+There was some OSC stuff in the code; this project was a spin-off from [OSC Jumper](http://neurogami.com/blog/neurogami-osc-jumper-version-1-released.html).    That tool has been acquiring assorted OSC handlers, and one of them was a way to set up a note-column timer.
 
+It worked, crudely.  It was more proof of concept than anything else. To do it right it needed a good way to set up the various parameters. 
+
+So it became its own tool.  But with that in place it is now easier to understand what parameters are needed, such that sending an OSC message to manipulate such timers is much simpler.  You need to send a track number, a timer interval, a function-execution percentage number, odds for selecting each of the non-default note columns, and the odds for returning back to the default.
+
+Yes, that's a bunch of stuff, but it would (presumably) be done programmatically so it's not a big deal.  The only really tricky part is in sending a variable-length array of note-column odds.  (The OSC spec has something for arrays.)
+
+The intial expectation was that an OSC API would be added to Randy Note Columns once the code settled down, but it presents a problem: how many OSC servers should be running for a Renoise song, and how would clients be able to make use of all of them?  
+
+That's actually _two_ problems but they're coupled.
+
+If, for example, you're using OSC Jumper because it offers super-bad song manipulation behavior, you can still use the built-in Renoise OSC handlers because OSC Jumper knows how to proxy such calls.  So there are two OSC servers running (the built-in Renoise server and the OSC Jumper server) but an OSC client need only be concerned with one (the Jumper server) because that one will effectively handle messages for both of them.
+
+But if you add another OSC server in there, what happens? Which of these tools acts as the OSC point of entry, and how does it know to proxy to all other OSC servers?
+
+The solution for now is to assume that all new OSC behavior should go into OSC Jumper (which seems due for a name change).  OSC Jumper can leverage behavior defined in other tools using the "code-sharing hack.":http://www.neurogami.com/blog/neurogami-sharing-lua-files-in-renoise.html
+
+The upside is that the OSC device code in OSC Jumper does not have to be duplicated in Randy Note Columns (and whatever other number tools that might want an OSC API).  That stays in one place.  It means there's just one OSC server a client needs to care about.
+
+The downside is that if you want to use Randy Note Columns via OSC you have to install another tool.
+
+The removal of duplication, however, seems like a much bigger gain.
 
 ## Author
 
