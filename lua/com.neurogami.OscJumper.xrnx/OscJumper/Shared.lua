@@ -8,7 +8,6 @@ local RANGE_TRACK_IN_SONG = 3
 local RANGE_TRACK_IN_PATTERN = 4
 local RANGE_SELECTION_IN_PATTERN = 5
 
-
 have_rotator = false
 have_randy = false
 
@@ -17,7 +16,6 @@ function rotate_setup()
   require "pattern_line_tools"
   require "main"
 end
-
 
 function attempt_rotate_setup()
 
@@ -29,7 +27,7 @@ function attempt_rotate_setup()
   else
     have_rotator = false
     print("WARNING: " .. TOOL_NAME .. " failed to load code from com.renoise.PatternRotate.xrnx." )
-
+    print("Error: ", err)
   end
 end
 
@@ -43,14 +41,11 @@ end
 
 
 function attempt_randy_setup()
-print("|||||||||||||||||||||||| ATTEMPT RANDY SETUP |||||||||||||||||||||") -- DEBUG
-
   local res, err = pcall(randy_setup)
 
   if (res) then
     have_randy = true
     print(TOOL_NAME .. ": Seem to have loaded code from com.neurogami.RandyNoteColumns.xrnx")
-
   else
     have_randy = false
     print("WARNING: " .. TOOL_NAME .. " failed to load code from com.neurogami.RandyNoteColumns.xrnx." )
@@ -77,7 +72,7 @@ rotate_handlers = {
       local selected_track_index = song().selected_track_index
       print( "ROTATE: selected_track_index is now " , selected_track_index )
     end
-    
+
     rotate(lines, RANGE_TRACK_IN_PATTERN, true)
 
   end 
@@ -85,15 +80,42 @@ rotate_handlers = {
 
 }
 
-
 randy_handlers = {
-
   { -- Marks a pattern loop range and  then sets the start of the loop as  the next pattern to play
   pattern = "/randy/test",
-  handler = function(track_index)
+  handler = function(track_index, timer_interval, trigger_percentage,  solo_stop_percentage, ... )
+
     -- need a way to get the current pattern or something so that
     -- this works on the right stuff
     print("Randy test for track_index ", track_index )
+ 
+    local note_column_odds = {} 
+
+    -- arg seems to be magic, in that the last value is the arg count.
+    -- We do no want ta
+    print("We have note_column_odds: ", note_column_odds )
+
+    for i,v in ipairs(arg) do
+        note_column_odds[i+1] = v 
+      end
+--[[
+
+What is the proper way to pass along a series of values?
+
+Arrays in OSC v1:  Not part of the core types, but the spec describes conventions used by some implementations.
+
+Does Renoise understand arrays in OSC? None of the default hhandlers use arrays. Nor does osc-repl (right now).
+
+One hack: Pass a variable number of args with the OSC message, and just pass all of them to the handler
+
+    http://www.lua.org/pil/5.2.html
+
+In principle this may be violating some OSC thing, in that you are 
+
+--]]
+
+  RandyNoteColumns.assign_note_column_timer(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
+
   end 
 }, 
 

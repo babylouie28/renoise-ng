@@ -187,14 +187,32 @@ function RandyNoteColumns.reset_note_volumes(track_index)
 end
 
 function RandyNoteColumns.clear_vol_column_timers(track_index)
+  print("Clear timer for track ", track_index )
   if(RandyNoteColumns.timers[track_index] and renoise.tool():has_timer( RandyNoteColumns.timers[track_index] ) ) then
+    print("-- REMVOVING ...", RandyNoteColumns.timers[track_index] ) 
     renoise.tool():remove_timer( RandyNoteColumns.timers[track_index] )
+    RandyNoteColumns.timers[track_index] = nil
   end
+
   RandyNoteColumns.reset_note_volumes(track_index)
+  print("Remainer song timers:")
+  rPrint(RandyNoteColumns.timers)
+
 end
 
-
+-- Something odd is happening.
+-- When this is called from the GUI it works, and repeated calls
+-- correctly replace any existing functions.
+-- Also, clearing for the track works as well.
+-- But when called via the OSC handler it adds a timer function
+-- that seems to exist outside of the tool.
+-- OF COURSE:  There are two separate tools that happen to share the
+-- same file.  They exist independently
 function RandyNoteColumns.assign_note_column_timer(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
+  print("RandyNoteColumns.assign_note_column_timer called!")
+  print("note_column_odds are ...")
+
+  rPrint(note_column_odds)
 
   RandyNoteColumns.volume_jumper_track_timer_interval[track_index] = timer_interval
   RandyNoteColumns.volume_jumper_track_col_odds[track_index] = note_column_odds
@@ -208,6 +226,8 @@ end
 
 function RandyNoteColumns.construct_and_deploy_timer(track_index)
   print(" - - - - RandyNoteColumns.construct_and_deploy_timer(", track_index, ")")
+  
+  rPrint(track_index)
 
   local func_string = [[   
   local track = renoise.song().tracks[]] .. track_index .. [[]
@@ -220,8 +240,7 @@ function RandyNoteColumns.construct_and_deploy_timer(track_index)
     if (odds > rand_num ) then
       RandyNoteColumns.solo_note_column(]] .. track_index .. [[)
     end
-  else
-    odds = 50
+  else   
     if (stop_odds > rand_num ) then
       RandyNoteColumns.reset_note_volumes(]] .. track_index ..[[ )
     end
@@ -230,8 +249,14 @@ function RandyNoteColumns.construct_and_deploy_timer(track_index)
 
   local timer_interval = RandyNoteColumns.volume_jumper_track_timer_interval[track_index]
   if(RandyNoteColumns.timers[track_index] and renoise.tool():has_timer( RandyNoteColumns.timers[track_index] ) ) then
+    print("Remove existing timer ...")
     renoise.tool():remove_timer( RandyNoteColumns.timers[track_index] )
+    rPrint(RandyNoteColumns.timers)
+    RandyNoteColumns.timers[track_index] = nil
+
   end
+
+    rPrint(RandyNoteColumns.timers)
 
   -- Stuff can go wrong here, though there is no way at
   -- the moment to inform the client of that
