@@ -6,6 +6,13 @@ local RANGE_SELECTION_IN_PATTERN = 5
 
 have_rotator = false
 
+
+
+local function attempt_remove_menu(menu_name)
+  renoise.tool():remove_menu_entry(menu_name)
+end
+
+
 function rotate_setup()
   package.path = "../com.renoise.PatternRotate.xrnx/?.lua;" .. package.path
   require "pattern_line_tools"
@@ -19,6 +26,10 @@ function attempt_rotate_setup()
 
   if (res) then
     have_rotator = true
+    res, err = pcall( attempt_remove_menu, "Pattern Editor:Rotate..." )
+    if res then
+      print("Should have removed an extra Rotate menu")
+    end
     print(TOOL_NAME, " seems to have loaded code from com.renoise.PatternRotate.xrnx")
   else
     have_rotator = false
