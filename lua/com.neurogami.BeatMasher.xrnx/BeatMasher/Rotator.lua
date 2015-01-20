@@ -22,7 +22,7 @@ end
 
 function attempt_rotate_setup()
 
-  local res = pcall(rotate_setup)
+  local res, err = pcall(rotate_setup)
 
   if (res) then
     have_rotator = true

@@ -1,6 +1,3 @@
--- The ides is to have  place to attempt loading 
--- files that belong to other tools
-
 
 local RANGE_WHOLE_SONG = 1
 local RANGE_WHOLE_PATTERN = 2
@@ -11,12 +8,9 @@ local RANGE_SELECTION_IN_PATTERN = 5
 have_rotator = false
 have_randy = false
 
-
-
 local function attempt_remove_menu(menu_name)
   renoise.tool():remove_menu_entry(menu_name)
 end
-
 
 function rotate_setup()
   package.path = "../com.renoise.PatternRotate.xrnx/?.lua;" .. package.path
@@ -42,14 +36,10 @@ function attempt_rotate_setup()
   end
 end
 
-
--- *******************************************
-
 function randy_setup()
   package.path = "../com.neurogami.RandyNoteColumns.xrnx/?.lua;" .. package.path
   require "RandyNoteColumns/Core"
 end
-
 
 function attempt_randy_setup()
   local res, err = pcall(randy_setup)
