@@ -7,51 +7,21 @@
 
 handlers = { 
 
-  {  
-    pattern = "/track/notes/solo_column_timer",
-    handler = function(track_index, column_index)
-      print(" ***** Call OscJumper.solo_vol_timer(track_index, column_index) ********")
-      OscJumper.solo_vol_timer(track_index, column_index)
-    end 
-  }, 
-
-
-  {  
-    pattern = "/track/notes/solo_column",
-    handler = function(track_index, column_index)
-      OscJumper.solo_vol(track_index, column_index)
-    end 
-  }, 
-
-  {
-    pattern = "/add_poll",
-    handler = function(poll_id, code, interval)
-      interval = interval or 500 
-      print("Handler /add_poll has '" .. poll_id .. "', '" .. code .. "' " .. interval) 
-      Status.add_poll(poll_id, code, interval)
-    end 
-  }, 
-
-  {
-    pattern = "/remove_poll",
-    handler = function(poll_id)
-      Status.remove_poll(poll_id)
-    end 
-  }, 
-
-
-  { -- Marks a pattern loop range and  then sets the start of the loop as  the next pattern to play
+  { 
   pattern = "/loop/schedule",
+  docs = [[ Marks a pattern loop range and  then sets the start of the loop as the next pattern to play. 
+            Args: range_start, range_end ]],
   handler = function(range_start, range_end)
     OscJumper.loop_schedule(range_start, range_end)
   end 
 }, 
 
 {  
-  -- Instantly jumps from the current pattern/line to given pattern and relative next line.
-  -- If the second arg is greater than -1 it schedules that as the next pattern to play, and turns on
-  -- block loop for that pattern.
   pattern = "/pattern/into",
+  docs = [[ Instantly jumps from the current pattern/line to given pattern and relative next line.
+  If the second arg  (stick_to) is greater than -1 it schedules that as the next pattern to play, and turns on
+  block loop for that pattern.
+  Args: pattern_index,  stick_to ]],
   handler = function(pattern_index,  stick_to )
     OscJumper.pattern_into(pattern_index, stick_to)
   end 
@@ -59,6 +29,8 @@ handlers = {
 
 {
   pattern = "/sequence_pos",
+  docs = [[ Supposedly sends back to the OSC the current sequence position, but does not seem to be implemented.
+  Args: none ]],
   handler = function()
     OscJumper.sequence_pos()
   end

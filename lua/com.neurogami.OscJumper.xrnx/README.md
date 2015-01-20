@@ -6,36 +6,55 @@ OSC Jumper is an OSC-drive tool for jumping around patterns in a song.
 
 You can learn about OSC (Open Sound Control) [here.](http://osc.justthebestparts.com)
 
-OSC Jumper understands the following OSC address patterns:
-
-
-    /ng/loop/schedule ii
-
-and
-
-    /ng//pattern/into ii
-
-
-If you have the [Rotate Pattern tool](http://www.renoise.com/tools/rotate-pattern) installed then OSC Jumper will also respond to
-
-    /ng/rotate/track  ii
 
 ## The OSC commands
 
-`/ng/loop/schedule` takes two integers, range start and range end.  It uses those values to schedule a loop using that range of a patterns.  The song will finish playing the current pattern then jump to the first pattern of the defined loop, and play from there.
 
-`/ng/pattern/into` also takes two integers, a pattern number and "flag" number. 
+    /ng/loop/schedule
 
-When invoked, Renoise will immediately move playback the given pattern number. It maintains the same relative pattern line number so that the song's beat is not disrupted.
+     Marks a pattern loop range and  then sets the start of the loop as the next pattern to play.
 
-For example: Suppose your song has patterns of length 32.  It is currently in pattern 2, at the 10 line of that pattern when  `/ng/pattern/into 4 1` is invoked.  Playback will then move to line 11 of pattern 4.
+    Args: range_start, range_end 
 
-If the second number is non-negative then Renoise will loop on pattern just jumped to.
+    /ng/pattern/into
 
+     Instantly jumps from the current pattern/line to given pattern and relative next line.
 
-`/ng/rotate/track` takes two integers, a track number and the number of lines to rotate.  It uses the code in the Rotate Pattern tool, which you must manually install if you want this to work.  
+    If the second arg  (stick_to) is greater than -1 it schedules that as the next pattern to play, and turns on
 
-Rotation will be forward or backwards based on whether the lines number is positive or negative.  If you pass a negative track number then rotation occurs on whatever is the current track.
+    block loop for that pattern.
+
+    Args: pattern_index,  stick_to 
+
+    /ng/sequence_pos
+
+     Supposedly sends back to the OSC the current sequence position, but does not seem to be implemented.
+
+    Args: none 
+
+    /ng/rotate/track
+
+     Rotates the lines in the current pattern of the selected track.
+
+    Args: track_index, num_lines. 
+
+    /ng/randy/clear_track_note_timer
+
+     Clears note-column soloing timer for the given track.
+
+    Args: track_index 
+
+    /ng/randy/add_track_note_timer
+
+     Creates a note-column soloing timer.
+
+    Args: track_index, timer_interval, trigger_percentage, solo_stop_percentage, solo_odds (...) 
+
+    /ng/randy/solo_note_column
+
+     Selects the given track and mutes all but the given note column.
+
+    Args: track_index, note_column.
 
 
 ## Usage

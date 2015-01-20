@@ -55,27 +55,28 @@ function attempt_randy_setup()
 
 end
 
+-- ********************* OSC Handlers **************************************
 
 rotate_handlers = {
 
-  { -- Marks a pattern loop range and  then sets the start of the loop as  the next pattern to play
+  { 
   pattern = "/rotate/track",
-  handler = function(track_num, lines)
+  docs = [[ Rotates the lines in the current pattern of the selected track. 
+            Args: track_index, num_lines. ]],
+  handler = function(track_index, num_lines)
 
     -- need a way to get the current pattern or something so that
     -- this works on the right stuff
-    print("Rotate ",lines, " lines")
+    print("Rotate ",num_lines, " lines")
 
     --      local selected_track_index = song().selected_track_index
     local song = renoise.song
-    if (track_num > -1 ) then
-      song().selected_track_index = track_num
+    if (track_index > -1 ) then
+      song().selected_track_index = track_index
       local selected_track_index = song().selected_track_index
       print( "ROTATE: selected_track_index is now " , selected_track_index )
     end
-
-    rotate(lines, RANGE_TRACK_IN_PATTERN, true)
-
+    rotate(num_lines, RANGE_TRACK_IN_PATTERN, true)
   end 
 }, 
 
@@ -85,6 +86,8 @@ randy_handlers = {
 
   {
     pattern = "/randy/clear_track_note_timer",
+    docs = [[ Clears note-column soloing timer for the given track. 
+              Args: track_index ]],
     handler = function(track_index)
       print("/randy/clear_track_note_timer ", track_index )
       RandyNoteColumns.clear_note_column_timers(track_index)
@@ -92,13 +95,14 @@ randy_handlers = {
   },
   {
     pattern = "/randy/add_track_note_timer",
+    docs = [[ Creates a note-column soloing timer. 
+        Args: track_index, timer_interval, trigger_percentage, solo_stop_percentage, solo_odds (...) ]],
     handler = function(track_index, timer_interval, trigger_percentage,  solo_stop_percentage, ... )
 
       local note_column_odds = {} 
 
       -- arg seems to be magic, in that the last value is the arg count.
       -- We do no want that.
-      print("We have note_column_odds: ", note_column_odds )
       for i,v in ipairs(arg) do
         note_column_odds[i+1] = v 
       end
@@ -107,6 +111,15 @@ randy_handlers = {
 
     end 
   }, 
+
+  {
+    pattern = "/randy/solo_note_column",
+    docs = [[ Selects the given track and mutes all but the given note column. 
+      Args: track_index, note_column.]],
+    handler = function(track_index, note_column)
+      RandyNoteColumns.solo_note_column_volume(track_index, note_column)
+    end
+  }
 
 }
 
