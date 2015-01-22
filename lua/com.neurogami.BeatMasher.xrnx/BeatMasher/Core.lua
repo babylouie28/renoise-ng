@@ -86,15 +86,15 @@ function BeatMasher.speak_bpm(client_renoise, track_index, instrument_index)
       d1,d2 = bpm_string:match('(%d)(%d)')
       print( ("Speak %s %s, track %d, intr %s "):format(d1, d2, track_index, instrument_index) )
       
-      
       client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
         {tag="i", value=instrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} 
       }))        
       sleep(1)
       client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-        {tag="i", value=intrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  
+        {tag="i", value=instrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}  
       } )  )
 
+      print("Now speak the second digit ,,,")
 
       client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
         {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} 

@@ -62,6 +62,7 @@ rotate_handlers = {
   { 
   pattern = "/rotate/track",
   docs = [[ Rotates the lines in the current pattern of the selected track. 
+            Requires that you have installed the Pattern Rotate tool
             Args: track_index, num_lines. ]],
   handler = function(track_index, num_lines)
 
@@ -87,6 +88,7 @@ randy_handlers = {
   {
     pattern = "/randy/clear_track_note_timer",
     docs = [[ Clears note-column soloing timer for the given track. 
+              Requires that you have installed the Randy Note Columns tool
               Args: track_index ]],
     handler = function(track_index)
       print("/randy/clear_track_note_timer ", track_index )
@@ -96,7 +98,8 @@ randy_handlers = {
   {
     pattern = "/randy/add_track_note_timer",
     docs = [[ Creates a note-column soloing timer. 
-        Args: track_index, timer_interval, trigger_percentage, solo_stop_percentage, solo_odds (...) ]],
+              Requires that you have installed the Randy Note Columns tool
+              Args: track_index, timer_interval, trigger_percentage, solo_stop_percentage, solo_odds (...) ]],
     handler = function(track_index, timer_interval, trigger_percentage,  solo_stop_percentage, ... )
 
       local note_column_odds = {} 
@@ -115,7 +118,8 @@ randy_handlers = {
   {
     pattern = "/randy/solo_note_column",
     docs = [[ Selects the given track and mutes all but the given note column. 
-      Args: track_index, note_column.]],
+              Requires that you have installed the Randy Note Columns tool
+              Args: track_index, note_column.]],
     handler = function(track_index, note_column)
       RandyNoteColumns.solo_note_column_volume(track_index, note_column)
     end
