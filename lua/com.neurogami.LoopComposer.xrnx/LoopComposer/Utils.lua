@@ -21,4 +21,39 @@ function clamp_value(value, min_value, max_value)
 	end
 	return l
 end	
- 
+
+
+string.lpad = function(str, len, char)
+  if char == nil then char = ' ' end
+  return str .. string.rep(char, len - #str)
+end
+
+
+function string.trim(s)
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+function string.lines(s)
+  local t = {}
+  local function add(line) table.insert(t, line) return "" end
+  add((s:gsub("(.-)\r?\n", add)))
+  return t
+end
+
+
+function string:words(s)
+  local t = {}
+   for w in s:gmatch("%S+") do
+      table.insert(t, w)
+   end
+  return t
+end
+
+function string:words(s)
+  local t = {}
+   for w in s:gmatch("%S+") do
+      table.insert(t, w)
+   end
+  return t
+end
+

@@ -182,7 +182,42 @@ function LoopComposer.loop_schedule(range_start, range_end)
   song().transport.loop_range = {pos_start, pos_end}
 end
 
+
+function LoopComposer:ppatern_line_to_number_table(s)
+  local t = {}
+   for w in s:gmatch("%S+") do
+      table.insert(t, tonumber(w))
+   end
+  return t
+end
+
+
+function LoopComposer.load_loop_table()
+  load_loop_config()
+  local raw_composition_text = string.trim(composition.text.value)
+  local lines = string.lines(raw_composition_text)
+  print("-------------- lo0p composition raw lines --------------")
+  rPrint(lines)
+ print("-------------- lo0p composition raw lines --------------")
+
+ LoopComposer.loop_list = {}
+ local _ = ""
+
+ for i, line in pairs(lines) do
+    _ = string.trim(line)
+    if string.len(_) > 4  then
+    table.insert(LoopComposer.loop_list, LoopComposer:ppatern_line_to_number_table(line)) 
+  end
+ end
+  
+  print("-------------- LoopComposer.loop_list --------------")
+  rPrint(LoopComposer.loop_list)
+ print("-------------- LoopComposer.loop_list --------------")
+end
+
 function LoopComposer.go() 
+
+  LoopComposer.load_loop_table()
 
   LoopComposer.current_pattern = 1 
   LoopComposer.last_pattern = LoopComposer.current_pattern

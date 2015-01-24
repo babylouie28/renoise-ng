@@ -10,10 +10,6 @@ local raw_composition_text = ""
 
 SMALL_GAP = 8
 
-string.lpad = function(str, len, char)
-    if char == nil then char = ' ' end
-    return str .. string.rep(char, len - #str)
-end
 
 
 -- function next_raw_loop_index()
@@ -36,19 +32,16 @@ function save_composition()
 
   print("save_composition. raw_composition_text: ")
   rPrint(raw_composition_text)
--- It *should * come in as a string, a series of rows of space-delimited numbers.
---  It should be saved and loaed that way; it make sit easier to hand edit or
---  have some otehr tool create/manipulate.
---  Other code will need to convert it into the internal table format
--- http://stackoverflow.com/questions/2779700/lua-split-into-words
---   for w in s:gmatch("%S+") do print(w) end
+  -- It *should * come in as a string, a series of rows of space-delimited numbers.
+  --  It should be saved and loaed that way; it make sit easier to hand edit or
+  --  have some otehr tool create/manipulate.
+  --  Other code will need to convert it into the internal table format
   if composition ~= nil then
+    composition = renoise.Document.create(TOOL_NAME) {
+      text = raw_composition_text,
+    }
 
- composition = renoise.Document.create(TOOL_NAME) {
-    text = raw_composition_text,
-  }
-
-   composition:save_as(composition_file)
+    composition:save_as(composition_file)
   end
 end
 
@@ -75,32 +68,32 @@ function init_loop_compose_dialog()
         tooltip = "n n n",
       },
     },   
-   
+
     vb:horizontal_aligner {
       mode = "justify",    
-            vb:row {
-              vb:multiline_textfield {
-                text = raw_composition_text,
-                id = "composition",
-                font = "big",
-                width = 100,
-                height = 400,
-                notifier = function(v)
-                  -- This will set the table to a list of rows of text
-                   raw_composition_text =  v --vb.views["raw_coposition"].paragraphs
-                end
-              }, -- multiline 
-            },  -- row
-            
-      
-        
-  }, -- h:aligner
-vb:button {
-          text = "Save",
-          released = function()
-            save_composition()
-            composition_dialog:close()
+      vb:row {
+        vb:multiline_textfield {
+          text = raw_composition_text,
+          id = "composition",
+          font = "big",
+          width = 100,
+          height = 400,
+          notifier = function(v)
+            -- This will set the table to a list of rows of text
+            raw_composition_text =  v --vb.views["raw_coposition"].paragraphs
           end
+        }, -- multiline 
+      },  -- row
+
+
+
+    }, -- h:aligner
+    vb:button {
+      text = "Save",
+      released = function()
+        save_composition()
+        composition_dialog:close()
+      end
     },
   }
 
