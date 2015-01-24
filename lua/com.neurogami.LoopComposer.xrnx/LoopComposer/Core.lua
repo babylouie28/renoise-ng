@@ -1,15 +1,15 @@
 -- Core.lua 
-PatternJumper = {}
+LoopComposer = {}
 
-PatternJumper.current_line = 1 
-PatternJumper.last_line = 1 
-PatternJumper.current_pattern = 1 
-PatternJumper.last_pattern = PatternJumper.current_pattern
-PatternJumper.current_loop_count = 1
-PatternJumper.current_loop = 1 
-PatternJumper.timer_interval = 250 
+LoopComposer.current_line = 1 
+LoopComposer.last_line = 1 
+LoopComposer.current_pattern = 1 
+LoopComposer.last_pattern = LoopComposer.current_pattern
+LoopComposer.current_loop_count = 1
+LoopComposer.current_loop = 1 
+LoopComposer.timer_interval = 250 
 
-PatternJumper.loop_list = {
+LoopComposer.loop_list = {
   {5, 5, 1},
   {1, 2, 1},
   {5, 6, 1},
@@ -19,35 +19,35 @@ PatternJumper.loop_list = {
   {3, 4, 1},
 } 
 
-function PatternJumper.did_we_loop()
+function LoopComposer.did_we_loop()
   -- This only works if the loop max is > 1
   -- We should assume that whenever a new loop is
   -- scheduled the loop count starts at 1
 
   -- If we are not in the last pattern of the loop then return false
-  PatternJumper.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
+  LoopComposer.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
 
-  if PatternJumper.current_pattern < PatternJumper.loop_list[PatternJumper.current_loop][2] then
+  if LoopComposer.current_pattern < LoopComposer.loop_list[LoopComposer.current_loop][2] then
     return false
   end
-  PatternJumper.current_line = renoise.song().transport.playback_pos.line  
-  if  PatternJumper.current_line < PatternJumper.last_line then
-    PatternJumper.last_line =  PatternJumper.current_line
+  LoopComposer.current_line = renoise.song().transport.playback_pos.line  
+  if  LoopComposer.current_line < LoopComposer.last_line then
+    LoopComposer.last_line =  LoopComposer.current_line
     return true
   else
-    PatternJumper.last_line =  PatternJumper.current_line
+    LoopComposer.last_line =  LoopComposer.current_line
     return false
   end
 end
 
 
 -- We never use this. What was the intention?
-function PatternJumper.are_we_in_this_loop(loop_index) 
+function LoopComposer.are_we_in_this_loop(loop_index) 
   local pos_start = song().transport.loop_start
   local pos_end = song().transport.loop_end
 
-  local range_start = PatternJumper.loop_list[loop_index][1]
-  local range_end = PatternJumper.loop_list[loop_index][2]
+  local range_start = LoopComposer.loop_list[loop_index][1]
+  local range_end = LoopComposer.loop_list[loop_index][2]
 
   if (pos_start  == range_start ) and (pos_end == range_end ) then
     return true
@@ -58,7 +58,7 @@ end
 
 
 -- We never use this. What was the intention?
-function PatternJumper.are_we_at_the_end_of_loop_count()
+function LoopComposer.are_we_at_the_end_of_loop_count()
   -- Find the current pattern
   -- See if it the same as the last pattern for loop
   -- See if we are near the end of the pattern
@@ -66,31 +66,31 @@ function PatternJumper.are_we_at_the_end_of_loop_count()
   -- If so, return true
 
   local song_pos_line = renoise.song().transport.playback_pos.line
-  local pattern_num_lines = renoise.song().patterns[PatternJumper.current_pattern].number_of_lines
+  local pattern_num_lines = renoise.song().patterns[LoopComposer.current_pattern].number_of_lines
   print("Current line: ", song_pos_line , " of max ", pattern_num_lines )
 
   -- song_pos.line
 end
 
 function set_next_loop()
-  if PatternJumper.current_loop < #PatternJumper.loop_list then
-    print("There is a next loop. Current loop is ", PatternJumper.current_loop )
-    PatternJumper.current_loop = PatternJumper.current_loop + 1
+  if LoopComposer.current_loop < #LoopComposer.loop_list then
+    print("There is a next loop. Current loop is ", LoopComposer.current_loop )
+    LoopComposer.current_loop = LoopComposer.current_loop + 1
 
 
-    print("Go get loop at index ", PatternJumper.current_loop );
+    print("Go get loop at index ", LoopComposer.current_loop );
 
-    local new_loop = PatternJumper.loop_list[PatternJumper.current_loop]
-    PatternJumper.current_loop_count = 1
-    PatternJumper.current_pattern = new_loop[1]
-    PatternJumper.last_pattern = new_loop[1]
+    local new_loop = LoopComposer.loop_list[LoopComposer.current_loop]
+    LoopComposer.current_loop_count = 1
+    LoopComposer.current_pattern = new_loop[1]
+    LoopComposer.last_pattern = new_loop[1]
 
-    PatternJumper.loop_schedule(new_loop[1], new_loop[2])       
+    LoopComposer.loop_schedule(new_loop[1], new_loop[2])       
   else
     print("There is no next loop. Now what?")
     -- Clear all schedulated loops and let the song play out.
     renoise.tool():remove_timer(process_looping)
-    PatternJumper.loop_clear()
+    LoopComposer.loop_clear()
   end
 end
 
@@ -127,22 +127,22 @@ Just moved from loop N to N+1
 function process_looping()
 
   local range_start, range_end, count, num_loops
-  local max_loops = PatternJumper.loop_list[PatternJumper.current_loop][3]
-  range_start = PatternJumper.loop_list[PatternJumper.current_loop][1]
-  range_end = PatternJumper.loop_list[PatternJumper.current_loop][2]
+  local max_loops = LoopComposer.loop_list[LoopComposer.current_loop][3]
+  range_start = LoopComposer.loop_list[LoopComposer.current_loop][1]
+  range_end = LoopComposer.loop_list[LoopComposer.current_loop][2]
 
 
-  PatternJumper.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
+  LoopComposer.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
 
-  print("Current pattern: ", PatternJumper.current_pattern, "; loop count = ",  PatternJumper.current_loop_count, "max loops ",  max_loops)
+  print("Current pattern: ", LoopComposer.current_pattern, "; loop count = ",  LoopComposer.current_loop_count, "max loops ",  max_loops)
 
-    if (PatternJumper.current_pattern == range_end ) then       
+    if (LoopComposer.current_pattern == range_end ) then       
       print("We are in the last patter of the loop.")
-       if PatternJumper.did_we_loop() then
-        PatternJumper.current_loop_count = PatternJumper.current_loop_count + 1
+       if LoopComposer.did_we_loop() then
+        LoopComposer.current_loop_count = LoopComposer.current_loop_count + 1
       end
 
-      if PatternJumper.current_loop_count >= max_loops then
+      if LoopComposer.current_loop_count >= max_loops then
         print("* * * * * Loop count >= max looping, so set next loop * * * * *")
         set_next_loop()
       else
@@ -153,22 +153,22 @@ function process_looping()
 
 
   
-  PatternJumper.last_pattern = PatternJumper.current_pattern 
+  LoopComposer.last_pattern = LoopComposer.current_pattern 
 
 end
 
-function PatternJumper.loop_clear()
+function LoopComposer.loop_clear()
   local song = renoise.song
   local pos_start = song().transport.loop_start
   pos_start.line = 1; 
-  pos_start.sequence = PatternJumper.current_pattern
+  pos_start.sequence = LoopComposer.current_pattern
   local pos_end = song().transport.loop_end
   pos_end.line = 1; 
-  pos_end.sequence  = PatternJumper.current_pattern
+  pos_end.sequence  = LoopComposer.current_pattern
   song().transport.loop_range = {pos_start, pos_end}
 end
 
-function PatternJumper.loop_schedule(range_start, range_end)
+function LoopComposer.loop_schedule(range_start, range_end)
   local song = renoise.song
   print("/loop/schedule! ", range_start, " ", range_end)
   song().transport:set_scheduled_sequence(clamp_value(range_start, 1, song().transport.song_length.sequence))
@@ -182,16 +182,16 @@ function PatternJumper.loop_schedule(range_start, range_end)
   song().transport.loop_range = {pos_start, pos_end}
 end
 
-function PatternJumper.go() 
+function LoopComposer.go() 
 
-  PatternJumper.current_pattern = 1 
-  PatternJumper.last_pattern = PatternJumper.current_pattern
-  PatternJumper.current_loop_count = 1
-  PatternJumper.current_loop = 1 
+  LoopComposer.current_pattern = 1 
+  LoopComposer.last_pattern = LoopComposer.current_pattern
+  LoopComposer.current_loop_count = 1
+  LoopComposer.current_loop = 1 
 
-  PatternJumper.loop_schedule(PatternJumper.loop_list[PatternJumper.current_loop][1], PatternJumper.loop_list[PatternJumper.current_loop][2])
-  renoise.tool():add_timer(process_looping, PatternJumper.timer_interval)
+  LoopComposer.loop_schedule(LoopComposer.loop_list[LoopComposer.current_loop][1], LoopComposer.loop_list[LoopComposer.current_loop][2])
+  renoise.tool():add_timer(process_looping, LoopComposer.timer_interval)
 
 end
 
-return PatternJumper
+return LoopComposer
