@@ -182,12 +182,36 @@ function LoopComposer.loop_schedule(range_start, range_end)
   song().transport.loop_range = {pos_start, pos_end}
 end
 
+--[[ 
 
-function LoopComposer:ppatern_line_to_number_table(s)
-  local t = {}
+  New plan:
+
+  A loop row must start with 2 numbers that define the loop range
+  The next item can be a number or a string
+  if a number it is the number of times to run the loop
+  if a string it is a function to execute after the loop has run.
+
+  If the third item is a number then there can be a fourth item,
+  a string. This will be a function name.
+
+  To make things easier we can require that there always be a loop
+  number; this makes it easier to parse for the optional function
+  name.  
+  
+  --]]
+function LoopComposer:pattern_line_to_loop_table(s)
+   local t = {}
+   local count = 1
+
    for w in s:gmatch("%S+") do
+     if count < 4 then
       table.insert(t, tonumber(w))
+    else
+      table.insert(t, w)
+    end
+    count = count + 1
    end
+   
   return t
 end
 
@@ -206,7 +230,7 @@ function LoopComposer.load_loop_table()
  for i, line in pairs(lines) do
     _ = string.trim(line)
     if string.len(_) > 4  then
-    table.insert(LoopComposer.loop_list, LoopComposer:ppatern_line_to_number_table(line)) 
+    table.insert(LoopComposer.loop_list, LoopComposer:pattern_line_to_loop_table(line)) 
   end
  end
   
