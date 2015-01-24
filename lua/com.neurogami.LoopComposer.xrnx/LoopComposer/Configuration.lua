@@ -6,8 +6,7 @@ local view_loop_compose_dialog = nil
 
 local composition_file = TOOL_NAME .. "Pattern.xml"
 
-local raw_loop_table = {}
-local raw_loop_index = 0
+local raw_composition_text = ""
 
 SMALL_GAP = 8
 
@@ -17,31 +16,36 @@ string.lpad = function(str, len, char)
 end
 
 
-function next_raw_loop_index()
-   raw_loop_index = raw_loop_index +  1
-   return string.lpad("0" .. raw_loop_index, 5, "0")
-end
--- Since we have a variable size of data
--- we may need to use that serialization lib
+-- function next_raw_loop_index()
+--    raw_loop_index = raw_loop_index +  1
+--    return string.lpad("0" .. raw_loop_index, 5, "0")
+--  end
 
 function load_loop_config()
   composition = renoise.Document.create(TOOL_NAME) {
-
-    loop_table = { 1,2,3,4  },
+    text = "",
   }
 
   local res = composition:load_from(composition_file)
+  raw_composition_text = composition.text.value
 end
+
+
 
 function save_composition()
 
-  print("save_composition. raw_loop_table: ")
-  rPrint(raw_loop_table)
-
+  print("save_composition. raw_composition_text: ")
+  rPrint(raw_composition_text)
+-- It *should * come in as a string, a series of rows of space-delimited numbers.
+--  It should be saved and loaed that way; it make sit easier to hand edit or
+--  have some otehr tool create/manipulate.
+--  Other code will need to convert it into the internal table format
+-- http://stackoverflow.com/questions/2779700/lua-split-into-words
+--   for w in s:gmatch("%S+") do print(w) end
   if composition ~= nil then
 
  composition = renoise.Document.create(TOOL_NAME) {
-    loop_table = { 1,2,3,4  },
+    text = raw_composition_text,
   }
 
    composition:save_as(composition_file)
@@ -67,67 +71,37 @@ function init_loop_compose_dialog()
     vb:horizontal_aligner {
       mode = "justify",
       vb:text {
-        text = "Test to see if we can add and remove tings dynamically",
-        tooltip = "test",
+        text = "Enter your loop composition as a series of space-seperated numbers:\nstart end count",
+        tooltip = "n n n",
       },
-
     },   
-    vb:horizontal_aligner {
-         mode = "justify",
-    vb:column {
-      id = "loop_holder"
-    },
-  },
-
-
+   
     vb:horizontal_aligner {
       mode = "justify",    
-      vb:button {
-        text = "Add a loop pattern",
-        released = function()
-          local rand_id = next_raw_loop_index()
-          local loop_holder = vb.views["loop_holder"]
-
-          local new_loop = vb:row {
-            id = rand_id, 
-            vb:text { text = "Loop details: n,n,n,n " },
-             vb:space {width = SMALL_GAP * 2 },
             vb:row {
-              vb:textfield {
-                width = 64,
+              vb:multiline_textfield {
+                text = raw_composition_text,
+                id = "composition",
+                font = "big",
+                width = 100,
+                height = 400,
                 notifier = function(v)
-                       raw_loop_table[rand_id] = v
+                  -- This will set the table to a list of rows of text
+                   raw_composition_text =  v --vb.views["raw_coposition"].paragraphs
                 end
-              }, vb:space {width = SMALL_GAP  },
-            },  
+              }, -- multiline 
+            },  -- row
             
-            vb:button {
-              text = " X ",
-              released = function(stuff)
-                 print("delete button was passed ", stuff)
-                 print("Do we know about the id? ", rand_id)
-                 raw_loop_table[rand_id] = nil
-                 local loop_thing =  vb.views[rand_id]
-                  local loop_holder = vb.views["loop_holder"]
-                  loop_holder:remove_child(loop_thing)
-                  loop_holder:resize() -- FIXME This does nothing. Need to resize
-              end
-             } 
-          }
-
-          loop_holder:add_child(new_loop)
-        end 
-      },
-      vb:space { width = SMALL_GAP },
-        vb:button {
+      
+        
+  }, -- h:aligner
+vb:button {
           text = "Save",
           released = function()
             save_composition()
             composition_dialog:close()
           end
     },
-  }
-
   }
 
 end
