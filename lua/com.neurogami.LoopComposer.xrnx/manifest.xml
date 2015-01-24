@@ -7,7 +7,7 @@
   <Author>Neurogami | james@neurogami.com  </Author>
   <Name>Neurogami Loop Composer</Name>
   <Category>In Progress</Category>
-  <Description>FIXE ME</Description>
+  <Description>Reads a text description defining a series of pattern loop sequences and executes it.</Description>
   <Homepage>http://neurogami.com</Homepage>
 </RenoiseScriptingTool>
 

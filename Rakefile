@@ -147,5 +147,14 @@ namespace :package do
     zipit name, folder, input_filenames
   end
 
+    desc "Package up LoopComposer"
+  task :loopcomposer do
+    cd 'lua'
+    name = "LoopComposer"
+    folder = "com.neurogami.#{name }.xrnx"
+    input_filenames = files folder
+    zipit name, folder, input_filenames
+  end
+
 end
 
