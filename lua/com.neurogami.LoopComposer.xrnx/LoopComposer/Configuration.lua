@@ -6,25 +6,45 @@ local view_loop_compose_dialog = nil
 
 local composition_file = TOOL_NAME .. "Pattern.xml"
 
+local raw_loop_table = {}
+local raw_loop_index = 0
+
 SMALL_GAP = 8
 
+string.lpad = function(str, len, char)
+    if char == nil then char = ' ' end
+    return str .. string.rep(char, len - #str)
+end
+
+
+function next_raw_loop_index()
+   raw_loop_index = raw_loop_index +  1
+   return string.lpad("0" .. raw_loop_index, 5, "0")
+end
 -- Since we have a variable size of data
 -- we may need to use that serialization lib
 
 function load_loop_config()
   composition = renoise.Document.create(TOOL_NAME) {
 
-    composition_settings = {
-      placeholder = "foo" 
-    },
+    loop_table = { 1,2,3,4  },
   }
 
   local res = composition:load_from(composition_file)
 end
 
 function save_composition()
+
+  print("save_composition. raw_loop_table: ")
+  rPrint(raw_loop_table)
+
   if composition ~= nil then
-    composition:save_as(composition_file)
+
+ composition = renoise.Document.create(TOOL_NAME) {
+    loop_table = { 1,2,3,4  },
+  }
+
+   composition:save_as(composition_file)
   end
 end
 
@@ -65,33 +85,28 @@ function init_loop_compose_dialog()
       vb:button {
         text = "Add a loop pattern",
         released = function()
-          local rand_id = "" .. math.random(10000)
+          local rand_id = next_raw_loop_index()
           local loop_holder = vb.views["loop_holder"]
 
           local new_loop = vb:row {
             id = rand_id, 
-            vb:text { text = "Loop details" },
+            vb:text { text = "Loop details: n,n,n,n " },
              vb:space {width = SMALL_GAP * 2 },
             vb:row {
               vb:textfield {
-                width = 18,
+                width = 64,
+                notifier = function(v)
+                       raw_loop_table[rand_id] = v
+                end
               }, vb:space {width = SMALL_GAP  },
-              vb:textfield {
-                width = 18,
-              }, vb:space {width = SMALL_GAP  },
-              vb:textfield {
-                width = 18,
-              }, vb:space {width = SMALL_GAP  },
-              vb:textfield {
-                width = 18,
-              }, vb:space {width = SMALL_GAP  }, 
             },  
             
             vb:button {
-              text = "[X]",
+              text = " X ",
               released = function(stuff)
                  print("delete button was passed ", stuff)
                  print("Do we know about the id? ", rand_id)
+                 raw_loop_table[rand_id] = nil
                  local loop_thing =  vb.views[rand_id]
                   local loop_holder = vb.views["loop_holder"]
                   loop_holder:remove_child(loop_thing)
@@ -101,18 +116,15 @@ function init_loop_compose_dialog()
           }
 
           loop_holder:add_child(new_loop)
-
-
-
         end 
       },
       vb:space { width = SMALL_GAP },
-            vb:button {
-        text = "Save",
-         released = function()
-           save_composition()
-           composition_dialog:close()
-         end
+        vb:button {
+          text = "Save",
+          released = function()
+            save_composition()
+            composition_dialog:close()
+          end
     },
   }
 

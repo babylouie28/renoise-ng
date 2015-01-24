@@ -8,6 +8,7 @@ TOOL_NAME = "LoopComposer"
 
 require 'LoopComposer/Utils'
 require 'LoopComposer/Core'
+require 'LoopComposer/Dumper'
 require 'LoopComposer/Configuration'
 
 
