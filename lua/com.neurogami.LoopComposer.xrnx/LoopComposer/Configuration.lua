@@ -9,10 +9,7 @@ local view_loop_compose_dialog = nil
 local raw_composition_text = ""
 
 function composition_file()
-  local fname = renoise.song().file_name
-  local parts = string.split(fname, "/")
-  local xname = parts[#parts]
-  return "loop_composition_" ..  xname .. ".xml"
+  return "loop_composition_" ..  base_file_name() .. ".xml"
 end
 
 function load_loop_config()

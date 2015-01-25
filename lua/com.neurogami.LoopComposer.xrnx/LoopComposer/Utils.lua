@@ -23,6 +23,13 @@ function clamp_value(value, min_value, max_value)
 end	
 
 
+function base_file_name()
+  local fname = renoise.song().file_name
+  local parts = string.split(fname, "/")
+  local xname = parts[#parts]
+  return xname
+end
+
 string.lpad = function(str, len, char)
   if char == nil then char = ' ' end
   return str .. string.rep(char, len - #str)
