@@ -29,19 +29,21 @@ It's super basic.
 It's a single text field.
 
 A composition is a series of lines.
+
 Each line has three numbers, separated by spaces.
 
 You may add an optional fourth item: the name of a function.
 
 For example:
 
-      1 2 2
+      0 2 2
       4 4 1 rand_looping
       3 4 2
       1 1 2
-      4 5 1
-      1 1 1
+      4 5 1 rand_jump
+      0 0 1
       5 5 1 restart
+      # This is a comment
 
 The first two numbers are the start and end patterns for a loop.
 
@@ -49,11 +51,18 @@ The third number is how many times that loop should run before moving on to the 
 
 The optional function name will get called after the loop has run the given number of times.  
 
-Blank lines are (or should be) ignored.  The code does not try hard to catch or fix possible mistakes.
+Blank lines are (or should be) ignored.  Same for lines that start with "#".
+
+Patern numbers correspond to what you see in the Renoise editor; they begin with 0.
+
+(This can be confusing if you are doing things by code because Lua begins indexing with 1. Why oh why did the Renoise devs decide patterns should begin with 0?)
+
+The code does not try very hard to catch or fix possible mistakes.
 
 Once you have created a composition, click the "Save" button.
 
 Navigate back to the `LoopComposer` menu and click "Run" to start your composition.
+
 
 
 ### Built-in helper functions
@@ -66,10 +75,6 @@ These are the helper functions defined so far:
  `rand_looping`:  Defines a 50/50 change of resetting the loop pointer back to the current loop definition
 
  `rand_jump`: Sets the loop pointer to a random loop in your composition
-
-
-
-
 
 
 # Author
