@@ -6,8 +6,8 @@ LoopComposer.last_line = 1
 LoopComposer.current_pattern = 1 
 LoopComposer.last_pattern = LoopComposer.current_pattern
 LoopComposer.current_loop_count = 1
-LoopComposer.current_loop = 1 
-LoopComposer.timer_interval = 250 
+LoopComposer.current_loop = 0
+LoopComposer.timer_interval = 100 
 
 LoopComposer.loop_list = {
   {5, 5, 1},
@@ -20,7 +20,6 @@ LoopComposer.loop_list = {
 } 
 
 
-
 function LoopComposer.did_we_loop()
   -- This only works if the loop max is > 1
   -- We should assume that whenever a new loop is
@@ -29,11 +28,16 @@ function LoopComposer.did_we_loop()
   -- If we are not in the last pattern of the loop then return false
   LoopComposer.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
 
-  if LoopComposer.current_pattern < LoopComposer.loop_list[LoopComposer.current_loop][2] then
+  print("\n\tDid we loop? compare ", LoopComposer.current_pattern , " < ", LoopComposer.current_range_end() )
+  if LoopComposer.current_pattern < LoopComposer.current_range_end() then
+    print("\t\tNot in the last pattern of the loop")
     return false
   end
+
   LoopComposer.current_line = renoise.song().transport.playback_pos.line  
-  if  LoopComposer.current_line < LoopComposer.last_line then
+  
+  
+  if LoopComposer.current_line < LoopComposer.last_line then
     LoopComposer.last_line =  LoopComposer.current_line
     return true
   else
@@ -50,12 +54,11 @@ function LoopComposer.set_next_loop()
 
     print("Go get loop at index ", LoopComposer.current_loop );
 
-    local new_loop = LoopComposer.loop_list[LoopComposer.current_loop]
     LoopComposer.current_loop_count = 1
-    LoopComposer.current_pattern = new_loop[1]
-    LoopComposer.last_pattern = new_loop[1]
+    LoopComposer.current_pattern =  LoopComposer.current_range_start()
+    LoopComposer.last_pattern =  LoopComposer.current_range_start()
 
-    LoopComposer.loop_schedule(new_loop[1], new_loop[2])       
+    LoopComposer.loop_schedule( LoopComposer.current_range_start(),  LoopComposer.current_range_end())       
   else
     print("There is no next loop.")
     LoopComposer.clear()
@@ -67,26 +70,42 @@ function LoopComposer.clear()
     LoopComposer.loop_clear()
 end
 
+
+function LoopComposer.current_range_end()
+  return LoopComposer.loop_list[LoopComposer.current_loop][2]+1
+end
+
+
+function LoopComposer.current_range_start()
+  return LoopComposer.loop_list[LoopComposer.current_loop][1]+1
+end
+
 function LoopComposer.process_looping()
 
   local range_start, range_end, count, num_loops
   local max_loops = LoopComposer.loop_list[LoopComposer.current_loop][3]
   local end_function = LoopComposer.loop_list[LoopComposer.current_loop][4]
-  range_start = LoopComposer.loop_list[LoopComposer.current_loop][1]
-  range_end = LoopComposer.loop_list[LoopComposer.current_loop][2]
+  range_start = LoopComposer.current_range_start()
+  range_end = LoopComposer.current_range_end()
 
   LoopComposer.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
 
   print("Current pattern: ", LoopComposer.current_pattern, "; loop count = ",  LoopComposer.current_loop_count, "max loops ",  max_loops)
 
   if (LoopComposer.current_pattern == range_end ) then       
-    print("We are in the last patter of the loop.")
+    
+    print("We are in the last pattern of the loop.")
+
     if LoopComposer.did_we_loop() then
+      print("\t\tWE LOOPED!")
       LoopComposer.current_loop_count = LoopComposer.current_loop_count + 1
+    else
+        print("! ! ! WE STILL HAVE NOT LOOPED")
     end
 
     if LoopComposer.current_loop_count >= max_loops then
       print("* * * * * Loop count >= max looping, so set next loop * * * * *")
+      print("* * * * * end_function = ", end_function, " LoopComposer.current_loop = ", LoopComposer.current_loop, " * * * * *")
       if end_function then
         print("Try to invoked '", end_function, "' ...")
         _G[end_function]()
@@ -97,8 +116,6 @@ function LoopComposer.process_looping()
       ---- Do nothing since we have loop counts to go
     end
   end
-
-
 
   LoopComposer.last_pattern = LoopComposer.current_pattern 
 
@@ -116,7 +133,13 @@ function LoopComposer.loop_clear()
 end
 
 function LoopComposer.loop_schedule(range_start, range_end)
+  -- The main code and confg should be using the 0-based indexing the user sees in the Renoise UI
+  -- but the actual values are +1
   local song = renoise.song
+  
+  range_start = LoopComposer.current_range_start() 
+  range_end = LoopComposer.current_range_end() 
+
   print("/loop/schedule! ", range_start, " ", range_end)
   song().transport:set_scheduled_sequence(clamp_value(range_start, 1, song().transport.song_length.sequence))
   local pos_start = song().transport.loop_start
@@ -166,6 +189,7 @@ end
 function LoopComposer.load_loop_table()
   load_loop_config() -- This is from Configuration.
   local raw_composition_text = string.trim(composition.text.value)
+
   local lines = string.lines(raw_composition_text)
   print("-------------- lo0p composition raw lines --------------")
   rPrint(lines)
@@ -176,7 +200,7 @@ function LoopComposer.load_loop_table()
 
   for i, line in pairs(lines) do
     _ = string.trim(line)
-    if string.len(_) > 4  then
+    if string.len(_) > 4  and not _:match('^#') then
       table.insert(LoopComposer.loop_list, LoopComposer:pattern_line_to_loop_table(line)) 
     end
   end
@@ -195,7 +219,7 @@ function LoopComposer.go()
   LoopComposer.current_loop_count = 1
   LoopComposer.current_loop = 1 
 
-  LoopComposer.loop_schedule(LoopComposer.loop_list[LoopComposer.current_loop][1], LoopComposer.loop_list[LoopComposer.current_loop][2])
+  LoopComposer.loop_schedule(LoopComposer.current_range_start(), LoopComposer.current_range_end())
   renoise.tool():add_timer(LoopComposer.process_looping, LoopComposer.timer_interval)
 
 end

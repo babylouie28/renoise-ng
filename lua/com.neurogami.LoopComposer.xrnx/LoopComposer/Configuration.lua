@@ -124,5 +124,5 @@ renoise.tool():add_menu_entry {
   end
 }
 
-load_loop_config()
+
 
