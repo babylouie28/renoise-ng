@@ -96,21 +96,18 @@ Such helper files have access to all the code defined in the tool as well as the
 
 Here's an example file:
 
+    pattern_loop_counter = 1
+    max_count = 5
 
-`
-pattern_loop_counter = 1
-max_count = 5
-
-function end_after_max()
-  pattern_loop_counter = pattern_loop_counter + 1
-  if pattern_loop_counter > max_count then 
-    LoopComposer.clear()
-    renoise.song().transport:set_scheduled_sequence(#renoise.song().patterns)
-  else
-    LoopComposer.set_next_loop()
-  end
-end
-`
+    function end_after_max()
+      pattern_loop_counter = pattern_loop_counter + 1
+      if pattern_loop_counter > max_count then 
+        LoopComposer.clear()
+        renoise.song().transport:set_scheduled_sequence(#renoise.song().patterns)
+      else
+        LoopComposer.set_next_loop()
+      end
+    end
 
 Suppose you have a loop composition that uses some random jumping as well as the `restart` command.  The function defined here can be used to track how often a given loop line is executed, and force the song to the last pattern after some maximum number of loop executions.
 
