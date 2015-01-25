@@ -76,7 +76,7 @@ function init_loop_compose_dialog()
           text = raw_composition_text,
           id = "composition",
           font = "big",
-          width = 100,
+          width = 300,
           height = 400,
           notifier = function(v)
             -- This will set the table to a list of rows of text
@@ -112,6 +112,18 @@ end
 renoise.tool():add_menu_entry {
   name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Compose ...",
   invoke = function() display_loop_compose_dialog() end
+}
+
+renoise.tool():add_menu_entry {
+  name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME  .. ":Run",
+  invoke = LoopComposer.go
+}
+
+renoise.tool():add_menu_entry {
+  name = "--- Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Stop",
+  invoke = function()  
+      LoopComposer.clear() 
+  end
 }
 
 load_loop_config()
