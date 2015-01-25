@@ -4,25 +4,23 @@ composition = nil
 local composition_dialog = nil
 local view_loop_compose_dialog = nil
 
-local composition_file = TOOL_NAME .. "Pattern.xml"
+-- local composition_file = TOOL_NAME .. "Pattern.xml"
 
 local raw_composition_text = ""
 
-SMALL_GAP = 8
-
-
-
--- function next_raw_loop_index()
---    raw_loop_index = raw_loop_index +  1
---    return string.lpad("0" .. raw_loop_index, 5, "0")
---  end
+function composition_file()
+  local fname = renoise.song().file_name
+  local parts = string.split(fname, "/")
+  local xname = parts[#parts]
+  return "loop_composition_" ..  xname .. ".xml"
+end
 
 function load_loop_config()
   composition = renoise.Document.create(TOOL_NAME) {
     text = "",
   }
 
-  local res = composition:load_from(composition_file)
+  local res = composition:load_from(composition_file())
   raw_composition_text = composition.text.value
 end
 
@@ -41,7 +39,7 @@ function save_composition()
       text = raw_composition_text,
     }
 
-    composition:save_as(composition_file)
+    composition:save_as(composition_file())
   end
 end
 
