@@ -90,13 +90,13 @@ end
 
 function RandyNoteColumns.config_file_for_current_song()
   local fname = renoise.song().file_name
-  local parts = split(fname, "/")
+  local parts = split(fname, PATH_SEP)
   local xname = parts[#parts]
   return RandyNoteColumns.CONFIG_PREFIX  .. "_" ..  xname .. ".xml"
 end
 
 function RandyNoteColumns.have_config_file() 
-  local file_name = os.currentdir() .. "/" .. RandyNoteColumns.config_file_for_current_song()
+  local file_name = os.currentdir() .. PATH_SEP .. RandyNoteColumns.config_file_for_current_song()
   print(file_name)
   local f=io.open(file_name,"r")
   if f~=nil then io.close(f) return true else return false end

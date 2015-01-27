@@ -6,6 +6,13 @@ RENOISE_OSC    = nil
 CONTROLLER_OSC = nil
 TOOL_NAME = "RandyNoteColumns"
 
+PATH_SEP = "/"
+if (os.platform() == "WINDOWS") then
+  PATH_SEP = "\\"
+end
+
+
+
 require (TOOL_NAME .. '/Utils')
 require (TOOL_NAME .. '/Status')
 
