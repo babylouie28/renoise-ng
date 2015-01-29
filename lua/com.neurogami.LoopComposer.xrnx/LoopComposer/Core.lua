@@ -141,13 +141,13 @@ function LoopComposer.loop_schedule(range_start, range_end)
   range_end = LoopComposer.current_range_end() 
 
   print("/loop/schedule! ", range_start, " ", range_end)
-  song().transport:set_scheduled_sequence(clamp_value(range_start, 1, song().transport.song_length.sequence))
+  song().transport:set_scheduled_sequence(U.clamp_value(range_start, 1, song().transport.song_length.sequence))
   local pos_start = song().transport.loop_start
   pos_start.line = 1; 
-  pos_start.sequence = clamp_value(range_start, 1, song().transport.song_length.sequence)
+  pos_start.sequence = U.clamp_value(range_start, 1, song().transport.song_length.sequence)
   local pos_end = song().transport.loop_end
   pos_end.line = 1; 
-  pos_end.sequence =  clamp_value(range_end + 1, 1, 
+  pos_end.sequence =  U.clamp_value(range_end + 1, 1, 
   song().transport.song_length.sequence + 1)
   song().transport.loop_range = {pos_start, pos_end}
 end

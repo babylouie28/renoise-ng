@@ -18,7 +18,8 @@ tool_names = %w{
   RawMidi2
   OscJumper
   NewFromTemplate 
-RandyNoteColumns
+  RandyNoteColumns
+  BeatMasher
 
 }
 
@@ -188,6 +189,17 @@ namespace :package do
   task :loop_composer do
     Dir.chdir'lua' do
       name = "LoopComposer"
+      folder = "com.neurogami.#{name }.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
+
+
+    desc "Package up BeatMasher"
+  task :beat_masher do
+    Dir.chdir'lua' do
+      name = "BeatMasher"
       folder = "com.neurogami.#{name }.xrnx"
       input_filenames = files folder
       zipit name, folder, input_filenames

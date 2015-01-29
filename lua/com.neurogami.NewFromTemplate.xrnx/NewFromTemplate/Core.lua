@@ -143,7 +143,7 @@ function NewFromTemplate.generate_new_file(template_name, new_file_name)
   print("Create a new song by copying ", template_name, " to ", new_file_name, " (we hope)" ) -- DEBUG
   print(" We have new_file_folder = ", new_file_folder ) -- DEBUG
 
-  new_file_name = U.trim(new_file_name)
+  new_file_name = string.trim(new_file_name)
   new_file_name = string.gsub(new_file_name, "\.xrns$", "")
   new_file_name  = (new_file_name .. ".xrns")
   

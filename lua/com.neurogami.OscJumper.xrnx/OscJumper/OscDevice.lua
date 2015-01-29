@@ -101,7 +101,7 @@ function OscDevice:receive_osc_message(value_str)
     message.is_osc_msg = true
     -- cap to the range specified in the control-map
     for k,v in pairs(val) do
-      val[k] = clamp_value(v,xarg.minimum,xarg.maximum)
+      val[k] = U.clamp_value(v,xarg.minimum,xarg.maximum)
     end
     --rprint(xarg)
     -- multiple messages are tables, single value a number...
