@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>3</ApiVersion>
+  <AutoUpgraded>true</AutoUpgraded>
+  <Id>com.neurogami.Utils</Id>
+  <Version>0.1</Version>
+  <Author>Neurogami | james@neurogami.com  </Author>
+  <Name>Neurogami Utils</Name>
+  <Category>In Progress</Category>
+  <Description>FIX ME</Description>
+  <Homepage>http://neurogami.com/code</Homepage>
+</RenoiseScriptingTool>
+

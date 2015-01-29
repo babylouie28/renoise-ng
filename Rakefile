@@ -1,4 +1,4 @@
-
+require 'facets/string/snakecase'
 require 'zip'
 require 'zip/zip'
 require 'zip/zipfilesystem'
@@ -11,6 +11,31 @@ end
 V2 = '2.8.2'
 V3 = '3.0.1'
 
+
+tool_names = %w{
+  LoopComposer
+  Configgy
+  RawMidi
+  OscJumper
+  NewFromTemplate 
+  MidiMapper
+  RawMidi
+}
+
+
+task :copy_utils do
+   cd 'lua'
+   tool_names.each do |tool| 
+      warn `cp com.neurogami.Utils.xrnx/Utilities.lua com.neurogami.#{name}.xrnx/#{name}/Utilities.lua `
+   end
+end
+
+desc "rebuild all"
+task :rebuild =>  [:copy_utils] do
+   tool_names.each do |tool| 
+     Rake::Task[tool].execute
+   end
+end
 
 desc "Copy over ./lua/GlobalOscActions.lua"
 task :global do
@@ -84,7 +109,7 @@ end
 namespace :package do
 
   desc "Package up SharedCode"
-  task :shared do
+  task = :shared_code do
     cd 'lua'
     name = 'SharedCode'
     folder = "com.neurogami.#{name}.xrnx" 
@@ -93,7 +118,7 @@ namespace :package do
   end
 
   desc "Package up RandyNoteColumns"
-  task :randy_notes do
+  task :randy_note_columns do
     cd 'lua'
     name = 'RandyNoteColumns'
     folder = "com.neurogami.#{name}.xrnx"
@@ -121,7 +146,7 @@ namespace :package do
 
 
   desc "Package up MidiMapper"
-  task :midimapper do
+  task :midi_mapping_demo do
     cd 'lua'
     name = 'MidiMappingDemo'
     folder = "com.neurogami.#{name}.xrnx"
@@ -148,7 +173,7 @@ namespace :package do
   end
 
     desc "Package up LoopComposer"
-  task :loopcomposer do
+  task :loop_composer do
     cd 'lua'
     name = "LoopComposer"
     folder = "com.neurogami.#{name }.xrnx"
