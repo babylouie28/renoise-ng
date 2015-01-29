@@ -1,5 +1,59 @@
 
+--  String stuff
+function string.lpad(str, len, char)
+  if char == nil then char = ' ' end
+  return str .. string.rep(char, len - #str)
+end
+
+function string.trim(s)
+  print("string:trim has '", s, "'")
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+function string.lines(s)
+  local t = {}
+  local function add(line) table.insert(t, line) return "" end
+  add((s:gsub("(.-)\r?\n", add)))
+  return t
+end
+
+
+function string:words(s)
+  local t = {}
+  for w in s:gmatch("%S+") do
+    table.insert(t, w)
+  end
+  return t
+end
+
+function string:words(s)
+  local t = {}
+  for w in s:gmatch("%S+") do
+    table.insert(t, w)
+  end
+  return t
+end
+
+
+-- https://helloacm.com/split-a-string-in-lua/
+function string.split(s, delimiter)
+  local result = {};
+  for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+    table.insert(result, match);
+  end
+  return result;
+end
+
+-- Other stuff
 U = {}
+
+
+PATH_SEP = "/"
+if (os.platform() == "WINDOWS") then
+  PATH_SEP = "\\"
+end
+
+
 
 --- Common util funcitons
 function U.clamp_value(value, min_value, max_value)
@@ -19,15 +73,28 @@ function U.rPrint(s, l, i) -- recursive Print (structure, limit, indent)
   if (ts ~= "table") then print (i,ts,s); return l-1 end
   print (i,ts);           -- print "table"
   for k,v in pairs(s) do  -- print "[KEY] VALUE"
-    l = rPrint(v, l, i.."\t["..tostring(k).."]");
+    l = U.rPrint(v, l, i.."\t["..tostring(k).."]");
     if (l < 0) then break end
   end
   return l
 end	
 
-function U.trim(s)
-  return (s:gsub("^%s*(.-)%s*$", "%1"))
+-- http://lua-users.org/wiki/SleepFunction
+local clock = os.clock
+function U.sleep(n)  -- seconds
+  local t0 = clock()
+  while clock() - t0 <= n do end
 end
+
+
+
+function U.base_file_name()
+  local fname = renoise.song().file_name
+  local parts = string.split(fname, PATH_SEP )
+  local xname = parts[#parts]
+  return xname
+end
+
 
 -- Taken from the CreateTool tool.
 -- Why does Renoise Lua not have os.copyfile?
@@ -101,7 +168,6 @@ function U.may_overwrite(path)
   end  
   return overwrite
 end
-
 
 
 return U

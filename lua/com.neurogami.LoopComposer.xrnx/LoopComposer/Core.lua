@@ -192,7 +192,7 @@ function LoopComposer.load_loop_table()
 
   local lines = string.lines(raw_composition_text)
   print("-------------- lo0p composition raw lines --------------")
-  rPrint(lines)
+  U.rPrint(lines)
   print("-------------- lo0p composition raw lines --------------")
 
   LoopComposer.loop_list = {}
@@ -206,7 +206,7 @@ function LoopComposer.load_loop_table()
   end
 
   print("-------------- LoopComposer.loop_list --------------")
-  rPrint(LoopComposer.loop_list)
+  U.rPrint(LoopComposer.loop_list)
   print("-------------- LoopComposer.loop_list --------------")
 end
 

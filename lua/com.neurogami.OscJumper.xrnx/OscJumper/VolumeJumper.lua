@@ -213,7 +213,7 @@ function normalize_volume_jumper_track_col_odds(track_index)
     normalized[k] = v/sum
   end
 
-  rPrint()
+  U.rPrint()
   sum = 0
   for k,v in pairs(normalized ) do
     normalized [k] = normalized [k] + sum
@@ -223,7 +223,7 @@ function normalize_volume_jumper_track_col_odds(track_index)
   volume_jumper_normalized_col_odds[track_index]  = normalized 
 
   print(" Should have now created volume_jumper_normalized_col_odds[track_index]  ")
-  rPrint(volume_jumper_normalized_col_odds[track_index]  )
+  U.rPrint(volume_jumper_normalized_col_odds[track_index]  )
 end
 
 function select_note_col(track_index)
@@ -243,7 +243,7 @@ function select_note_col(track_index)
   print("------------ select_note_col for ", track_index, " -------------")
 
   print(" SELECT A COLUMN USING volume_jumper_normalized_col_odds[track_index] ")
-  rPrint(volume_jumper_normalized_col_odds[track_index])
+  U.rPrint(volume_jumper_normalized_col_odds[track_index])
 
   local column_odds = volume_jumper_normalized_col_odds[track_index]
   print("column_odds = ", column_odds )
@@ -270,7 +270,7 @@ end
 function assign_vol_column_timers(timer_interval, trigger_percentage, track_index, note_column_odds, solo_stop_percentage)
 
   print("assign_vol_column_timers. note_column_odds = ", note_column_odds )
-  rPrint(note_column_odds)
+  U.rPrint(note_column_odds)
 
   volume_jumper_track_timer_interval[track_index] = timer_interval
   volume_jumper_track_col_odds[track_index] = note_column_odds

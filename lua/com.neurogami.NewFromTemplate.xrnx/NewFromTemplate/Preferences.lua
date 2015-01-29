@@ -1,11 +1,10 @@
-local Utils = require 'NewFromTemplate/Utils'
+local U = require 'NewFromTemplate/Utilities'
 
 local P = {}
 
 local preferences = nil
 local template_dialog = nil
 local view_template_dialog = nil
-
 
 
 function P.templates_folder()
@@ -33,8 +32,11 @@ end
 
 function P.clean_loaded_data()
   if preferences ~= nil then
-    preferences.new_file_folder.value =  Utils.trim(preferences.new_file_folder.value)
-    preferences.templates_folder.value =  Utils.trim(preferences.templates_folder.value)
+
+local nff = preferences.new_file_folder.value 
+    print("nff = ", nff  )
+    preferences.new_file_folder.value =  string.trim(nff)
+    preferences.templates_folder.value =  string.trim(preferences.templates_folder.value)
     
     preferences.new_file_folder.value =  string.gsub(preferences.new_file_folder.value, "\/$", "")
     preferences.new_file_folder.value =  string.gsub(preferences.new_file_folder.value, "\\$", "")

@@ -7,7 +7,7 @@ CONTROLLER_OSC = nil
 
 TOOL_NAME = "BeatMasher"
 
-require (TOOL_NAME .. '/Utils')
+require (TOOL_NAME .. '/Utilties')
 require (TOOL_NAME .. '/Status')
 require (TOOL_NAME .. '/Rotator')
 

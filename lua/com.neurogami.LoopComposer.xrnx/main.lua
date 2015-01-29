@@ -6,7 +6,7 @@ com.neurogami.PatternJumper.xrnx/main.lua
 
 TOOL_NAME = "LoopComposer"
 
-require 'LoopComposer/Utils'
+U = require 'LoopComposer/Utilities'
 require 'LoopComposer/Core'
 require 'LoopComposer/LoopHelpers'
 require 'LoopComposer/Dumper'
@@ -71,7 +71,7 @@ notifier.add(close_doc_observable, close_song)
 ----------------
 
 function helper_file_base_name()
-  local name = base_file_name():gsub(" ", "_"):gsub(".xrns", "") .. "_LC"
+  local name = U.base_file_name():gsub(" ", "_"):gsub(".xrns", "") .. "_LC"
   print(TOOL_NAME, ": Have song slug " .. name )
   return name
 end

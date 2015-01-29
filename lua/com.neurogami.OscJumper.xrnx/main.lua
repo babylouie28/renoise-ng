@@ -6,7 +6,7 @@ RENOISE_OSC    = nil
 CONTROLLER_OSC = nil
 TOOL_NAME = "OscJumper"
 
-require (TOOL_NAME .. '/Utils')
+U  = require (TOOL_NAME .. '/Utilities')
 require (TOOL_NAME .. '/Status')
 require (TOOL_NAME .. '/Shared')
 
@@ -58,6 +58,6 @@ require (TOOL_NAME .. '/Handlers')
 
 renoise.ng = renoise.ng or {}
 renoise.ng[TOOL_NAME] =  TOOL_NAME
-rPrint(renoise.ng)
+U.rPrint(renoise.ng)
 
 -- Even though this is done in two different tools, each only sees what they created

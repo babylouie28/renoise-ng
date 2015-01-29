@@ -15,26 +15,30 @@ V3 = '3.0.1'
 tool_names = %w{
   LoopComposer
   Configgy
-  RawMidi
+  RawMidi2
   OscJumper
   NewFromTemplate 
-  MidiMapper
-  RawMidi
+RandyNoteColumns
+
 }
 
+except = %w{Configgy RawMidi2 }
 
 task :copy_utils do
-   cd 'lua'
-   tool_names.each do |tool| 
+  Dir.chdir'lua' do
+    tool_names.each do |name| 
+      next if except.include? name     
       warn `cp com.neurogami.Utils.xrnx/Utilities.lua com.neurogami.#{name}.xrnx/#{name}/Utilities.lua `
-   end
+    end
+  end
 end
 
 desc "rebuild all"
 task :rebuild =>  [:copy_utils] do
-   tool_names.each do |tool| 
-     Rake::Task[tool].execute
-   end
+  tool_names.each do |tool| 
+    Rake::Task["package:#{tool.snakecase}"].execute
+  end
+  sh "./__cp.sh"
 end
 
 desc "Copy over ./lua/GlobalOscActions.lua"
@@ -42,7 +46,7 @@ task :global do
   warn "This is hardcoded for Ubuntu"
   warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V#{V2}/Scripts/`
   warn `cp ./lua/GlobalOscActions.lua /home/james/.renoise/V#{V3}/Scripts/`
-  
+
   warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V#{V2}/Scripts/`
   warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V#{V3}/Scripts/`
   #  warn `cp ./lua/GlobalMidiActions.lua /home/james/.renoise/V3.0.0/Scripts/`
@@ -95,10 +99,10 @@ def files tool_folder, exlude_patterns = []
       end
     end
   end
-  
+
   exlude_patterns.each do |re|
-     _.reject!{ |f|
-       f =~ re
+    _.reject!{ |f|
+      f =~ re
     }
   end
 
@@ -109,76 +113,85 @@ end
 namespace :package do
 
   desc "Package up SharedCode"
-  task = :shared_code do
-    cd 'lua'
-    name = 'SharedCode'
-    folder = "com.neurogami.#{name}.xrnx" 
-    input_filenames = files folder 
-    zipit name, folder, input_filenames
+  task :shared_code do
+    Dir.chdir'lua' do
+      name = 'SharedCode'
+      folder = "com.neurogami.#{name}.xrnx" 
+      input_filenames = files folder 
+      zipit name, folder, input_filenames
+    end
   end
 
   desc "Package up RandyNoteColumns"
   task :randy_note_columns do
-    cd 'lua'
-    name = 'RandyNoteColumns'
-    folder = "com.neurogami.#{name}.xrnx"
-    input_filenames = files folder 
-    zipit name, folder, input_filenames
+    Dir.chdir'lua' do
+      name = 'RandyNoteColumns'
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder 
+      zipit name, folder, input_filenames
+    end
   end
 
   desc "Package up OscJumper"
   task :osc_jumper do
-    cd 'lua'
-    name = 'OscJumper'
-    folder = "com.neurogami.#{name}.xrnx"
-    input_filenames = files folder 
-    zipit name, folder, input_filenames
+    Dir.chdir'lua' do
+      name = 'OscJumper'
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder 
+      zipit name, folder, input_filenames
+    end
+
   end
 
   desc "Package up NewFromTemplate"
   task :new_from_template do
-    cd 'lua'
-    name = 'NewFromTemplate'
-    folder = "com.neurogami.#{name}.xrnx"
-    input_filenames = files folder, [ /config.xml/ ] 
-    zipit name, folder, input_filenames
+    Dir.chdir'lua' do
+      name = 'NewFromTemplate'
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder, [ /config.xml/ ] 
+      zipit name, folder, input_filenames
+    end
   end
 
 
   desc "Package up MidiMapper"
   task :midi_mapping_demo do
-    cd 'lua'
-    name = 'MidiMappingDemo'
-    folder = "com.neurogami.#{name}.xrnx"
-    input_filenames = %w{ main.lua manifest.xml Actions.lua  HandlersLaunchpad.lua  Handlers.lua  HandlersQuNexus.lua  }
-    zipit name, folder, input_filenames
+    Dir.chdir'lua' do
+      name = 'MidiMappingDemo'
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = %w{ main.lua manifest.xml Actions.lua  HandlersLaunchpad.lua  Handlers.lua  HandlersQuNexus.lua  }
+      zipit name, folder, input_filenames
+    end
   end
 
   desc "Package up RawMidi"
-  task :raw_midi do
-    cd 'lua'
-    name = "RawMidi"
-    folder = "com.neurogami.#{name }.xrnx"
-    input_filenames = %w{ main.lua manifest.xml }
-    zipit name, folder, input_filenames
+  task :raw_midi2 do
+    Dir.chdir'lua' do
+      name = "RawMidi2"
+      folder = "com.neurogami.#{name }.xrnx"
+      input_filenames = %w{ main.lua manifest.xml }
+      zipit name, folder, input_filenames
+    end
   end
 
   desc "Package up Configgy"
   task :configgy do
-    cd 'lua'
-    name = "Configgy"
-    folder = "com.neurogami.#{name }.xrnx"
-    input_filenames = %w{ main.lua manifest.xml }
-    zipit name, folder, input_filenames
+    Dir.chdir'lua' do
+      name = "Configgy"
+      folder = "com.neurogami.#{name }.xrnx"
+      input_filenames = %w{ main.lua manifest.xml }
+      zipit name, folder, input_filenames
+    end
   end
 
-    desc "Package up LoopComposer"
+  desc "Package up LoopComposer"
   task :loop_composer do
-    cd 'lua'
-    name = "LoopComposer"
-    folder = "com.neurogami.#{name }.xrnx"
-    input_filenames = files folder
-    zipit name, folder, input_filenames
+    Dir.chdir'lua' do
+      name = "LoopComposer"
+      folder = "com.neurogami.#{name }.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
   end
 
 end

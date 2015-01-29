@@ -3,7 +3,7 @@ com.neurogami.NewFromTemplate.xrnx/main.lua
 ============================================================================]]--
 
 
-require 'NewFromTemplate/Utils'
+U = require 'NewFromTemplate/Utilities'
 require 'NewFromTemplate/Core'
 local Prefs = require 'NewFromTemplate/Preferences'
 

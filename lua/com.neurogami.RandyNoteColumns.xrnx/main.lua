@@ -6,14 +6,12 @@ RENOISE_OSC    = nil
 CONTROLLER_OSC = nil
 TOOL_NAME = "RandyNoteColumns"
 
-PATH_SEP = "/"
-if (os.platform() == "WINDOWS") then
-  PATH_SEP = "\\"
-end
+-- PATH_SEP = "/"
+-- if (os.platform() == "WINDOWS") then
+--   PATH_SEP = "\\"
+-- end
 
-
-
-require (TOOL_NAME .. '/Utils')
+U = require (TOOL_NAME .. '/Utilities')
 require (TOOL_NAME .. '/Status')
 
 require (TOOL_NAME .. '/Core')
@@ -23,8 +21,6 @@ require (TOOL_NAME .. '/GUI')
 local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
 local osc_device = nil
-
-
 
 function create_osc_server()
   osc_server, server_socket_error = renoise.Socket.create_server(
@@ -72,4 +68,4 @@ require (TOOL_NAME .. '/Handlers')
 renoise.ng = renoise.ng or {}
 renoise.ng[TOOL_NAME] =  TOOL_NAME 
 
-rPrint(renoise.ng)
+U.rPrint(renoise.ng)

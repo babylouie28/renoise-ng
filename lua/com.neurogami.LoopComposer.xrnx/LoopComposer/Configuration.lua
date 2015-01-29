@@ -9,7 +9,7 @@ local view_loop_compose_dialog = nil
 local raw_composition_text = ""
 
 function composition_file()
-  return "loop_composition_" ..  base_file_name() .. ".xml"
+  return "loop_composition_" ..  U.base_file_name() .. ".xml"
 end
 
 function load_loop_config()
@@ -26,7 +26,7 @@ end
 function save_composition()
 
   print("save_composition. raw_composition_text: ")
-  rPrint(raw_composition_text)
+  U.rPrint(raw_composition_text)
   -- It *should * come in as a string, a series of rows of space-delimited numbers.
   --  It should be saved and loaed that way; it make sit easier to hand edit or
   --  have some otehr tool create/manipulate.

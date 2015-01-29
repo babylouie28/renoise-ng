@@ -1,4 +1,4 @@
-local Utils = require 'NewFromTemplate/Utils'
+local U = require 'NewFromTemplate/Utilities'
 local Prefs = require 'NewFromTemplate/Preferences'
 
 local preferences = Prefs.load_preferences()
@@ -143,7 +143,7 @@ function NewFromTemplate.generate_new_file(template_name, new_file_name)
   print("Create a new song by copying ", template_name, " to ", new_file_name, " (we hope)" ) -- DEBUG
   print(" We have new_file_folder = ", new_file_folder ) -- DEBUG
 
-  new_file_name = Utils.trim(new_file_name)
+  new_file_name = U.trim(new_file_name)
   new_file_name = string.gsub(new_file_name, "\.xrns$", "")
   new_file_name  = (new_file_name .. ".xrns")
   
@@ -151,7 +151,7 @@ function NewFromTemplate.generate_new_file(template_name, new_file_name)
   local to_file   = new_file_folder .. path_slash .. new_file_name
 
   print("Copy '" .. from_file .. "' to '" .. to_file .. "'" ) -- DEBUG
-  local ok, err, code =  Utils.copy_file_to( from_file, to_file )
+  local ok, err, code =  U.copy_file_to( from_file, to_file )
 
   if (err and code ~= ERROR.USER) then 
     renoise.app():show_error(err)  

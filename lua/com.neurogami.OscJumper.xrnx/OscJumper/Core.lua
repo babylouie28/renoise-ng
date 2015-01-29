@@ -1,6 +1,6 @@
 -- Core.lua 
 
-require "OscJumper/Utils"
+U = require "OscJumper/Utilities"
 
 OscJumper = {}
 

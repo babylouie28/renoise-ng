@@ -1,6 +1,6 @@
 -- Core.lua 
 
-require "RandyNoteColumns/Utils"
+U = require "RandyNoteColumns/Utilities"
 require "RandyNoteColumns/Dumper"
 
 -- Define a shortcut function for testing
@@ -65,7 +65,7 @@ notifier.add(new_doc_observable, open_song)
 
 function RandyNoteColumns.reload_all_timers()
   print("RandyNoteColumns.reload_all_timers() ... ")
-  rPrint(RandyNoteColumns.volume_jumper_track_timer_interval)
+  U.rPrint(RandyNoteColumns.volume_jumper_track_timer_interval)
   for track_index, interval in pairs(RandyNoteColumns.volume_jumper_track_timer_interval) do
     RandyNoteColumns.construct_and_deploy_timer(track_index)
   end
@@ -90,7 +90,7 @@ end
 
 function RandyNoteColumns.config_file_for_current_song()
   local fname = renoise.song().file_name
-  local parts = split(fname, PATH_SEP)
+  local parts = string.split(fname, PATH_SEP)
   local xname = parts[#parts]
   return RandyNoteColumns.CONFIG_PREFIX  .. "_" ..  xname .. ".xml"
 end
@@ -196,7 +196,7 @@ function RandyNoteColumns.clear_note_column_timers(track_index)
 
   RandyNoteColumns.reset_note_volumes(track_index)
   print("Remainer song timers:")
-  rPrint(RandyNoteColumns.timers)
+  U.rPrint(RandyNoteColumns.timers)
 
 end
 
@@ -212,7 +212,7 @@ function RandyNoteColumns.assign_note_column_timer(timer_interval, trigger_perce
   print("RandyNoteColumns.assign_note_column_timer called!")
   print("note_column_odds are ...")
 
-  rPrint(note_column_odds)
+  U.rPrint(note_column_odds)
 
   RandyNoteColumns.volume_jumper_track_timer_interval[track_index] = timer_interval
   RandyNoteColumns.volume_jumper_track_col_odds[track_index] = note_column_odds
@@ -227,7 +227,7 @@ end
 function RandyNoteColumns.construct_and_deploy_timer(track_index)
   print(" - - - - RandyNoteColumns.construct_and_deploy_timer(", track_index, ")")
   
-  rPrint(track_index)
+  U.rPrint(track_index)
 
   local func_string = [[   
   local track = renoise.song().tracks[]] .. track_index .. [[]
@@ -251,12 +251,12 @@ function RandyNoteColumns.construct_and_deploy_timer(track_index)
   if(RandyNoteColumns.timers[track_index] and renoise.tool():has_timer( RandyNoteColumns.timers[track_index] ) ) then
     print("Remove existing timer ...")
     renoise.tool():remove_timer( RandyNoteColumns.timers[track_index] )
-    rPrint(RandyNoteColumns.timers)
+    U.rPrint(RandyNoteColumns.timers)
     RandyNoteColumns.timers[track_index] = nil
 
   end
 
-    rPrint(RandyNoteColumns.timers)
+    U.rPrint(RandyNoteColumns.timers)
 
   -- Stuff can go wrong here, though there is no way at
   -- the moment to inform the client of that
