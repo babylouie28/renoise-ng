@@ -89,10 +89,10 @@ function RandyNoteColumns.save_all()
 end
 
 function RandyNoteColumns.config_file_for_current_song()
-  local fname = renoise.song().file_name
-  local parts = string.split(fname, PATH_SEP)
-  local xname = parts[#parts]
-  return RandyNoteColumns.CONFIG_PREFIX  .. "_" ..  xname .. ".xml"
+--  local fname = renoise.song().file_name
+--  local parts = string.split(fname, PATH_SEP)
+ -- local xname = parts[#parts]
+  return RandyNoteColumns.CONFIG_PREFIX  .. "_" ..   U.base_file_name() .. ".xml"
 end
 
 function RandyNoteColumns.have_config_file() 

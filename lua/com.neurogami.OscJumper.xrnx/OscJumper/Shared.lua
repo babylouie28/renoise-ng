@@ -32,7 +32,7 @@ function attempt_rotate_setup()
   else
     have_rotator = false
     print("WARNING: " .. TOOL_NAME .. " failed to load code from com.renoise.PatternRotate.xrnx." )
-    print("Error: ", err)
+--    print("Error: ", err)
   end
 end
 
@@ -50,7 +50,7 @@ function attempt_randy_setup()
   else
     have_randy = false
     print("WARNING: " .. TOOL_NAME .. " failed to load code from com.neurogami.RandyNoteColumns.xrnx." )
-    print("Error: ", err)
+  --  print("Error: ", err)
   end
 
 end
