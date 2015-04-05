@@ -11,7 +11,7 @@ The selected template song then gets copied over as a new song and loaded into R
 
 ## Usage
 
-Once installed the tool should add a "Neurogami New from Template" item to the Tools menu.  
+Once installed the tool should add a "Neurogami New from Template" item to the Files menu.  
 
 This will have two sub-menus: Configuration, and New from Template.
 

@@ -3,10 +3,10 @@
   <ApiVersion>3</ApiVersion>
   <AutoUpgraded>true</AutoUpgraded>
   <Id>com.neurogami.NewFromTemplate</Id>
-  <Version>0.6</Version>
+  <Version>0.8</Version>
   <Author>Neurogami | james@neurogami.com  </Author>
   <Name>Neurogami: New from Template</Name>
-  <Category>In Progress</Category>
+  <Category>Files</Category>
   <Description>Shows a list of template songs, from which a new song may be created via copying</Description>
   <Homepage>http://neurogami.com/code</Homepage>
 </RenoiseScriptingTool>
