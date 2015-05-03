@@ -7,7 +7,7 @@
   <Author>Neurogami | james@neurogami.com  </Author>
   <Name>Neurogami: New from Template</Name>
   <Category>Files</Category>
-  <Description>Shows a list of template songs, from which a new song may be created via copying</Description>
+  <Description>Shows a list of template songs, from which a new song may be created via copying and saving with a user-provided name</Description>
   <Homepage>http://neurogami.com/code</Homepage>
 </RenoiseScriptingTool>
 
