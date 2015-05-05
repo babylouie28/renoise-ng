@@ -135,12 +135,23 @@ function NewFromTemplate.template_dialog_init()
         released = function()
           -- Do we need to do something with any running OSC servers?
           template_dialog:close()
-          NewFromTemplate.generate_new_file(selected_template, new_file_name)
+          
+         new_file_name = string.trim(new_file_name)
+         selected_template = string.trim(selected_template)
+         print("* * * * * Working with new file name '" .. new_file_name .. "'")
+         print("* * * * *  Working with selected_template '" .. selected_template .. "'")
+          if (U.is_empty(selected_template)) then
+             renoise.app():show_message("There seems to be no template selected.\nPlease be sure you select one of the available templates.") 
+          else
+            if (U.is_empty(new_file_name)) then
+              renoise.app():show_message("There seems to be no name for the new song.\nPlease be sure you enter a new song name.") 
+            else
+           ---   NewFromTemplate.generate_new_file(selected_template, new_file_name)
+          end
+        end
         end
       },
-
     } -- ******************** end aligner ******************** 
-
   } 
 
 

@@ -1,7 +1,9 @@
 require 'facets/string/snakecase'
-require 'zip'
+gem 'rubyzip'
+gem 'zip-zip'
 require 'zip/zip'
 require 'zip/zipfilesystem'
+require 'zip'
 require 'find'
 
 Dir.glob("tasks/*.rake") do |t|
@@ -39,7 +41,12 @@ task :rebuild =>  [:copy_utils] do
   tool_names.each do |tool| 
     Rake::Task["package:#{tool.snakecase}"].execute
   end
+  if win32?
+  sh "./__CP.bat"
+  else
   sh "./__cp.sh"
+  end
+
 end
 
 desc "Copy over ./lua/GlobalOscActions.lua"
@@ -72,10 +79,19 @@ def zipit name, folder, input_filenames
   sh "mv #{zipfile_name} ../dist/"
 end
 
+def win32?
+  RUBY_PLATFORM =~ /-mingw32/ ? true : false
+end
+
 def ng_vhost
   case  hostname 
   when /james1/
+    if win32?
+        %~c:/Users/james/ownCloud/vhosts/2012.neurogami.com~
+    else
   %~/home/james/data/vhosts/2012.neurogami.com~
+    end
+
   else
     raise "Undefined NG vhost for #{hostname}"
   end
