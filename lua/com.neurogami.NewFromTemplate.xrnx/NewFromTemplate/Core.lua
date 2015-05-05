@@ -48,14 +48,13 @@ function NewFromTemplate.template_dialog_keyhander(dialog, key)
 end
 
 function NewFromTemplate.load_preferences()
-    preferences = Prefs.load_preferences()
-   template_folder = Prefs.templates_folder()
-   new_file_folder = Prefs.new_file_folder()
+  preferences = Prefs.load_preferences()
+  template_folder = Prefs.templates_folder()
+  new_file_folder = Prefs.new_file_folder()
 end
 
--- Issue: This code needs the preferences data,
--- but that is handled elsewhere
--- FIXME
+
+
 function NewFromTemplate.prompt_user()
 
   -- Remove any existing dialog
@@ -65,8 +64,16 @@ function NewFromTemplate.prompt_user()
 
   NewFromTemplate.load_preferences() 
 
-  NewFromTemplate.template_dialog_init()
-  template_dialog = renoise.app():show_custom_dialog("New from template", view_template_dialog, NewFromTemplate.template_dialog_keyhander)
+  -- Validate the current config settings.  If either path is
+  -- invalid, tell the user and do not allow them to continue to
+  -- create a song from a template
+
+  local paths_are_valid = Prefs.validate_paths()
+
+  if paths_are_valid then
+    NewFromTemplate.template_dialog_init()
+    template_dialog = renoise.app():show_custom_dialog("New from template", view_template_dialog, NewFromTemplate.template_dialog_keyhander)
+  end
 end
 
 function NewFromTemplate.template_dialog_init()
@@ -146,7 +153,7 @@ function NewFromTemplate.generate_new_file(template_name, new_file_name)
   new_file_name = string.trim(new_file_name)
   new_file_name = string.gsub(new_file_name, "\.xrns$", "")
   new_file_name  = (new_file_name .. ".xrns")
-  
+
   local from_file = template_folder .. path_slash .. template_name
   local to_file   = new_file_folder .. path_slash .. new_file_name
 
@@ -157,7 +164,7 @@ function NewFromTemplate.generate_new_file(template_name, new_file_name)
     renoise.app():show_error(err)  
     return
   end
-  
+
   print("copy_file_to OK  = ", ok) -- DEBUG
 
   if (ok) then

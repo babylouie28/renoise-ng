@@ -30,6 +30,44 @@ function P.load_preferences()
   return preferences 
 end
 
+function P.validate_paths()
+  local template_folder = P.templates_folder()
+  local new_file_folder = P.new_file_folder()
+
+  local template_err = false
+  local new_file_err = false
+
+  if (not io.exists(template_folder)) then    
+    template_err = true
+  end
+
+  if (not io.exists(new_file_folder)) then    
+    new_file_err = true
+  end
+
+  if (new_file_err or template_err) then
+    local err_msg = ""
+
+    if (template_err == true) then
+      err_msg ="The template folder  '" .. template_folder .. "' cannot be found.\n\n"
+    end
+
+    if (new_file_err  == true ) then
+      err_msg = err_msg .. "The new file  folder  '" .. new_file_folder .. "' cannot be found.\n\n"
+    end
+
+    err_msg = err_msg .. "\nPlease check that the configuration settings are correct and are full paths to existing folders."
+    renoise.app():show_message(err_msg)
+
+    return false;
+  else
+    return true;
+  end
+
+end
+
+
+
 function P.clean_loaded_data()
   if preferences ~= nil then
 
@@ -114,9 +152,9 @@ function P.template_dialog_init()
         text = "Save & Close",
         released = function()
           P.save_preferences()
-          -- Do we need to do something with any running OSC servers?
           template_dialog:close()
           renoise.app():show_status("New from Template preferences saved.")
+          P.validate_paths()
         end
       },
     },  -- ************** vb:horizontal_aligner ********************
@@ -136,6 +174,7 @@ function P.display_template_dialog()
   P.load_preferences()
   P.template_dialog_init()
   template_dialog = renoise.app():show_custom_dialog("New from template Preferences", view_template_dialog, P.template_dialog_keyhander)
+
 end
 
 
