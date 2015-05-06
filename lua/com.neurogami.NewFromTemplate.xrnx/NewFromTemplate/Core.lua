@@ -81,10 +81,18 @@ function NewFromTemplate.template_dialog_init()
   NewFromTemplate.load_preferences()
 
   local vb = renoise.ViewBuilder()
+
   -- Need to replace this with preference value for template folder.
   local template_files = NewFromTemplate.get_file_list(template_folder) 
+  
   local default_template_index = 1
-  selected_template = template_files[default_template_index] 
+  
+  if next (template_files) == nil then
+    selected_template = ""
+    renoise.app():show_message("There are no templates in '"..template_folder.."'")
+  else
+    selected_template = template_files[default_template_index] 
+  end 
 
   view_template_dialog = vb:column {
     spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
@@ -102,20 +110,17 @@ function NewFromTemplate.template_dialog_init()
         items = template_files,
         tooltip = "Template files",
         value = default_template_index,
-
-        -- Notifier is only called if the user selects something on purpose.
+        
         notifier = function(idx)
-       if next (template_files) == nil then
-                 selected_template = ""
-        renoise.app():show_message("There are no templates.")
+          if next (template_files) == nil then
+            selected_template = ""
+            renoise.app():show_message("There are no templates in '", template_folder, "'")
+          else
+            selected_template = template_files[idx]
+          end 
 
-       else
-        selected_template = template_files[idx]
-
-           end 
-          
           print("Template file  ", template_files[idx] , " selected.") -- DEBUG
-             
+
         end
       },
     },  -- ******************** end aligner ******************** 
@@ -144,20 +149,20 @@ function NewFromTemplate.template_dialog_init()
         released = function()
           -- Do we need to do something with any running OSC servers?
           template_dialog:close()
-          
-         new_file_name = string.trim(new_file_name)
-         selected_template = string.trim(selected_template)
-         print("* * * * * Working with new file name '" .. new_file_name .. "'")
-         print("* * * * *  Working with selected_template '" .. selected_template .. "'")
+
+          new_file_name = string.trim(new_file_name)
+          selected_template = string.trim(selected_template)
+          print("* * * * * Working with new file name '" .. new_file_name .. "'")
+          print("* * * * *  Working with selected_template '" .. selected_template .. "'")
           if (U.is_empty(selected_template)) then
-             renoise.app():show_message("There seems to be no template selected.\nPlease be sure you select one of the available templates.") 
+            renoise.app():show_message("There seems to be no template selected.\nPlease be sure your template folder has \ntemplates and that you select one of them.") 
           else
             if (U.is_empty(new_file_name)) then
               renoise.app():show_message("There seems to be no name for the new song.\nPlease be sure you enter a new song name.") 
             else
-           ---   NewFromTemplate.generate_new_file(selected_template, new_file_name)
+              NewFromTemplate.generate_new_file(selected_template, new_file_name)
+            end
           end
-        end
         end
       },
     } -- ******************** end aligner ******************** 
