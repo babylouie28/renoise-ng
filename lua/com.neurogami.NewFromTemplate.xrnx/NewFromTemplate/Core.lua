@@ -105,8 +105,17 @@ function NewFromTemplate.template_dialog_init()
 
         -- Notifier is only called if the user selects something on purpose.
         notifier = function(idx)
-          -- print("Template file  ", template_files[idx] , " selected.") -- DEBUG
-          selected_template = template_files[idx]
+       if next (template_files) == nil then
+                 selected_template = ""
+        renoise.app():show_message("There are no templates.")
+
+       else
+        selected_template = template_files[idx]
+
+           end 
+          
+          print("Template file  ", template_files[idx] , " selected.") -- DEBUG
+             
         end
       },
     },  -- ******************** end aligner ******************** 

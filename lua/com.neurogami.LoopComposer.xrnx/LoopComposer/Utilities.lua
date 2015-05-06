@@ -6,8 +6,12 @@ function string.lpad(str, len, char)
 end
 
 function string.trim(s)
-  print("string:trim has '", s, "'")
-  return (s:gsub("^%s*(.-)%s*$", "%1"))
+  if s == nil then
+    return "" -- Is this a good idea?  FIXME
+  else
+   print("string:trim has '", s, "'")
+   return (s:gsub("^%s*(.-)%s*$", "%1"))
+  end
 end
 
 function string.lines(s)
@@ -153,6 +157,11 @@ function U.copy_file_to(source, target)
     code = ERROR.USER
   end
   return ok, error, code
+end
+
+
+function U.is_empty(s)
+   return s == nil or s == ''
 end
 
 
