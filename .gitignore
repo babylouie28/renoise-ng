@@ -7,4 +7,5 @@ cruft
 lua/com.neurogami.NewFromTemplate.xrnx/config.xml
 osc-repl-*
 tasks
+known-to-work*
 __*
