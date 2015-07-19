@@ -22,6 +22,7 @@ tool_names = %w{
   NewFromTemplate 
   RandyNoteColumns
   BeatMasher
+  MasterMuter
 
 }
 
@@ -221,6 +222,17 @@ namespace :package do
       zipit name, folder, input_filenames
     end
   end
+
+    desc "Package up MasterMuter"
+  task :master_muter do
+    Dir.chdir'lua' do
+      name = "MasterMuter"
+      folder = "com.neurogami.#{name }.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
+
 
 end
 
