@@ -16,8 +16,8 @@ function MasterMuter.get_master_track(song)
     return t
 end
 
-function MasterMuter.set_up_muter_gainer(track)
-  print( "MasterMuter.set_up_muter_gainer(", track, ")" )
+function MasterMuter.get_muter_gainer(track)
+  print( "MasterMuter.get_muter_gainer(", track, ")" )
 
   -- rprint(track.available_devices)
 
@@ -25,9 +25,8 @@ function MasterMuter.set_up_muter_gainer(track)
 -- then return.
 -- If no such device exists, add a gain device and set the volume to -INF and disable it
 
-for index, device in ipairs(track.devices) do
-    if device.display_name == MasterMuter.mute_gainer_name then -- Skip TrackVolPan device
-      device.is_active = false 
+  for index, device in ipairs(track.devices) do
+    if device.display_name == MasterMuter.mute_gainer_name then -- Skip TrackVolPan device    
        return device
     end
   end
@@ -38,9 +37,19 @@ for index, device in ipairs(track.devices) do
    local gainer = track:insert_device_at("Audio/Effects/Native/Gainer", 2) -- Doesn't like index 1
    print("gainer  = ", gainer)
    gainer.display_name = MasterMuter.mute_gainer_name
-   gainer.is_active = false 
+--   gainer.is_active = false 
    return gainer
 
+end
+
+
+function MasterMuter.prepare_gainer(gainer) 
+   gainer.is_active = false
+--   rprint(gainer.presets)
+--   2 is panning
+--   1 is gain, though it seems to only accept values of 1 through 4.
+   gainer.parameters[1].value = 0
+     
 end
 
 function MasterMuter.manage_master_mute(mute_value)
@@ -51,6 +60,8 @@ function MasterMuter.manage_master_mute(mute_value)
     local master = MasterMuter.get_master_track(song) 
     print("master = ", master)
 
-    MasterMuter.gainer = MasterMuter.set_up_muter_gainer(master)
+    MasterMuter.gainer = MasterMuter.get_muter_gainer(master)
+
+    MasterMuter.prepare_gainer(MasterMuter.gainer)
 end
 
