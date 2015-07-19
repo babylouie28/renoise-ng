@@ -3,6 +3,7 @@ MasterMuter = {}
 
 MasterMuter.mute_gainer_name = "MUTE_GAINER"
 
+MasterMuter.gainer = nil
 
 function MasterMuter.get_master_track(song) 
     local t
@@ -25,7 +26,8 @@ function MasterMuter.set_up_muter_gainer(track)
 -- If no such device exists, add a gain device and set the volume to -INF and disable it
 
 for index, device in ipairs(track.devices) do
-    if device.name == MasterMuter.mute_gainer_name then -- Skip TrackVolPan device
+    if device.display_name == MasterMuter.mute_gainer_name then -- Skip TrackVolPan device
+      device.is_active = false 
        return device
     end
   end
@@ -35,6 +37,9 @@ for index, device in ipairs(track.devices) do
    -- local gainer = track:insert_device_at("Audio/Effects/    Native/Gainer", 2) -- Doesn't like index 1
    local gainer = track:insert_device_at("Audio/Effects/Native/Gainer", 2) -- Doesn't like index 1
    print("gainer  = ", gainer)
+   gainer.display_name = MasterMuter.mute_gainer_name
+   gainer.is_active = false 
+   return gainer
 
 end
 
@@ -46,6 +51,6 @@ function MasterMuter.manage_master_mute(mute_value)
     local master = MasterMuter.get_master_track(song) 
     print("master = ", master)
 
-    MasterMuter.set_up_muter_gainer(master)
+    MasterMuter.gainer = MasterMuter.set_up_muter_gainer(master)
 end
 
