@@ -17,6 +17,12 @@ local osc_client, socket_error = nil
 local osc_server, server_socket_error = nil
 local osc_device = nil
 
+
+function start() 
+  MasterMuter.setup() 
+  create_osc_server()
+end
+
 function create_osc_server()
   osc_server, server_socket_error = renoise.Socket.create_server(
   configuration.osc_settings.internal.ip.value, 
@@ -42,8 +48,8 @@ function create_osc_server()
 end
 
 renoise.tool():add_menu_entry {
-  name = "--- Main Menu:Tools:Neurogami " .. TOOL_NAME .. ":Start the OSC " .. TOOL_NAME .. " server ..",
-  invoke = create_osc_server
+  name = "--- Main Menu:Tools:Neurogami " .. TOOL_NAME .. ":Start " .. TOOL_NAME,
+  invoke = start
 }
 
 require (TOOL_NAME .. '/Handlers')
