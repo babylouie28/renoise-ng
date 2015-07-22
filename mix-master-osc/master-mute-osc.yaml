@@ -1,0 +1,7 @@
+:port: 8001
+:address: 192.168.0.15
+# This file is specific to 4K Miles, and all such files need
+# to be custom because they must know the track index of Master and 
+# the device index for special Gainer
+:initial_messages:
+  - /ng/master/set_mute 1

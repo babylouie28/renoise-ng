@@ -1,0 +1,13 @@
+:port: 8000
+:address: 192.168.0.58
+# This file is specific to 4K Miles, and all such files need
+# to be custom because they must know the track index of Master and 
+# the device index for special Gainer
+:initial_messages:
+  - /renoise/transport/start
+  - /renoise/transport/stop
+  - /renoise/song/track/27/device/2/bypass 1
+  - /renoise/song/track/27/device/2/bypass 0
+  - /renoise/song/track/1/solo
+# If you have one device it ends up as device #2.
+#
