@@ -10,18 +10,11 @@ function OscDevice:__init()
   self.server = nil
 
   self.osc_client = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
-  self.osc_controller_client = OscClient(configuration.osc_settings.controller.ip.value, configuration.osc_settings.controller.port.value)
   
   if (self.osc_client == nil ) then 
     renoise.app():show_warning("Warning: ", TOOL_NAME, " failed to start the internal OSC client")
   else
     print("We have self.osc_client = ", self.osc_client )
-  end
-
-    if (self.osc_controller_client == nil ) then 
-    renoise.app():show_warning("OscDevice Warning: OSC Jumper failed to start the controller OSC client")
-  else
-    print("We have self.osc_controller_client = ", self.osc_controller_client )
   end
 
 
@@ -34,10 +27,6 @@ end
 
 function OscDevice:renoise_osc()
   return self.osc_client
-end
-
-function OscDevice:controller_osc()
-  return self.osc_controller_client
 end
 
 function OscDevice:open()
@@ -278,7 +267,9 @@ function OscClient:__init(osc_host,osc_port)
 
   local client, socket_error = renoise.Socket.create_client(osc_host, osc_port, renoise.Socket.PROTOCOL_UDP)
   if (socket_error) then 
-    renoise.app():show_warning("Warning: ", TOOL_NAME, " failed to start the internal OSC client")
+     local _sport = tostring(osc_port)
+    local msg = "Warning: " .. TOOL_NAME .. " failed to start the internal OSC client using " .. osc_host .. " and " .. _sport .. ". socket_error: " .. socket_error
+    renoise.app():show_warning(msg)
     self._connection = nil
   else
     self._connection = client

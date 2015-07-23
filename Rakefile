@@ -103,7 +103,12 @@ def hostname
 end
 
 def copy_to_neurogami_dist zipfile_name
-  sh "cp #{zipfile_name} #{ng_vhost}/content/renoise-tools/ "
+  if File.exist? "#{ng_vhost}/content/renoise-tools/"
+    sh "cp #{zipfile_name} #{ng_vhost}/content/renoise-tools/ "
+  else
+    warn "copy_to_neurogami_dist: Cannot find #{ng_vhost}/content/renoise-tools/ "
+  end
+
 end
 
 def files tool_folder, exlude_patterns = []
@@ -235,4 +240,5 @@ namespace :package do
 
 
 end
+
 

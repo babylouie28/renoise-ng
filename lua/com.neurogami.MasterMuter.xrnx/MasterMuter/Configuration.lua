@@ -23,11 +23,6 @@ function load_osc_config()
         protocol = 2,               
       },
 
-      controller = {     
-        ip = "0.0.0.0",
-        port = 8010,
-        protocol = 2,               
-      },
     },
   }
 

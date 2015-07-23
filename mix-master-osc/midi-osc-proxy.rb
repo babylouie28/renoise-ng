@@ -4,6 +4,7 @@
 require 'java'
 require 'unimidi'
 require 'midi-eye'
+require 'osc-ruby-ng'
 
 COLOR_OFF   = 12      
 RED_FLASH   = 11
@@ -36,10 +37,11 @@ end
 
   # If you have two instances of renoise you will have to change
   # the OSC port on one of them.
-  refererence = {:address => '127.0.0.1', :port => 900}
+  # The song port needs to be the one set for Master Muter
+  osc_config = { :reference => {:address => '192.168.0.15', :port => 9000},
+    :song => {:address => '192.168.0.58', :port => 8001 }
 
-song = {:address => '127.0.0.1', :port => 8001 }
-
+}
 
 =begin
 Launchpad motes:
@@ -115,12 +117,94 @@ Hex  Decimal  Colour  Brightness
 
 =end
 
+class OscDispatcher
+  include  OSC
+
+
+  def initialize config
+    @config = config
+    setup
+  end
+
+  def setup
+    # Need clients for the song and the reference instance
+    warn "setup OSC with #{@config}"
+    _song = @config[:song]
+    _reference = @config[:reference]
+
+    @song      = OSC::Client.new _song[:address],      _song[:port]
+    @reference = OSC::Client.new _reference[:address], _reference[:port]
+  end
+
+
+  def song_send msg
+    Thread.new do
+      begin
+        @song.send msg
+      rescue 
+        warn '!'*80
+        warn "Error sending @song OSC message: #{$!}"
+        warn '!'*80
+      end
+    end
+  end
+
+  def reference_send msg
+    Thread.new do
+      begin
+        warn "Send msg #{msg} to #{@reference}"
+        @reference.send msg
+      rescue 
+        warn '!'*80
+        warn "Error sending @song OSC message: #{$!}"
+        warn '!'*80
+      end
+    end
+  end
+
+  def solo_song
+    msg = OSC::Message.new  "/ng/master/set_mute" , 0
+    song_send msg
+  end
+
+
+  def mute_song
+    msg = OSC::Message.new  "/ng/master/set_mute" , 1
+    song_send msg
+  end
+
+
+
+  def solo_reference track
+    #       /renoise/song/track/XXX/solo
+    #  or
+    #       /renoise/song/track/XXX/mute   
+    #       /renoise/song/track/XXX/unmute
+    #
+    # Which is better? Do we fire off a slwew of mutes, then a single unmute?
+warn "solo reference track #{track}"
+    mute_all_reference_tracks
+
+    msg = OSC::Message.new  "/renoise/song/track/#{track}/unmute"
+    reference_send msg
+  end
+
+  def mute_all_reference_tracks
+    1.upto(8) do |track|
+      msg = OSC::Message.new  "/renoise/song/track/#{track}/mute"
+      reference_send msg  
+    end
+  end
+
+end
+
 class Launchpad
 
   SCENE_BUTTONS = [8, 24, 40, 56, 72, 88, 104,120]
 
-  def initialize output
+  def initialize output, osc_config
     @output = output  
+    @osc_config = osc_config
     @current_column = 0
     @current_scene = 0
     @current_control = 0
@@ -129,10 +213,11 @@ class Launchpad
     @multi_end = -1
   end
 
-  def setup
+  def setup 
     clear 
     light_top_set 
     @output.puts 176, 0, 40
+    @osc = OscDispatcher.new @osc_config
   end
 
 
@@ -187,136 +272,146 @@ class Launchpad
     end
   end
 
-def light_column_from n
-
-  #col = column_from_note  n
-  while n < MAX_NOTE  
-    light_grid_button n
-    n += 16
-  end
-end
-
-
-# This is slow.
-def clear_grid
-  warn "************* CLEAR ****************"
-  8.times do |r|
-    8.times do |c| # The numbers jump +16 on each row.
-      grid_off r*16 + c
-    end
-  end
-end
-
-def light_grid_button n, color=GREEN_FULL
-  @output.puts GRID, n, color # note on
-end
-
-def handle_grid_button note_array
-
-
-
-  # The current plan: Solo the selected track.
-  #  We need to know the  column, and then decide
-  #  what OSC to send
-  if note_array[2].to_i > 0   
-    clear_grid
-    @current_grid = note_array[1]
-    light_column_from  @current_grid
-  end
-
-end
-
-def handle_scene_button note_array 
-  if note_array[2].to_i > 0   
-    @output.puts GRID, note_array[1], AMBER_FULL # note on
-  else
-    Thread.new do 
-      sleep  0.5
-      @output.puts GRID, note_array[1], COLOR_OFF # note off
-    end
-  end
-end
-
-def handle_top_control note_array
-  if note_array[2].to_i > 0   
-
-    clear_control_row
-    @current_control = note_array[1]
-
-    @output.puts CONTROL, @current_control, RED_FULL # note on
-    #else
-    #  Thread.new do 
-    #    sleep  0.5
-    #    @output.puts CONTROL, note_array[1], COLOR_OFF # note off
-    #  end
-  end
-end
-
-
-def min_max_notes message_array
-  warn "min_max_notes #{message_array} "
-  
-  min,max = MAX_NOTE, 0
-
-  message_array.each do |msg|
-  warn "msg = #{msg}"
-    data = msg[:data]
-    if data[1].to_i < min
-      min = data[1].to_i
-    end
-    if data[1].to_i > max
-      max = data[1].to_i
+  def light_column_from n
+    while n < MAX_NOTE  
+      light_grid_button n
+      n += 16
     end
   end
 
-  [min,max]
-end
-
-def process_multi messages
-    clear_grid
-
-   @multi_start, @multi_end = *(min_max_notes messages )
-  light_column_from_to @multi_start, @multi_end
-end
-
-
-def process messages
-  warn "process #{messages.inspect}"
-
-
-  @multi = messages.size > 1
-
-  if @multi
-    process_multi messages
-    return
-  end
-
-  messages.each do |msg|
-    p msg
-    note_array = msg[:data]
-
-    case note_array[0].to_i
-    when GRID 
-      # The problem: End-of-row arrow keys come up as GRID notes
-      # (These are alos called 'scene launch buttons')
-      # They all resolve to n%8 == 0 but so do some other keys.
-      # How cna we quickly tell if 
-      if SCENE_BUTTONS.include? note_array[1].to_i
-        warn "Handle a scene button #{note_array[1].to_i} ..."
-        handle_scene_button note_array 
-      else
-        warn "Handle a grid button #{note_array[1].to_i}  ..."
-        handle_grid_button note_array
-      end
-    when CONTROL
-      handle_top_control note_array
+  def solo_audio column
+    warn '-' * 90
+    warn "     solo_audio #{column}    "
+    warn '-' * 90
+    if column == 0
+      @osc.solo_song
+      @osc.mute_all_reference_tracks
     else
-      warn "'process' does not know what to do with note thing #{note_array[0].to_i}"
+      @osc.mute_song
+      @osc.solo_reference column
+    end
+
+  end
+
+  # This is slow.
+  def clear_grid
+    warn "************* CLEAR ****************"
+    8.times do |r|
+      8.times do |c| # The numbers jump +16 on each row.
+        grid_off r*16 + c
+      end
     end
   end
 
-  warn "Multi message? #{@multi}"
-end
+  def light_grid_button n, color=GREEN_FULL
+    @output.puts GRID, n, color # note on
+  end
+
+  def handle_grid_button note_array
+
+    # The current plan: Solo the selected track.
+    #  We need to know the  column, and then decide
+    #  what OSC to send
+    if note_array[2].to_i > 0   
+      clear_grid
+      @current_grid = note_array[1]
+      light_column_from  @current_grid
+      solo_audio column_from_note @current_grid 
+    end
+
+  end
+
+  def handle_scene_button note_array 
+    if note_array[2].to_i > 0   
+      @output.puts GRID, note_array[1], AMBER_FULL # note on
+    else
+      Thread.new do 
+        sleep  0.5
+        @output.puts GRID, note_array[1], COLOR_OFF # note off
+      end
+    end
+  end
+
+  def handle_top_control note_array
+    if note_array[2].to_i > 0   
+
+      clear_control_row
+      @current_control = note_array[1]
+
+      @output.puts CONTROL, @current_control, RED_FULL # note on
+      #else
+      #  Thread.new do 
+      #    sleep  0.5
+      #    @output.puts CONTROL, note_array[1], COLOR_OFF # note off
+      #  end
+    end
+  end
+
+
+  def min_max_notes message_array
+    warn "min_max_notes #{message_array} "
+
+    min,max = MAX_NOTE, 0
+
+    message_array.each do |msg|
+      warn "msg = #{msg}"
+      data = msg[:data]
+      if data[1].to_i < min
+        min = data[1].to_i
+      end
+      if data[1].to_i > max
+        max = data[1].to_i
+      end
+    end
+
+    [min,max]
+  end
+
+  def process_multi messages
+    clear_grid
+
+    @multi_start, @multi_end = *(min_max_notes messages )
+    light_column_from_to @multi_start, @multi_end
+  end
+
+
+  def process messages
+    warn "process #{messages.inspect}"
+
+
+    @multi = messages.size > 1
+
+    if @multi
+      process_multi messages
+      return
+    end
+
+    messages.each do |msg|
+      p msg
+      note_array = msg[:data]
+
+      case note_array[0].to_i
+      when GRID 
+        # The problem: End-of-row arrow keys come up as GRID notes
+        # (These are alos called 'scene launch buttons')
+        # They all resolve to n%8 == 0 but so do some other keys.
+        # How cna we quickly tell if 
+        if SCENE_BUTTONS.include? note_array[1].to_i
+          warn "Handle a scene button #{note_array[1].to_i} ..."
+          handle_scene_button note_array 
+        else
+          warn "Handle a grid button #{note_array[1].to_i}  ..."
+          handle_grid_button note_array
+        end
+      when CONTROL
+        handle_top_control note_array
+      else
+        warn "'process' does not know what to do with note thing #{note_array[0].to_i}"
+      end
+    end
+
+    warn "Multi message? #{@multi}"
+  end
 
 end # End Launchpad class
 
@@ -333,8 +428,9 @@ end # End Launchpad class
 
 #end
 
-@launchpad = Launchpad.new @output 
-@launchpad.setup
+@launchpad = Launchpad.new @output, osc_config
+@launchpad.setup 
+
 warn "Ready on #{`hostname`.to_s.strip}!"
 
 
