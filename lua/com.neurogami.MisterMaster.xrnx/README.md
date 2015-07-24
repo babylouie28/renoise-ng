@@ -1,4 +1,4 @@
-# Master Muter 
+# Mister Master 
 
 ## Description
 
@@ -12,11 +12,11 @@ Once installed, the tool will add a new item to the Tools menu, for "Neurogami M
 
 This in turn provide two submenu items.  "Configuration" will show a small dialog box where you can set the IP address and port numbers for the tool and for the internal Renoise OSC server.
 
-The Renoise OSC port should match whatever Renoise is using (typically port 8000). The Master Muter port number needs to be another port number (e.g 8001).
+The Renoise OSC port should match whatever Renoise is using (typically port 8000). The Mister Master port number needs to be another port number (e.g 8001).
 
-Master Muter needs to know the Renoise port number because Master Muter will pass through any OSC messages it does not know how to handle.  This allows you to send the default Renoise OSC message to the Master Muter OSC server.
+Mister Master needs to know the Renoise port number because Mister Master will pass through any OSC messages it does not know how to handle.  This allows you to send the default Renoise OSC message to the Mister Master OSC server.
 
-Once configured you use the other submenu item, "Start Master Muter" to start the Master Muter OSC server as well as add a custom gainer device to the master track.
+Once configured you use the other submenu item, "Start Mister Master" to start the Mister Master OSC server as well as add a custom gainer device to the master track.
 
 That master gainer is set to `-INF` (complete silence) and deactivated.
 
@@ -38,7 +38,7 @@ Nothing should happen unless you start the tool, so it should not be adding this
 
 ## Author
 
-Master Muter was written by James Britt / Neurogami.
+Mister Master was written by James Britt / Neurogami.
 
 Source code can be found [here](https://github.com/Neurogami/renoise-ng/tree/master/lua/com.neurogami.MisterMaster.xrnx).
 
