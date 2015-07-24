@@ -35,6 +35,26 @@ Assuming Renoise, then the columns might map to locations in a song.
 Having a way to jump around in a reference track would be nice, maybe even with some kind of looping.
 
 
+** Thu Jul 23 11:14:15 MST 2015 **
+
+Consider that you are unlikely to listen to an entire reference track. 
+
+You really want to compare a section of a song for the sonic effects.
+
+It might make more sense for each ref track to be a sequence of song excerpts.
+
+You could then put more than one song on a track.
+
+The Launchpad then is use to select a section to loop.  If you hit one grid button it just loops over that pattern.
+
+Press two buttons and we use the "multi message" thing to define the loop range.
+
+We might also use the scene buttons (or the top buttons) to toggle mono and stereo.
+
+Maybe add that to the Master Muter code so that it adds a stero thing, sets it to mono, then deactivates.
+
+Then when listening you can quickly toggle mono/steroe from the LP.
+
 
 # Stuff to look at
 

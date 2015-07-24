@@ -3,11 +3,11 @@
   <ApiVersion>3</ApiVersion>
   <AutoUpgraded>true</AutoUpgraded>
   <Id>com.neurogami.MasterMuter</Id>
-  <Version>0.2</Version>
+  <Version>0.3</Version>
   <Author>Neurogami | james@neurogami.com  </Author>
-  <Name>Neurogami MasterMuter</Name>
+  <Name>Neurogami Master Master</Name>
   <Category>In Progress</Category>
-  <Description>FIXE ME</Description>
+  <Description>Tool to manage certain properties of the master track, mainly for mixing</Description>
   <Homepage>http://neurogami.com</Homepage>
 </RenoiseScriptingTool>
 
