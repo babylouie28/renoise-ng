@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>3</ApiVersion>
+  <AutoUpgraded>true</AutoUpgraded>
+  <Id>com.neurogami.MisterMaster</Id>
+  <Version>0.3</Version>
+  <Author>Neurogami | james@neurogami.com  </Author>
+  <Name>Neurogami Mister Master</Name>
+  <Category>In Progress</Category>
+  <Description>Tool to manage certain properties of the master track, mainly for mixing</Description>
+  <Homepage>http://neurogami.com</Homepage>
+</RenoiseScriptingTool>
+
