@@ -22,7 +22,7 @@ tool_names = %w{
   NewFromTemplate 
   RandyNoteColumns
   BeatMasher
-  MasterMuter
+  MisterMaster
 
 }
 
@@ -191,7 +191,7 @@ namespace :package do
   task :raw_midi2 do
     Dir.chdir'lua' do
       name = "RawMidi2"
-      folder = "com.neurogami.#{name }.xrnx"
+      folder = "com.neurogami.#{name}.xrnx"
       input_filenames = %w{ main.lua manifest.xml }
       zipit name, folder, input_filenames
     end
@@ -201,7 +201,7 @@ namespace :package do
   task :configgy do
     Dir.chdir'lua' do
       name = "Configgy"
-      folder = "com.neurogami.#{name }.xrnx"
+      folder = "com.neurogami.#{name}.xrnx"
       input_filenames = %w{ main.lua manifest.xml }
       zipit name, folder, input_filenames
     end
@@ -211,7 +211,7 @@ namespace :package do
   task :loop_composer do
     Dir.chdir'lua' do
       name = "LoopComposer"
-      folder = "com.neurogami.#{name }.xrnx"
+      folder = "com.neurogami.#{name}.xrnx"
       input_filenames = files folder
       zipit name, folder, input_filenames
     end
@@ -222,17 +222,17 @@ namespace :package do
   task :beat_masher do
     Dir.chdir'lua' do
       name = "BeatMasher"
-      folder = "com.neurogami.#{name }.xrnx"
+      folder = "com.neurogami.#{name}.xrnx"
       input_filenames = files folder
       zipit name, folder, input_filenames
     end
   end
 
-    desc "Package up MasterMuter"
-  task :master_muter do
+    desc "Package up MisterMaster"
+  task :mister_master do
     Dir.chdir'lua' do
-      name = "MasterMuter"
-      folder = "com.neurogami.#{name }.xrnx"
+      name = "MisterMaster"
+      folder = "com.neurogami.#{name}.xrnx"
       input_filenames = files folder
       zipit name, folder, input_filenames
     end
@@ -240,5 +240,6 @@ namespace :package do
 
 
 end
+
 
 
