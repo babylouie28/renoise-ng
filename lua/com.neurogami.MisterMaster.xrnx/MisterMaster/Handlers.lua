@@ -29,7 +29,45 @@ handlers = {
     print("/master/set_mute")
     MisterMaster.manage_master_mute(mute_value)
   end 
+},
+
+  {
+  pattern = "/master/mono",
+  handler = function()
+    print("/master/mono")
+    MisterMaster.manage_master_stereo(1)
+  end 
+}, 
+
+{  
+  pattern = "/master/stereo",
+  handler = function()
+    print("/master/stereo")
+    MisterMaster.manage_master_stereo(0)
+  end 
+} ,
+
+{  
+  pattern = "/master/set_stereo",
+  handler = function(stereo_value)
+    print("/master/set_stereo")
+    MisterMaster.manage_master_stereo(stereo_value)
+  end 
+} ,
+
+{  
+  pattern = "/master/set_mono",
+  handler = function(mono_value)
+    print("/master/set_mono")
+    if(mono_value == 0) then 
+      mono_value = 1
+    else
+      mono_value = 0
+    end
+    MisterMaster.manage_master_stereo(mono_value)
+  end 
 } 
+
 
 
 } -- end of handlers 
