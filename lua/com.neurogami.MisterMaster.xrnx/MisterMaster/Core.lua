@@ -65,9 +65,13 @@ end
 function MisterMaster.prepare_stereo(stereo) 
   rprint(stereo.parameters)
   stereo.is_active = false
-  --  stereo.parameters[1].value = 0
-  -- stereo.parameters[2].value = 1
-  stereo.active_preset_data = "<?xml version='1.0' encoding='UTF-8'?><FilterDevicePreset doc_version='9'>  <DeviceSlot type='StereoExpanderDevice'><IsMaximized>true</IsMaximized><MonoMixMode>L+R</MonoMixMode><StereoWidth><Value>0.0</Value></StereoWidth><SurroundWidth><Value>0.0</Value></SurroundWidth></DeviceSlot></FilterDevicePreset>"
+  
+  -- stereo.active_preset_data = "<?xml version='1.0' encoding='UTF-8'?><FilterDevicePreset doc_version='9'>  <DeviceSlot type='StereoExpanderDevice'><IsMaximized>true</IsMaximized><MonoMixMode>L+R</MonoMixMode><StereoWidth><Value>0.0</Value></StereoWidth><SurroundWidth><Value>0.0</Value></SurroundWidth></DeviceSlot></FilterDevicePreset>"
+
+  stereo.active_preset_data = "<?xml version='1.0' encoding='UTF-8'?><FilterDevicePreset doc_version='9'><DeviceSlot type='StereoExpanderDevice'><MonoMixMode>L+R</MonoMixMode></DeviceSlot></FilterDevicePreset>"
+  stereo.parameters[1].value = 0
+  stereo.parameters[2].value = 0
+
 end
 
 function MisterMaster.manage_master_mute(mute_value)
