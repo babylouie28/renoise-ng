@@ -82,7 +82,6 @@ function NewFromTemplate.template_dialog_init()
 
   local vb = renoise.ViewBuilder()
 
-  -- Need to replace this with preference value for template folder.
   local template_files = NewFromTemplate.get_file_list(template_folder) 
   
   local default_template_index = 1

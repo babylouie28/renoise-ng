@@ -17,7 +17,6 @@ function OscDevice:__init()
     print("We have self.osc_client = ", self.osc_client )
   end
 
-
   self.message_queue = nil
   self.bundle_messages = false
   self.handlers = table.create{}
@@ -26,6 +25,7 @@ function OscDevice:__init()
 end
 
 function OscDevice:renoise_osc()
+  self.osc_client = OscClient(configuration.osc_settings.renoise.ip.value, configuration.osc_settings.renoise.port.value)
   return self.osc_client
 end
 

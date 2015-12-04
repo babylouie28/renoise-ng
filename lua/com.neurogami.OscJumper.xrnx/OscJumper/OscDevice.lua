@@ -277,8 +277,10 @@ function OscClient:__init(osc_host,osc_port)
   self._connection = nil
 
   local client, socket_error = renoise.Socket.create_client(osc_host, osc_port, renoise.Socket.PROTOCOL_UDP)
-  if (socket_error) then 
-    renoise.app():show_warning("Warning: ", TOOL_NAME, " failed to start the internal OSC client")
+
+  if (socket_error) then   
+    print("SOCKET ERROR ", socket_error, ". osc_port = ", osc_port, " in ", TOOL_NAME)
+    renoise.app():show_warning("Warning: " .. TOOL_NAME .." failed to start the internal OSC client for " .. osc_host .. ":" ..osc_port)
     self._connection = nil
   else
     self._connection = client
