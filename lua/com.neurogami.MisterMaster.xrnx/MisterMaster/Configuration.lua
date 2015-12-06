@@ -3,8 +3,35 @@
 configuration = nil
 local configuration_dialog = nil
 local view_osc_config_dialog = nil
-  
+local config_file_name = "config.xml"
+
+
+function song_slug()
+  local name = renoise.song().name:gsub(" ", "_")
+  print("Have song slug " .. name )
+  return name
+end
+
+
+function have_config_file() 
+  print("MisterMaster: Look for file ...")
+  local file_name = os.currentdir() .. "../../UserConfig/" .. song_slug() .. ".lua"
+  print(file_name)
+  local f=io.open(file_name,"r")
+  if f~=nil then io.close(f) return true else return false end
+end
+
+
+
 function load_osc_config()
+  
+  -- How would you generate this?
+  -- Should we just auto-generate it? Every song gets it's own config file?
+  -- Add a button to create it?
+  if have_config_file() then
+    config_file_name = song_slug() .. ".xml"
+  end
+
   configuration = renoise.Document.create(TOOL_NAME .. "Configuration") {
 
     osc_settings = {
@@ -25,13 +52,21 @@ function load_osc_config()
 
     },
   }
+-- See if 
+  configuration:load_from(config_file_name)
+end
 
-  configuration:load_from("config.xml")
+
+function save_osc_custom_config()
+ config_file_name = song_slug() .. ".xml"
+  if configuration ~= nil then
+    configuration:save_as(config_file_name)
+  end
 end
 
 function save_osc_config()
   if configuration ~= nil then
-    configuration:save_as("config.xml")
+    configuration:save_as(config_file_name)
   end
 end
 
@@ -155,9 +190,20 @@ function init_osc_config_dialog()
     vb:horizontal_aligner {
       mode = "justify",    
       vb:button {
-        text = "Save & Close",
+        text = "Save & close",
         released = function()
           save_osc_config()
+          configuration_dialog:close()
+          renoise.app():show_status(TOOL_NAME .. " configuration saved.")
+        end
+      },
+    },
+    vb:horizontal_aligner {
+      mode = "justify",    
+      vb:button {
+        text = "Save for this song & close",
+        released = function()
+          save_osc_custom_config()
           configuration_dialog:close()
           renoise.app():show_status(TOOL_NAME .. " configuration saved.")
         end
