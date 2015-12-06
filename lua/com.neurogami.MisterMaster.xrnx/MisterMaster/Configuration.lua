@@ -228,6 +228,3 @@ renoise.tool():add_menu_entry {
   invoke = function() display_osc_config_dialog() end
 }
 
-load_osc_config()
-
-
