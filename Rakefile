@@ -23,7 +23,7 @@ tool_names = %w{
   RandyNoteColumns
   BeatMasher
   MisterMaster
-
+  Generative
 }
 
 except = %w{Configgy RawMidi2 }
@@ -228,7 +228,7 @@ namespace :package do
     end
   end
 
-    desc "Package up MisterMaster"
+  desc "Package up MisterMaster"
   task :mister_master do
     Dir.chdir'lua' do
       name = "MisterMaster"
@@ -238,6 +238,15 @@ namespace :package do
     end
   end
 
+  desc "Package up Generative"
+  task :generative do
+    Dir.chdir'lua' do
+      name = "Generative"
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
 
 end
 
