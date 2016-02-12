@@ -93,4 +93,42 @@ We need to indicate things like
 We already have syntax for loop composure.  And something gets written to disk for randy notes.
 
 
+** Code/behavior organization **
 
+Assume that the loop is the main item, sort of an object (in OOP terms).
+
+So one approach to scripting is that the lines define loop objects and their behavior.
+
+If we were doing this is real code we might want to define a loop in terms of the pattern range, and then set some properties
+
+For example (Rubyish)
+
+   intro = Loop.new 1, 4, [2..4], :end
+
+This set the start and end patterns, a range for randomly selecting how many times to loop, and what loop to jump to when done.
+
+But we also want track randy-column behavior.
+
+So we could write
+
+       L: intro,1,4,[2..4],vox
+       L: vox,5,6,[1],bridge
+       L: bridge,7,10,[1],outro
+       L: outro, 11, 14,[2..5],end
+
+Which defines four loops, with names, number of repetitions, and where to go next.
+
+
+Then assign track behavior to loops.
+
+     T: 3, intro, {stuf about randy notes}
+
+This says that when loop "intro" is active then apply this behavior to track 3.
+
+Basically we could treat these as tables of values, no?
+
+** WHY NOT JUST START BY COPYING LOOP COMPOSER BUT READ SCRIPT FROM COMMENTS? **
+
+
+
+Then you have at least something to play with.

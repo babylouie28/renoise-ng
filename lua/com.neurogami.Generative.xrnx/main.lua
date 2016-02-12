@@ -38,10 +38,13 @@ function read_comments()
   -- and everything after that is the script.
 end
 
-
+function execute_script() 
+  print "Now executing the script"
+end
 
 function play_script()
   read_comments()
+  execute_script()
 end
 
 
