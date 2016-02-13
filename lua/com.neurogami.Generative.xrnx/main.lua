@@ -20,10 +20,11 @@ package.path = os.currentdir() .. "../../UserConfig/?.lua;" .. package.path
 local notifier = {}
 local have_script = false
 
-
+-- Problem: If we run this again we get an error about
+-- timer functions already registered.
 function play_script()
   print("Now we need to execute the script!")
-  read_comments()
+--  read_comments()
   Generative.go()
 end
 

@@ -190,7 +190,7 @@ end
 
 function Generative.load_loop_table()
 
-  -- load_loop_config() -- This is from Configuration.  It grabs text from disk.
+  load_loop_config() -- This is from Configuration.  It grabs text from disk.
 
   local raw_composition_text = Generative.raw_script_text -- string.trim(composition.text.value)
   print("raw_composition_text = " .. raw_composition_text)
@@ -231,8 +231,16 @@ print("Core 227")
 print("Core 229")
 
   Generative.loop_schedule(Generative.current_range_start(), Generative.current_range_end())
+  pcall(Generative.unreg_timer_function)
   renoise.tool():add_timer(Generative.process_looping, Generative.timer_interval)
 
 end
+
+-- A function with code that might asplode,
+-- so we wrapped that part and we call this function with pcall
+function Generative.unreg_timer_function()
+  renoise.tool():remove_timer(Generative.process_looping)
+end
+
 
 return Generative
