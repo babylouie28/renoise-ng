@@ -23,6 +23,7 @@ local have_script = false
 
 function play_script()
   print("Now we need to execute the script!")
+  read_comments()
   Generative.go()
 end
 
@@ -74,7 +75,9 @@ local close_doc_observable = renoise.tool().app_release_document_observable
 -- Set up notifier functions that are called when song opened or closed
 local function open_song()
   print("A new song was opened")
+  
   read_comments()
+
   if have_script then
     print("Add the menu item ...")
       

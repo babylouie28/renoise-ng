@@ -190,7 +190,7 @@ end
 
 function Generative.load_loop_table()
 
-  load_loop_config() -- This is from Configuration.
+  -- load_loop_config() -- This is from Configuration.  It grabs text from disk.
 
   local raw_composition_text = Generative.raw_script_text -- string.trim(composition.text.value)
   print("raw_composition_text = " .. raw_composition_text)
@@ -198,7 +198,7 @@ function Generative.load_loop_table()
   local lines = string.lines(raw_composition_text)
   print("-------------- lo0p composition raw lines --------------")
   U.rPrint(lines)
-  print("-------------- lo0p composition raw lines --------------")
+  print("-------------- end lo0p composition raw lines --------------")
 
   Generative.loop_list = {}
   local _ = ""
