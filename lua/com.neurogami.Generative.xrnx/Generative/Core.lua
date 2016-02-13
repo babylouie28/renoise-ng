@@ -8,6 +8,7 @@ Generative.last_pattern = Generative.current_pattern
 Generative.current_loop_count = 1
 Generative.current_loop = 0
 Generative.timer_interval = 100 
+Generative.raw_script_text = ""
 
 Generative.loop_list = {
   {5, 5, 1},
@@ -77,6 +78,7 @@ end
 
 
 function Generative.current_range_start()
+  U.rPrint(Generative.loop_list)
   return Generative.loop_list[Generative.current_loop][1]+1
 end
 
@@ -187,8 +189,11 @@ end
 
 
 function Generative.load_loop_table()
+
   load_loop_config() -- This is from Configuration.
-  local raw_composition_text = string.trim(composition.text.value)
+
+  local raw_composition_text = Generative.raw_script_text -- string.trim(composition.text.value)
+  print("raw_composition_text = " .. raw_composition_text)
 
   local lines = string.lines(raw_composition_text)
   print("-------------- lo0p composition raw lines --------------")
@@ -205,6 +210,8 @@ function Generative.load_loop_table()
     end
   end
 
+--  Generative.loop_list = script 
+
   print("-------------- Generative.loop_list --------------")
   U.rPrint(Generative.loop_list)
   print("-------------- Generative.loop_list --------------")
@@ -213,11 +220,15 @@ end
 function Generative.go() 
 
   Generative.load_loop_table()
-
+print("Core 221")
   Generative.current_pattern = 1 
+print("Core 223")
   Generative.last_pattern = Generative.current_pattern
+print("Core 225")
   Generative.current_loop_count = 1
+print("Core 227")
   Generative.current_loop = 1 
+print("Core 229")
 
   Generative.loop_schedule(Generative.current_range_start(), Generative.current_range_end())
   renoise.tool():add_timer(Generative.process_looping, Generative.timer_interval)

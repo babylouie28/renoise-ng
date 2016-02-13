@@ -19,32 +19,33 @@ package.path = os.currentdir() .. "../../UserConfig/?.lua;" .. package.path
 
 local notifier = {}
 local have_script = false
-local script = {}
-
 
 
 function play_script()
-print("Now we need to execute the script!")
+  print("Now we need to execute the script!")
+  Generative.go()
 end
 
 function read_comments()
-  
+ 
+  Generative.raw_script_text = ""
+
   for i, v in ipairs(renoise.song().comments) do 
-  if (have_script) then
-    print(i, v) 
-  end
+  
+    if (have_script) then
+      print(i, v) 
+      Generative.raw_script_text = Generative.raw_script_text  .. "\n" ..  v
+    end
     
     if ( string.find(v, "- script -") ) then
-     have_script = true
-     table.insert(script, v)
-   end
+      have_script = true
+    end
    
   end
   
   -- `comments` is  a table of strings.
   
-  
-  print(script)
+  print("Generative.raw_script_text is set to " .. Generative.raw_script_text )
 
   -- We might want to keep the table structure but only keep script lines.
   -- Perhaps we loop over the lines and look for some demarcation string
