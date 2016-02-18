@@ -204,7 +204,7 @@ function Generative.process_looping()
 
   current_loop_pass_lines_so_far = current_loop_pass_lines_so_far +  renoise.song().transport.playback_pos.line  
   --  print(" * renoise_curent_pattern: " .. renoise_curent_pattern )
-  --  print("total_lines_in_complete_loop: " .. total_lines_in_complete_loop .. "; we are at " .. current_loop_pass_lines_so_far )
+   print("max_loops: " .. max_loops .. "; current_loop_count: " .. Generative.current_loop_count .."; total_lines_in_complete_loop: " .. total_lines_in_complete_loop .. "; we are at " .. current_loop_pass_lines_so_far )
 
     -- Clue: It seems that the current_pattern is always one off. But simply decrementing the end sequence is always correct.
    if Generative.current_pattern  < actual_loop_start then
