@@ -23,13 +23,14 @@ local have_script = false
 -- Problem: If we run this again we get an error about
 -- timer functions already registered.
 function play_script()
+  read_comments()
   print("Now we need to execute the script!")
 --  read_comments()
   Generative.go()
 end
 
 function read_comments()
- 
+  have_script = false 
   Generative.raw_script_text = ""
 
   for i, v in ipairs(renoise.song().comments) do 
