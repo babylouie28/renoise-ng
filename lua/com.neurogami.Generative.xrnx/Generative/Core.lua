@@ -104,11 +104,10 @@ end
 
 -- THE TROUBLE IS HERE? ---
 function Generative.process_looping()
-  -- local range_start, range_end, count, num_loops
-  local count
+
   local pattern_pos_line = renoise.song().transport.playback_pos.line  
   local actual_loop_start = renoise.song().transport.loop_start.sequence - 1 
-  local actual_loop_end = renoise.song().transport.loop_end.sequence - 1 
+  local actual_loop_end = renoise.song().transport.loop_end.sequence - 2 -- ??
   local max_loops = Generative.loop_list[Generative.current_loop][3]
   local end_function = Generative.loop_list[Generative.current_loop][4]
 
@@ -202,22 +201,16 @@ function Generative.loop_clear()
 end
 
 function Generative.loop_schedule(range_start, range_end)
-  -- The main code and config should be using the 0-based indexing the user sees in the Renoise UI
+  -- The main code and confg should be using the 0-based indexing the user sees in the Renoise UI
   -- but the actual values are +1
   local song = renoise.song
+ 
+  print("/loop/schedule! ", range_start, " ", range_end)
 
-
-  -- Why do this if we are passing in values? 
-  -- range_start = Generative.current_range_start() 
-  -- range_end = Generative.current_range_end() 
-
-  print("/loop/schedule! ", range_start, " ", range_end .. " (normalized to Renoise indices)") -- 
   range_start = range_start + 1
-  range_end = range_end + 1
+  range_end =  range_end + 1
 
-  -- What exactly des this do, and with what?
-  song().transport:set_scheduled_sequence( U.clamp_value(range_start, 1, song().transport.song_length.sequence) )
-
+  song().transport:set_scheduled_sequence(U.clamp_value(range_start, 1, song().transport.song_length.sequence))
   local pos_start = song().transport.loop_start
   pos_start.line = 1; 
   pos_start.sequence = U.clamp_value(range_start, 1, song().transport.song_length.sequence)
@@ -226,6 +219,8 @@ function Generative.loop_schedule(range_start, range_end)
   pos_end.sequence =  U.clamp_value(range_end + 1, 1, 
   song().transport.song_length.sequence + 1)
   song().transport.loop_range = {pos_start, pos_end}
+
+  print("Just scheduled loop. renoise.song().transport.loop_end.sequence  = " .. renoise.song().transport.loop_end.sequence )
 end
 
 --[[ 
