@@ -7,7 +7,7 @@ Generative.current_pattern = 1
 Generative.last_pattern = Generative.current_pattern
 Generative.current_loop_count = 1
 Generative.current_loop = 0
-Generative.timer_interval = 100 
+Generative.timer_interval = 100 -- was 100 
 Generative.raw_script_text = ""
 
 Generative.previous_loop_start = 0
@@ -33,7 +33,8 @@ function Generative.did_we_loop()
   -- scheduled the loop count starts at 1
 
   -- If we are not in the last pattern of the loop then return false
-  Generative.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
+  --  OFFSET FROM LUA TO RENOISE
+  Generative.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] 
 
   print("\n\tDid we loop? compare ", Generative.current_pattern , " < ", Generative.current_range_end() )
   if Generative.current_pattern < Generative.current_range_end() then
@@ -72,7 +73,7 @@ function Generative.set_next_loop()
 
     Generative.loop_schedule( Generative.current_range_start(),  Generative.current_range_end())       
     Generative.loop_redefined = true
-    Generative.use_current_loop_end_points = false
+    Generative.use_current_loop_end_points = false -- OK
 
   else
     print("There is no next loop.")
@@ -87,65 +88,52 @@ end
 
 
 function Generative.current_range_end()
-  -- why is 1 added?
-  return Generative.loop_list[Generative.current_loop][2]+1
+  -- why is 1 added? 
+  -- When we end a song with a loop 6 6 1 why would we see 7?
+  -- We need to store and reference values in code
+  -- as they refer to what Renoise shows, and adjust for Lua's
+  -- 1-based indexing as needed
+  return Generative.loop_list[Generative.current_loop][2] 
 end
 
 
 function Generative.current_range_start()
   --  U.rPrint(Generative.loop_list)
-  return Generative.loop_list[Generative.current_loop][1]+1
+  return Generative.loop_list[Generative.current_loop][1]
 end
 
 -- THE TROUBLE IS HERE? ---
 function Generative.process_looping()
-  -- print(" playback_pos.sequence: " .. renoise.song().transport.playback_pos.sequence)
-  local range_start, range_end, count, num_loops
-
-  local actual_loop_start = renoise.song().transport.loop_start.sequence
+  -- local range_start, range_end, count, num_loops
+  local count
+  local pattern_pos_line = renoise.song().transport.playback_pos.line  
+  local actual_loop_start = renoise.song().transport.loop_start.sequence - 1 
   local actual_loop_end = renoise.song().transport.loop_end.sequence - 1 
   local max_loops = Generative.loop_list[Generative.current_loop][3]
   local end_function = Generative.loop_list[Generative.current_loop][4]
 
-  local renoise_curent_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
+  local renoise_curent_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
+  Generative.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
 
-  Generative.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
-
-  -- print(" - - - -     here: " .. Generative.current_pattern  .. " in loop  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "]" )
-
-
-
-
-
-  --[[
-  The problem: We need to know if the loop points refer to the loop we are currently following, or if
-  they have been changed in preparation for leaving this loop and jumping to the next one.
-
-  It would be ideal if we had an observable to signal when we have just started a new loop.
-
-  The alternative: We know that the loop gets changed when we are in the last pattern of the 
-  current loop and have reached max loop count.
-  --]]
-
-
+   print(" - - - -     here: " .. Generative.current_pattern  .. " in loop  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] Generative.current_range_end() = " .. Generative.current_range_end() )
 
   if (Generative.current_pattern == Generative.current_range_start() ) then       
     Generative.loop_redefined = false
-    print("\t\t\t Set Generative.use_current_loop_end_points = true")
+     print("\t\t\t Set Generative.use_current_loop_end_points = true")
     Generative.use_current_loop_end_points = true
   end
 
   if (Generative.current_pattern == Generative.current_range_end() ) then       
 
-    print("\n\nWe are in the last pattern of the loop.")
+    print("\n\nWe are in the last pattern of the loop, " .. Generative.current_pattern)
 
     if Generative.did_we_loop() then
       print("\t\tWE LOOPED!")
       Generative.current_loop_count = Generative.current_loop_count + 1
+      Generative.use_current_loop_end_points = true  -- OK
     else
       print("! ! ! WE STILL HAVE NOT LOOPED")
     end
-
 
     if Generative.current_loop_count >= max_loops then
 
@@ -156,8 +144,8 @@ function Generative.process_looping()
         _G[end_function]()
       else
         Generative.set_next_loop()
-        Generative.use_current_loop_end_points = false
-        Generative.loop_redefined = true
+        -- Generative.use_current_loop_end_points = false
+        -- Generative.loop_redefined = true
       end
     else
       -- Generative.use_current_loop_end_points = true
@@ -170,7 +158,7 @@ function Generative.process_looping()
    -- print(" = = = Use the previous  loop end points  = = = ")
     actual_loop_start = Generative.previous_loop_start
     actual_loop_end = Generative.previous_loop_end
-    actual_loop_index  = actual_loop_index  - 1
+    actual_loop_index  = actual_loop_index - 1
   end
 
 
@@ -179,7 +167,7 @@ function Generative.process_looping()
 
   ------- Something is getting reset to zero when a new pass of the loop occurs -----
  -- We seem to start a new loop bu we have not incremented the loop count  HERE
-  local lines_per_pattern = renoise.song().patterns[renoise_curent_pattern].number_of_lines
+  local lines_per_pattern = renoise.song().patterns[renoise_curent_pattern+1].number_of_lines
   local number_of_patterns = (actual_loop_end - actual_loop_start) + 1
 
   local total_lines_in_one_loop = lines_per_pattern * number_of_patterns
@@ -190,16 +178,14 @@ function Generative.process_looping()
 
   local current_loop_pass_lines_so_far = offset_pattern_in_loop * lines_per_pattern
 
-  current_loop_pass_lines_so_far = current_loop_pass_lines_so_far +  renoise.song().transport.playback_pos.line  
+  current_loop_pass_lines_so_far = current_loop_pass_lines_so_far + pattern_pos_line
   print("max_loops: " .. max_loops .. "; current_loop_count: " .. Generative.current_loop_count .."; total_lines_in_complete_loop: " .. total_lines_in_complete_loop .. "; we are at " .. current_loop_pass_lines_so_far )
 
-
-    -- Clue: It seems that the current_pattern is always one off. But simply decrementing the end sequence is always correct.
-   if Generative.current_pattern  < actual_loop_start then
-     print("*****************  Generative.current_pattern  < actual_loop_start  ********************")
-   end
+   --if Generative.current_pattern  < actual_loop_start then
+    -- print("*****************  Generative.current_pattern  < actual_loop_start  ********************")
+   -- end
    
-   print(   " Loop " .. actual_loop_index .." at pattern " .. Generative.current_pattern  .. " in range  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "]" )
+   print(" Loop " .. actual_loop_index .." at pattern " .. Generative.current_pattern  .. " in range  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] at line " .. pattern_pos_line )
 
   -------
 end
@@ -220,11 +206,15 @@ function Generative.loop_schedule(range_start, range_end)
   -- but the actual values are +1
   local song = renoise.song
 
+
   -- Why do this if we are passing in values? 
   -- range_start = Generative.current_range_start() 
   -- range_end = Generative.current_range_end() 
 
-  print("/loop/schedule! ", range_start, " ", range_end)
+  print("/loop/schedule! ", range_start, " ", range_end .. " (normalized to Renoise indices)") -- 
+  range_start = range_start + 1
+  range_end = range_end + 1
+
   -- What exactly des this do, and with what?
   song().transport:set_scheduled_sequence( U.clamp_value(range_start, 1, song().transport.song_length.sequence) )
 

@@ -1,4 +1,71 @@
+** Thu Feb 18 13:33:17 MST 2016 **
+
+
+There are problems detecting special events and states.
+
+What the code seems to want to do is track when it is time to set the range for the next loop.
+
+This needs to happen when the current loop has these conditions:
+
+- has reached loop-count == `max_loops`
+- is in the last pattern of the loop
+
+When this is true then the code will tell Renoise to set new end points.  
+
+The tricky part is then the loop index needs to increment a well.  
+
+But the above conditions can hold true for several ticks of the clock; we do not want to keep incrementing the loop index.
+
+So there are other conditions to track
+
+- We have not already incremented the loop index to the loop-range after the one we are finishing
+
+Empirically, the loop processing callback seems to get called once per line. Is this a coincidence?
+
+The code has this:  `Generative.timer_interval = 100`
+
+What happens if we set it lower?  You get more log entries, and multiple evaluation for the same line.
+
+So: We can set loop points to the next loop range at any time that we are in the last pattern of the last pass of repeated loops.
+
+We cannot update the loop counter until ... what?
+
+There is function `Generative.set_next_loop()` that gets called when 
+
+      if (Generative.current_pattern == Generative.current_range_end() ) then       
+         if  Generative.current_loop_count >= max_loops
+And `Generative.current_loop_count` gets incremented when `Generative.did_we_loop() ` returns true.
+
+`Generative.did_we_loop() ` returns true when
+
+     not Generative.current_pattern < Generative.current_range_end() 
+      Generative.current_line = renoise.song().transport.playback_pos.line  
+     if Generative.current_line < Generative.last_line then
+        true
+
+So if we are in the last pattern, and the current playback position is less than the last line?
+
+** This makes no sense. **
+
+How is this ever true? And yet it seems to work well enough for Loop Composer
+
+It seems to work by coincidence, that loops end points are always higher than they were.
+
+But if set a mid-song loop before and early pattern loop the looping still works correctly ....
+
+In fact, it seems to happen right on the money, after the last loop pass and the jump to another pattern.
+
+Why? :)
+
+It doesn't help that Lua uses 1-based indexing but Renoise has shit starting at 0.
+
+Would it help to somehow normalize everything? The thing is, if you look at a song you see pattern 0.
+
+
+
+
 # Notes on code/tool for generative renoise tracks #
+
 
 More or less.
 
