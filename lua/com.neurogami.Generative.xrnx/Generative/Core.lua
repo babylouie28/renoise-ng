@@ -34,7 +34,7 @@ function Generative.did_we_loop()
 
   -- If we are not in the last pattern of the loop then return false
   --  OFFSET FROM LUA TO RENOISE
-  Generative.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] 
+  Generative.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
 
   print("\n\tDid we loop? compare ", Generative.current_pattern , " < ", Generative.current_range_end() )
   if Generative.current_pattern < Generative.current_range_end() then
@@ -107,7 +107,7 @@ function Generative.process_looping()
 
   local pattern_pos_line = renoise.song().transport.playback_pos.line  
   local actual_loop_start = renoise.song().transport.loop_start.sequence - 1 
-  local actual_loop_end = renoise.song().transport.loop_end.sequence - 2 -- ??
+  local actual_loop_end = renoise.song().transport.loop_end.sequence - 2 -- ?? Why? 
   local max_loops = Generative.loop_list[Generative.current_loop][3]
   local end_function = Generative.loop_list[Generative.current_loop][4]
 
@@ -123,9 +123,7 @@ function Generative.process_looping()
   end
 
   if (Generative.current_pattern == Generative.current_range_end() ) then       
-
     print("\n\nWe are in the last pattern of the loop, " .. Generative.current_pattern)
-
     if Generative.did_we_loop() then
       print("\t\tWE LOOPED!")
       Generative.current_loop_count = Generative.current_loop_count + 1
