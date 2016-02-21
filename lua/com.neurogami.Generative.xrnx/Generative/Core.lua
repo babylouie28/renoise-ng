@@ -110,20 +110,21 @@ function Generative.process_looping()
   local actual_loop_end = renoise.song().transport.loop_end.sequence - 2 -- ?? Why? 
   local max_loops = Generative.loop_list[Generative.current_loop][3]
   local end_function = Generative.loop_list[Generative.current_loop][4]
+  local current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
 
   local renoise_curent_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
-  Generative.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
+  Generative.current_pattern = current_pattern 
 
-   print(" - - - -     here: " .. Generative.current_pattern  .. " in loop  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] Generative.current_range_end() = " .. Generative.current_range_end() )
+   print(" - - - -     here: " .. current_pattern  .. " in loop  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] Generative.current_range_end() = " .. Generative.current_range_end() )
 
-  if (Generative.current_pattern == Generative.current_range_start() ) then       
+  if (current_pattern  == Generative.current_range_start() ) then       
     Generative.loop_redefined = false
      print("\t\t\t Set Generative.use_current_loop_end_points = true")
     Generative.use_current_loop_end_points = true
   end
 
-  if (Generative.current_pattern == Generative.current_range_end() ) then       
-    print("\n\nWe are in the last pattern of the loop, " .. Generative.current_pattern)
+  if (current_pattern == Generative.current_range_end() ) then       
+    print("\n\nWe are in the last pattern of the loop, " .. current_pattern)
     if Generative.did_we_loop() then
       print("\t\tWE LOOPED!")
       Generative.current_loop_count = Generative.current_loop_count + 1
@@ -160,7 +161,7 @@ function Generative.process_looping()
 
 
   -- What's the logic here?
-  Generative.last_pattern = Generative.current_pattern 
+  Generative.last_pattern = current_pattern
 
   ------- Something is getting reset to zero when a new pass of the loop occurs -----
  -- We seem to start a new loop bu we have not incremented the loop count  HERE
@@ -182,7 +183,7 @@ function Generative.process_looping()
     -- print("*****************  Generative.current_pattern  < actual_loop_start  ********************")
    -- end
    
-   print(" Loop " .. actual_loop_index .." at pattern " .. Generative.current_pattern  .. " in range  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] at line " .. pattern_pos_line )
+   print(" Loop " .. actual_loop_index .." at pattern " .. current_pattern .. " in range  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] at line " .. pattern_pos_line )
 
   -------
 end

@@ -62,6 +62,84 @@ It doesn't help that Lua uses 1-based indexing but Renoise has shit starting at 
 Would it help to somehow normalize everything? The thing is, if you look at a song you see pattern 0.
 
 
+    Sun Feb 21 15:53:47 MST 2016
+
+Continuing on with normalizing the references to pattern numbers
+
+Where are we? Looking at the `print` stuff:
+
+The script gets stored correctly
+
+`
+  table
+  [1]  string  
+  [2]  string  4 5 1 
+  [3]  string  0 3 2
+  [4]  string  6 6 1
+`
+
+(Why is the first line empty? Still works, but it's weird.)
+
+So we get this at the start:
+
+`
+    /loop/schedule!   4     5
+    Just scheduled loop. renoise.song().transport.loop_end.sequence  = 7
+     - - - -     here: 4 in loop  4 to 5 [true] Generative.current_range_end() = 5
+`
+
+No idea why we get `renoise.song().transport.loop_end.sequence  = 7`
+
+But otherwise OK.
+
+Alos this:
+
+           Set Generative.use_current_loop_end_points = true
+    max_loops: 1; current_loop_count: 1; total_lines_in_complete_loop: 32; we are at 2
+     Loop 1 at pattern 4 in range  4 to 5 [true] at line 2
+     - - - -     here: 4 in loop  4 to 5 [true] Generative.current_range_end() = 5
+
+There's no mention of line 1. Weird.  Shows up later.
+
+And the loop scheduling seems to be  OK.
+
+But this looks odd: 
+
+
+    Go get loop at index   2
+    /loop/schedule!   0     3
+    Just scheduled loop. renoise.song().transport.loop_end.sequence  = 7
+    max_loops: 1; current_loop_count: 1; total_lines_in_complete_loop: 32; we are at 17
+     Loop 1 at pattern 0 in range  4 to 5 [false] at line 1
+     - - - -     here: 5 in loop  0 to 3 [false] Generative.current_range_end() = 3
+    max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at 18
+     Loop 1 at pattern 5 in range  4 to 5 [false] at line 2
+     - - - -     here: 5 in loop  0 to 3 [false] Generative.current_range_end() = 3
+    max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at 18
+     Loop 1 at pattern 5 in range  4 to 5 [false] at line 2
+     - - - -     here: 5 in loop  0 to 3 [false] Generative.current_range_end() = 3
+
+The next loop (the 2nd loop in our list) is scheduled.  The song is still in the last pattern of the previous loop.
+
+The line count might be correct; one cycle of two 16-line patterns, now at the start of the last pattern.
+
+But it's reporting `Loop 1 at pattern 0 in range  4 to 5 [false] at line 1`
+
+right afterwards:  `Loop 1 at pattern 5 in range  4 to 5 [false] at line 2`
+
+That comes from this:
+
+        print(" Loop " .. actual_loop_index .." at pattern " .. Generative.current_pattern  .. " in range  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] at line " .. pattern_pos_line )
+
+Why would that ever be wrong?  It gets set at the top of `process_looping`
+
+    Generative.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
+
+
+This gets fixed if we use a static variable in the function instead of the WTF `Generative.current_pattern` global.
+## #------------------------------------------------------------
+
+
 
 
 # Notes on code/tool for generative renoise tracks #
