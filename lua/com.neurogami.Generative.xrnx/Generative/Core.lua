@@ -7,7 +7,7 @@ Generative.current_pattern = 1
 Generative.last_pattern = Generative.current_pattern
 Generative.current_loop_count = 1
 Generative.current_loop = 0
-Generative.timer_interval = 100 -- was 100 
+Generative.timer_interval = 100 
 Generative.raw_script_text = ""
 
 Generative.previous_loop_start = 0
@@ -28,12 +28,6 @@ Generative.loop_list = {
 Generative.loop_redefined = false
 
 function Generative.did_we_loop()
-  -- This only works if the loop max is > 1
-  -- We should assume that whenever a new loop is
-  -- scheduled the loop count starts at 1
-
-  -- If we are not in the last pattern of the loop then return false
-  --  OFFSET FROM LUA TO RENOISE
   Generative.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
 
   print("\n\tDid we loop? compare ", Generative.current_pattern , " < ", Generative.current_range_end() )
@@ -57,17 +51,10 @@ end
 function Generative.set_next_loop()
   if Generative.current_loop < #Generative.loop_list then
     print("There is a next loop. Current loop is ", Generative.current_loop )
-    -- Added so that other code can refer to the loop defs for the loop currently ending
-    -- even after the next loop has been set
     Generative.previous_loop_start = Generative.current_range_start()
     Generative.previous_loop_end = Generative.current_range_end()
-
     Generative.current_loop = Generative.current_loop + 1
-
     print("Go get loop at index ", Generative.current_loop );
-
-
-    Generative.current_loop_count = 1
     Generative.current_pattern =  Generative.current_range_start()
     Generative.last_pattern =  Generative.current_range_start()
 
@@ -88,11 +75,6 @@ end
 
 
 function Generative.current_range_end()
-  -- why is 1 added? 
-  -- When we end a song with a loop 6 6 1 why would we see 7?
-  -- We need to store and reference values in code
-  -- as they refer to what Renoise shows, and adjust for Lua's
-  -- 1-based indexing as needed
   return Generative.loop_list[Generative.current_loop][2] 
 end
 
@@ -115,14 +97,13 @@ function Generative.process_looping()
   local renoise_curent_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence] - 1
   Generative.current_pattern = current_pattern 
 
-   print(" - - - -     here: " .. current_pattern  .. " in loop  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] Generative.current_range_end() = " .. Generative.current_range_end() )
-
   if (current_pattern  == Generative.current_range_start() ) then       
     Generative.loop_redefined = false
      print("\t\t\t Set Generative.use_current_loop_end_points = true")
     Generative.use_current_loop_end_points = true
   end
-
+  
+  
   if (current_pattern == Generative.current_range_end() ) then       
     print("\n\nWe are in the last pattern of the loop, " .. current_pattern)
     if Generative.did_we_loop() then
@@ -134,56 +115,77 @@ function Generative.process_looping()
     end
 
     if Generative.current_loop_count >= max_loops then
-
-  --    print("* * * * * Loop count >= max looping, so set next loop * * * * *")
-   --   print("* * * * * end_function = ", end_function, " Generative.current_loop = ", Generative.current_loop, " * * * * *")
       if end_function then
         print("Try to invoked '", end_function, "' ...")
         _G[end_function]()
       else
         Generative.set_next_loop()
-        -- Generative.use_current_loop_end_points = false
-        -- Generative.loop_redefined = true
       end
     else
       -- Generative.use_current_loop_end_points = true
       ---- Do nothing since we have loop counts to go
     end
   end
-   local actual_loop_index = Generative.current_loop 
+
+  local actual_loop_index = Generative.current_loop 
 
   if not Generative.use_current_loop_end_points then
    -- print(" = = = Use the previous  loop end points  = = = ")
     actual_loop_start = Generative.previous_loop_start
     actual_loop_end = Generative.previous_loop_end
     actual_loop_index  = actual_loop_index - 1
+    max_loops = Generative.loop_list[actual_loop_index][3]
   end
 
+   print(" - - - -     here: " .. current_pattern  .. " in loop  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] Generative.current_range_end() = " .. Generative.current_range_end() )
 
   -- What's the logic here?
   Generative.last_pattern = current_pattern
 
-  ------- Something is getting reset to zero when a new pass of the loop occurs -----
- -- We seem to start a new loop bu we have not incremented the loop count  HERE
+  --[[
+  Why is this so fucking hard?
+
+  We need to know: 
+    Lines in each pattern
+    Index of currently executing loop
+    Number of patterns in this loop
+    max_loops for this loop
+    How many COMPLETE passes have we made so far
+    How many patterns in the current partial loop have we COMPLETED
+    On what line in the CURRENT PATTERN are we?
+
+  --]]
+
   local lines_per_pattern = renoise.song().patterns[renoise_curent_pattern+1].number_of_lines
   local number_of_patterns = (actual_loop_end - actual_loop_start) + 1
-
   local total_lines_in_one_loop = lines_per_pattern * number_of_patterns
   local total_lines_in_complete_loop = total_lines_in_one_loop * max_loops
+  print("\n\t * number_of_patterns = " .. number_of_patterns .. "; total_lines_in_one_loop * max_loops = " .. total_lines_in_one_loop .. " * " .. max_loops .. " = " .. total_lines_in_complete_loop )
 
-  local pattern_lines_so_far = (Generative.current_loop_count-1)*total_lines_in_one_loop 
+  -- what is this suposed to be? 
+  -- The number of lines from COMPLETED loops, so far
+  -- Note that as soon as we enter a loop the count is incremented.
+  -- That is, on the first pass, as we begin, loop count is alread 1
+  -- So we want to decrement by one since the COMPLETED loops is going to be one less
+  local completed_loop_lines_so_far = (Generative.current_loop_count-1)*total_lines_in_one_loop  
+  
+  -- This should tell use how many patterns in the current loop have passed.
+  -- It should be 0-based. That is, if we are in pattern 1 of loop 0-3 then the offset should be 1
+  -- 
   local offset_pattern_in_loop = (renoise_curent_pattern - actual_loop_start)
+  print("\t * offset_pattern_in_loop = (renoise_curent_pattern - actual_loop_start) " .. offset_pattern_in_loop .. " = ( " .. renoise_curent_pattern .. " - " ..  actual_loop_start .. ")" )
 
-  local current_loop_pass_lines_so_far = offset_pattern_in_loop * lines_per_pattern
+  -- What is current_loop_pass_lines_so_far ? The number of *completed* pattern lines  in the current pass of the loop.
+  local current_loop_pass_lines_so_far = completed_loop_lines_so_far + (offset_pattern_in_loop) * lines_per_pattern
+  print("\t * 1. current_loop_pass_lines_so_far : " .. current_loop_pass_lines_so_far .. "; offset_pattern_in_loop * lines_per_pattern : " .. offset_pattern_in_loop .. " * " ..  lines_per_pattern)
 
+  -- We now add our current-pattern line number to current_loop_pass_lines_so_far 
   current_loop_pass_lines_so_far = current_loop_pass_lines_so_far + pattern_pos_line
-  print("max_loops: " .. max_loops .. "; current_loop_count: " .. Generative.current_loop_count .."; total_lines_in_complete_loop: " .. total_lines_in_complete_loop .. "; we are at " .. current_loop_pass_lines_so_far )
+  print("\t * max_loops: " .. max_loops .. "; current_loop_count: " .. Generative.current_loop_count .."; total_lines_in_complete_loop: " .. total_lines_in_complete_loop .. "; we are at current_loop_pass_lines_so_far:" .. current_loop_pass_lines_so_far )
 
-   --if Generative.current_pattern  < actual_loop_start then
-    -- print("*****************  Generative.current_pattern  < actual_loop_start  ********************")
-   -- end
    
-   print(" Loop " .. actual_loop_index .." at pattern " .. current_pattern .. " in range  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] at line " .. pattern_pos_line )
+  print(" Loop #" .. actual_loop_index .." at pattern " .. current_pattern .. " in range  " .. actual_loop_start .. " to " .. actual_loop_end .. " [" .. tostring(Generative.use_current_loop_end_points) .. "] at line " .. pattern_pos_line )
+  print("----------------------- end ---------------------------------------------------------\n")
 
   -------
 end

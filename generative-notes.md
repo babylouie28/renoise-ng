@@ -92,7 +92,7 @@ No idea why we get `renoise.song().transport.loop_end.sequence  = 7`
 
 But otherwise OK.
 
-Alos this:
+Also this:
 
            Set Generative.use_current_loop_end_points = true
     max_loops: 1; current_loop_count: 1; total_lines_in_complete_loop: 32; we are at 2
@@ -137,6 +137,226 @@ Why would that ever be wrong?  It gets set at the top of `process_looping`
 
 
 This gets fixed if we use a static variable in the function instead of the WTF `Generative.current_pattern` global.
+
+So then we have this:
+
+`
+      We are in the last pattern of the loop, 5
+
+        Did we loop? compare   5   <   5
+      ! ! ! WE STILL HAVE NOT LOOPED
+      There is a next loop. Current loop is   1
+      Go get loop at index   2
+      /loop/schedule!   0     3
+      Just scheduled loop. renoise.song().transport.loop_end.sequence  = 7
+      max_loops: 1; current_loop_count: 1; total_lines_in_complete_loop: 32; we are at 17
+       Loop 1 at pattern 5 in range  4 to 5 [false] at line 1
+       - - - -     here: 5 in loop  0 to 3 [false] Generative.current_range_end() = 3
+      max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at 18
+       Loop 1 at pattern 5 in range  4 to 5 [false] at line 2
+       - - - -     here: 5 in loop  0 to 3 [false] Generative.current_range_end() = 3
+      max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at 19
+       Loop 1 at pattern 5 in range  4 to 5 [false] at line 3
+       - - - -     here: 5 in loop  0 to 3 [false] Generative.current_range_end() = 3
+      max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at 20
+`
+
+The weird part: 
+`
+       Loop 1 at pattern 5 in range  4 to 5 [false] at line 1
+       - - - -     here: 5 in loop  0 to 3 [false] Generative.current_range_end() = 3
+`
+
+It has the range of the current loop, then  the range of newly scheduled loop, but we're not there yet.
+
+That's line 118 of Core.
+
+      actual_loop_start .. " to " .. actual_loop_end 
+
+is therefore wrong.
+
+What if we moce that to later in the function?
+
+It looks better.
+
+
+Next issue: With a single pass of a loop the accumulated line count is fine.
+
+But with multiple passes it is borked. 
+
+For the second loop we start off OK:
+
+`
+
+     - - - -     here: 0 in loop  0 to 3 [true] Generative.current_range_end() = 3
+    max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 128; we are at 1
+     Loop 2 at pattern 0 in range  0 to 3 [true] at line 1
+           Set Generative.use_current_loop_end_points = true
+     - - - -     here: 0 in loop  0 to 3 [true] Generative.current_range_end() = 3
+    max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 128; we are at 2
+     Loop 2 at pattern 0 in range  0 to 3 [true] at line 2
+
+ `
+
+The are 4 patterns of 16 lines: 64 in one pass of the loop.
+
+The loop should run twice, and the calculation of 128 total comes out correct.
+
+But we get this when the code detects the loop is nearing its end:
+
+`
+
+
+  Did we loop? compare   3   <   3
+! ! ! WE STILL HAVE NOT LOOPED
+ - - - -     here: 3 in loop  0 to 3 [true] Generative.current_range_end() = 3
+max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 128; we are at 63
+ Loop 2 at pattern 3 in range  0 to 3 [true] at line 15
+
+
+We are in the last pattern of the loop, 3
+
+  Did we loop? compare   3   <   3
+! ! ! WE STILL HAVE NOT LOOPED
+ - - - -     here: 3 in loop  0 to 3 [true] Generative.current_range_end() = 3
+max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 128; we are at 64
+ Loop 2 at pattern 3 in range  0 to 3 [true] at line 16
+       Set Generative.use_current_loop_end_points = true
+ - - - -     here: 0 in loop  0 to 3 [true] Generative.current_range_end() = 3
+max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 128; we are at 1
+ Loop 2 at pattern 0 in range  0 to 3 [true] at line 1
+
+ `
+
+ It knows it is in pattern 0 (start of loop) but mysteriously thinks the loop count is still 1.
+
+It is smart enough to check if we have looped.  
+
+If if is sees this it returns false for having looped.
+
+      Generative.current_pattern < Generative.current_range_end()
+
+But if we are at the start of the damn loop BECAUSE WE LOOPED ....
+
+This code workes well enough to actualy handle loop scheduling.
+
+`set_next_loop` updates the loop count.
+
+But check this out:
+
+`
+  Did we loop? compare   3   <   3
+    WE LOOPED!
+There is a next loop. Current loop is   2
+Go get loop at index   3
+/loop/schedule!   6     6
+Just scheduled loop. renoise.song().transport.loop_end.sequence  = 5
+ - - - -     here: 3 in loop  0 to 3 [false] Generative.current_range_end() = 6
+max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 128; we are at 49
+
+`
+
+The loop count is correctly upped and reported as `Current loop is   2` but then we see 
+
+      max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 128; we are at 49
+
+
+line 71 of Core looked wrong:
+
+          Generative.current_loop_count =  1
+
+  but should be 
+
+          Generative.current_loop_count = Generative.current_loop_count + 1
+
+But that breaks the count someplace else.  
+
+
+** Thu Feb 25 15:47:31 MST 2016 **
+
+What works:
+  The looping scheduling appears correct.
+
+What is not working:
+
+  Not seeing line 1 of the first pass of the first loop. Why?
+
+  The tracking of what lop range is currently in play is wrong:
+      `max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at 18`
+   But this appears while still wrapping up the first loop.  
+
+
+** Changed pattern size to 8 (from 16) so it runs through faster **
+
+
+So, a loop that goes from [4,5] is two patterns of 8 lines each, so the total lines == 16
+Correct.
+
+Oddly, we now see the first line of the first loop pass.
+
+The second loop cycle is `4*8*2 == 64`
+
+And that gets calculated correctly.
+
+
+BUT!  We still get to half the total when it gets reset back to zero.  Por que?
+
+
+Where does this number get calculated?
+
+        local pattern_lines_so_far = (Generative.current_loop_count-1)*total_lines_in_one_loop 
+
+Something here gets incorrectly set to 0?
+
+`
+
+1. current_loop_pass_lines_so_far : 24; offset_pattern_in_loop * lines_per_pattern : 3 * 8
+max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at current_loop_pass_lines_so_far:32
+ Loop 2 at pattern 3 in range  0 to 3 [true] at line 8
+       Set Generative.use_current_loop_end_points = true
+ - - - -     here: 0 in loop  0 to 3 [true] Generative.current_range_end() = 3
+number_of_patterns = 4; total_lines_in_one_loop * max_loops = 32 * 2 = 64
+1. current_loop_pass_lines_so_far : 0; offset_pattern_in_loop * lines_per_pattern : 0 * 8
+max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at current_loop_pass_lines_so_far:1
+
+`
+
+`offset_pattern_in_loop` is borked.
+
+** Fri Feb 26 11:21:17 MST 2016 **
+
+This is broken:
+
+`
+
+     Loop 2 at pattern 3 in range  0 to 3 [true] at line 7
+
+
+    We are in the last pattern of the loop, 3
+
+      Did we loop? compare   3   <   3
+    ! ! ! WE STILL HAVE NOT LOOPED
+     - - - -     here: 3 in loop  0 to 3 [true] Generative.current_range_end() = 3
+
+       * number_of_patterns = 4; total_lines_in_one_loop * max_loops = 32 * 2 = 64
+       * offset_pattern_in_loop = (renoise_curent_pattern - actual_loop_start) 3 = ( 3 - 0)
+       * 1. current_loop_pass_lines_so_far : 24; offset_pattern_in_loop * lines_per_pattern : 3 * 8
+       * max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at current_loop_pass_lines_so_far:32
+    --------------------------------------------------------------------------------
+     Loop 2 at pattern 3 in range  0 to 3 [true] at line 8
+           Set Generative.use_current_loop_end_points = true
+     - - - -     here: 0 in loop  0 to 3 [true] Generative.current_range_end() = 3
+
+       * number_of_patterns = 4; total_lines_in_one_loop * max_loops = 32 * 2 = 64
+       * offset_pattern_in_loop = (renoise_curent_pattern - actual_loop_start) 0 = ( 0 - 0)
+       * 1. current_loop_pass_lines_so_far : 0; offset_pattern_in_loop * lines_per_pattern : 0 * 8
+       * max_loops: 2; current_loop_count: 1; total_lines_in_complete_loop: 64; we are at current_loop_pass_lines_so_far:1
+
+`
+
+
+
+
 ## #------------------------------------------------------------
 
 
