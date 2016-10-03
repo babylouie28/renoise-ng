@@ -43,8 +43,10 @@ task :rebuild =>  [:copy_utils] do
     Rake::Task["package:#{tool.snakecase}"].execute
   end
   if win32?
+    warn "we are on win32 "
   sh "./__CP.bat"
   else
+    warn "WE ARE ON NOT WIN32 "
   sh "./__cp.sh"
   end
 
@@ -81,7 +83,8 @@ def zipit name, folder, input_filenames
 end
 
 def win32?
-  RUBY_PLATFORM =~ /-mingw32/ ? true : false
+  puts RUBY_PLATFORM
+  RUBY_PLATFORM =~ /mingw32/ ? true : false
 end
 
 def ng_vhost

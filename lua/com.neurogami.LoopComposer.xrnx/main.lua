@@ -7,6 +7,7 @@ com.neurogami.PatternJumper.xrnx/main.lua
 TOOL_NAME = "LoopComposer"
 
 U = require 'LoopComposer/Utilities'
+
 require 'LoopComposer/Core'
 require 'LoopComposer/LoopHelpers'
 require 'LoopComposer/Dumper'

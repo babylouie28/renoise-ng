@@ -28,8 +28,8 @@ function save_composition()
   print("save_composition. raw_composition_text: ")
   U.rPrint(raw_composition_text)
   -- It *should * come in as a string, a series of rows of space-delimited numbers.
-  --  It should be saved and loaed that way; it make sit easier to hand edit or
-  --  have some otehr tool create/manipulate.
+  --  It should be saved and loaded that way; it makes it easier to hand edit or
+  --  have some other tool loop_composition_create/manipulate.
   --  Other code will need to convert it into the internal table format
   if composition ~= nil then
     composition = renoise.Document.create(TOOL_NAME) {
@@ -120,6 +120,20 @@ renoise.tool():add_menu_entry {
       LoopComposer.clear() 
   end
 }
+
+
+renoise.tool():add_menu_entry {
+  name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Read from track ...",
+  invoke = function() LoopComposer.read_script_from_track() end
+}
+
+
+renoise.tool():add_menu_entry {
+  name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Read from comments ...",
+  invoke = function() LoopComposer.read_script_from_comments() end
+}
+
+
 
 
 

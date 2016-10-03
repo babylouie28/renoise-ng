@@ -314,6 +314,9 @@ function Generative.go()
   pcall(Generative.unreg_timer_function)
 
   -- This doesn't get triggered. Why not?
+  -- It gets triggered when you click on the curved-arrow button, the thing
+  -- for repeating the current pattern.
+  --
   renoise.song().transport.loop_pattern_observable:add_notifier(loop_trigger)
 
   Generative.load_loop_table()
