@@ -6,34 +6,40 @@ local view_loop_compose_dialog = nil
 
 -- local composition_file = TOOL_NAME .. "Pattern.xml"
 
-local raw_composition_text = ""
 
 function composition_file()
   return "loop_composition_" ..  U.base_file_name() .. ".xml"
 end
 
+-- Since we are loading from comments we don't need this
+-- to load from disk file. But while we're having issue
+-- this ight be handy to see what form the old code expected
 function load_loop_config()
+
   composition = renoise.Document.create(TOOL_NAME) {
     text = "",
   }
 
   local res = composition:load_from(composition_file())
-  raw_composition_text = composition.text.value
+  local text_from_xml = composition.text.value
+  print("text_from_xml = " .. text_from_xml )
+
+--  Generative.raw_script = composition.text.value
 end
 
 
 
 function save_composition()
 
-  print("save_composition. raw_composition_text: ")
-  U.rPrint(raw_composition_text)
+  print("save_composition. Generative.raw_script: ")
+  U.rPrint(Generative.raw_script)
   -- It *should * come in as a string, a series of rows of space-delimited numbers.
-  --  It should be saved and loaded that way; it makes it easier to hand edit or
-  --  have some other tool loop_composition_create/manipulate.
+  --  It should be saved and loaed that way; it make sit easier to hand edit or
+  --  have some otehr tool create/manipulate.
   --  Other code will need to convert it into the internal table format
   if composition ~= nil then
     composition = renoise.Document.create(TOOL_NAME) {
-      text = raw_composition_text,
+      text = Generative.raw_script,
     }
 
     composition:save_as(composition_file())
@@ -68,14 +74,14 @@ function init_loop_compose_dialog()
       mode = "justify",    
       vb:row {
         vb:multiline_textfield {
-          text = raw_composition_text,
+          text = Generative.raw_script,
           id = "composition",
           font = "big",
           width = 300,
           height = 400,
           notifier = function(v)
             -- This will set the table to a list of rows of text
-            raw_composition_text =  v --vb.views["raw_coposition"].paragraphs
+            Generative.raw_script =  v --vb.views["raw_coposition"].paragraphs
           end
         }, -- multiline 
       },  -- row
@@ -104,36 +110,26 @@ function display_loop_compose_dialog()
   composition_dialog = renoise.app():show_custom_dialog(TOOL_NAME .. " Preferences", view_loop_compose_dialog, composition_dialog_keyhander)
 end
 
+--[[
 renoise.tool():add_menu_entry {
   name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Compose ...",
   invoke = function() display_loop_compose_dialog() end
 }
-
+--]]
+--
+--[[
 renoise.tool():add_menu_entry {
   name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME  .. ":Run",
-  invoke = LoopComposer.go
+  invoke = Generative.go
 }
-
+--]]
+--[[
 renoise.tool():add_menu_entry {
   name = "--- Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Stop",
   invoke = function()  
-      LoopComposer.clear() 
+      Generative.clear() 
   end
 }
-
-
-renoise.tool():add_menu_entry {
-  name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Read from track ...",
-  invoke = function() LoopComposer.read_script_from_track() end
-}
-
-
-renoise.tool():add_menu_entry {
-  name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Read from comments ...",
-  invoke = function() LoopComposer.read_script_from_comments() end
-}
-
-
-
+--]]
 
 

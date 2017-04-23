@@ -16,6 +16,7 @@ V3 = '3.0.1'
 
 tool_names = %w{
   LoopComposer
+  Conscripter
   Configgy
   RawMidi2
   OscJumper
@@ -23,10 +24,20 @@ tool_names = %w{
   RandyNoteColumns
   BeatMasher
   MisterMaster
-
+  Generative
+  TrackPatternComments
 }
 
-except = %w{Configgy RawMidi2 }
+except = %w{Configgy RawMidi2 Generative }
+
+desc "Edit JGB01.lua"
+task :edit_terminal_lua do
+Thread.new do
+
+  sh "call v c:/Users/james/AppData/Roaming/Renoise/V3.1.0/Scripts/JGB01.lua"
+end
+sleep 3
+end
 
 task :copy_utils do
   Dir.chdir'lua' do
@@ -43,8 +54,10 @@ task :rebuild =>  [:copy_utils] do
     Rake::Task["package:#{tool.snakecase}"].execute
   end
   if win32?
+    warn "we are on win32 "
   sh "./__CP.bat"
   else
+    warn "WE ARE ON NOT WIN32 "
   sh "./__cp.sh"
   end
 
@@ -81,7 +94,8 @@ def zipit name, folder, input_filenames
 end
 
 def win32?
-  RUBY_PLATFORM =~ /-mingw32/ ? true : false
+  puts RUBY_PLATFORM
+  RUBY_PLATFORM =~ /mingw32/ ? true : false
 end
 
 def ng_vhost
@@ -218,6 +232,19 @@ namespace :package do
   end
 
 
+    desc "Package up Conscripter"
+  task :conscripter do
+    Dir.chdir'lua' do
+      name = "Conscripter"
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
+
+
+
+
     desc "Package up BeatMasher"
   task :beat_masher do
     Dir.chdir'lua' do
@@ -228,10 +255,31 @@ namespace :package do
     end
   end
 
-    desc "Package up MisterMaster"
+  desc "Package up MisterMaster"
   task :mister_master do
     Dir.chdir'lua' do
       name = "MisterMaster"
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
+
+  desc "Package up Generative"
+  task :generative do
+    Dir.chdir'lua' do
+      name = "Generative"
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
+
+
+  desc "Package up TrackPatternComments"
+  task :track_pattern_comments do
+    Dir.chdir'lua' do
+      name = "TrackPatternComments"
       folder = "com.neurogami.#{name}.xrnx"
       input_filenames = files folder
       zipit name, folder, input_filenames

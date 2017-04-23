@@ -21,16 +21,7 @@ function string.lines(s)
 end
 
 
-function string:words(str)
-  if str == nil then
-   print("string:words(str) has been given a nil value.")
-   return nil
-  end
-
-  print(str)
-
-  local s = string.trim(str)
-  print("string:words has '" .. s .. "'" )
+function string:words(s)
   local t = {}
   for w in s:gmatch("%S+") do
     table.insert(t, w)
@@ -38,17 +29,7 @@ function string:words(str)
   return t
 end
 
-
-function string:segs(str)
-  if str == nil then
-   print("string:segments(str) has been given a nil value.")
-   return nil
-  end
-
-  print(str)
-
-  local s = string.trim(str)
-  print("string:segments has '" .. s .. "'" )
+function string:words(s)
   local t = {}
   for w in s:gmatch("%S+") do
     table.insert(t, w)

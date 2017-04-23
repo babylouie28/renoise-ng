@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>4</ApiVersion>
+  <AutoUpgraded>true</AutoUpgraded>
+  <Id>com.neurogami.Generative</Id>
+  <Version>0.1</Version>
+  <Author>Neurogami | james@neurogami.com  </Author>
+  <Name>Neurogami Generative</Name>
+  <Category>WIP</Category>
+  <Description>Tool to explore a generative process in Renoise.</Description>
+  <Homepage>http://neurogami.com/code</Homepage>
+</RenoiseScriptingTool>
+
