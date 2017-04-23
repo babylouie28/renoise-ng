@@ -7,10 +7,8 @@ end
 
 function string.trim(s)
   if s == nil then
-   print("string:trim has a nil value")
     return "" -- Is this a good idea?  TODO Think if silently converting nil to an empty string is a Good Thing
   else
-   print("string:trim has '", s, "'")
    return (s:gsub("^%s*(.-)%s*$", "%1"))
   end
 end

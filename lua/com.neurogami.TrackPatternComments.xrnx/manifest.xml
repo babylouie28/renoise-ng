@@ -1,0 +1,10 @@
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>5</ApiVersion>
+  <Id>com.neurogami.TrackPatternComments</Id>
+  <Version>0.1</Version>
+  <Author>James Britt / Neurogam (james@neurogami.com)</Author>
+  <Name>Track-pattern Comments</Name>
+  <Category>Pattern Editor</Category>
+  <Description>This tool allows you to associate a comment with a track pattern. All data is stored in the global song comments.</Description>
+  <Homepage>http://neurogami.com/code</Homepage>
+</RenoiseScriptingTool>
