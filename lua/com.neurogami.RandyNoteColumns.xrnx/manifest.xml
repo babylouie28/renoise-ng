@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RenoiseScriptingTool doc_version="0">
-  <ApiVersion>3</ApiVersion>
+  <ApiVersion>4</ApiVersion>
   <AutoUpgraded>true</AutoUpgraded>
   <Id>com.neurogami.RandyNoteColumns</Id>
   <Version>1.4</Version>

@@ -13,6 +13,9 @@ Likely candidates for inclusion here:
 
 Please look in the `lua/` folder for the different tools; each of these should have a `README.md` file describing what it does.
 
+Most of these tools were first written for Renoise 2.8.  Most of those also happen to work with 3.1.0.  Some, though, required code changes that made them incompatible with 2.8.  There will be no effort to maintain two versions of any tool.  All tools should work with the latest version of Renoise.  If they work with earlier versions that's a bonus.
+
+
 ## Numbers
 
 A Renoise instrument.  It's a set of spoken (in English) numbers.  This grew out of a specific need.  Some  [Control](https://github.com/charlieroberts/Control) + Renoise scripts were set up so that some backing tracks could be started, stopped, and modifier via OSC sent from a phone.  The idea was to have some decent backing tracks for recording jams and improvs.  

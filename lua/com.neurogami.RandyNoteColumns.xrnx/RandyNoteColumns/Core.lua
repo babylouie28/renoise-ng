@@ -132,9 +132,9 @@ function RandyNoteColumns.solo_note_column_volume(track_index, note_column_index
 
   for i = 1,note_cols_num  do
     if (i == note_column_index ) then
-      track:mute_column(i, false)
+      track:set_column_is_muted(i, false)
     else
-      track:mute_column(i, true)
+      track:set_column_is_muted(i, true)
     end
   end
 end
