@@ -14,7 +14,7 @@ V2 = '2.8.2'
 V3 = '3.0.1'
 
 tool_names = %w{
-  SwapColumns
+  SwapChop
   LoopComposer
   Conscripter
   Configgy
@@ -233,10 +233,10 @@ namespace :package do
 
 
   
-  desc "Package up SwapColumns"
-  task :swap_columns do
+  desc "Package up SwapChop"
+  task :swap_chop do
     Dir.chdir'lua' do
-      name = "SwapColumns"
+      name = "SwapChop"
       folder = "com.neurogami.#{name}.xrnx"
       input_filenames = files folder
       zipit name, folder, input_filenames
