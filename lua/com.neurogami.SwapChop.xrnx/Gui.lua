@@ -10,8 +10,6 @@ GUI.col1_vol = "70"
 GUI.col2_vol = "70"
 GUI.lines_list = ""
 
-
-
 function line_nums_to_table(lines_str)
   print("In line_nums_to_table")
   local nums_table = string.int_list_to_numeric(lines_str)
@@ -26,6 +24,12 @@ end
 
 
 GUI.show_dialog = function()
+
+   Core.set_location()
+   if (Core.we_are_in_track) then
+     GUI.col1_vol = "C0"
+    GUI.col2_vol = "C0"
+   end
 
   if GUI.dialog and GUI.dialog.visible then
     GUI.dialog:show()
