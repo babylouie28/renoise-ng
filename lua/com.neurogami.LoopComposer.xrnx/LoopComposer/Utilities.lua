@@ -1,4 +1,6 @@
 
+
+
 --  String stuff
 function string.lpad(str, len, char)
   if char == nil then char = ' ' end
@@ -194,6 +196,14 @@ function U.may_overwrite(path)
     overwrite = (choice~=buttons[2])
   end  
   return overwrite
+end
+
+function U.subset(t, first, last)
+  local sub = {}
+  for i=first,last do
+    sub[#sub + 1] = t[i]
+  end
+  return sub
 end
 
 

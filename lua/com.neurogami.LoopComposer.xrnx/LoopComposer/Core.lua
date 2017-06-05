@@ -20,27 +20,68 @@ LoopComposer.loop_list = {
 } 
 
 
-function LoopComposer.read_script_from_comments()
-print("SEE IF WE CAN READ ALL THE LINES OF THE COMMENTS ...")
+LoopComposer.comments_marker   = "-- SCRIPT --"
+
+-- ********************************************************************
+function LoopComposer.read_script_from_comments() -- Expected to return a string
+
+  print("SEE IF WE CAN READ ALL THE LINES OF THE COMMENTS ...")
 
   local script_lines = {}
   local script_text = ""
   local comments = renoise.song().comments
- 
+  local start = table.find(comments, LoopComposer.comments_marker)
+
+  print("Core 34: start  = ", start )
+
+  -- Two scenarious:
+  -- We find LoopComposer.comments_marker , so we assume everything
+  -- AFTER that line is scrit
+  -- Or, we do not find that line.
+  -- Then we have to look at what we have to determine if what's there is
+  -- a plausble script.
+  -- But for now, let's demand that a comment script must start with 
+  -- the script demarcation 
+
+  if (not start) then 
+    return ""
+  end
+
+  print("We should have a comments script")
+
+-- This needs to read until the end of the comments and not look for an end marker
+  if start ~= nil then 
+    local ending = #comments -- ?? -- table.find(LoopComposer.current_song.comments, LoopComposer.comment_end_marker, start)
+    local first_line = start+1
+    local last_line = ending-1 --?
+    for comment_line = first_line, last_line do
+      script_text = script_text .. comments[comment_line]
+      if comment_line ~= last_line then
+        script_text = script_text .. "\n"
+      end
+    end
+  end  
+
+  print("Comment script:\n" ..  script_text)
+
+
+--[[
   for idx, line in ipairs(comments) do
     print(line)
-     local _ = string.trim(line)
-     -- Not sure if this is useful, but allow the option 
-     -- to ignore comment lines that begin with a semicolon.
+    local _ = string.trim(line)
+    -- Not sure if this is useful, but allow the option 
+    -- to ignore comment lines that begin with a semicolon.
     if (not _:match('^;') ) then
       table.insert(script_lines, line )
     end
     script_text = table.concat(script_lines,"\n")
   end
-
+--]]
+--
   return script_text
 end
 
+-- ********************************************************************
 function LoopComposer.read_script_from_track()
   print("SEE IF WE CAN READ ALL THE LINES OF A TRACK ...")
 
@@ -74,6 +115,7 @@ function LoopComposer.read_script_from_track()
 end
 
 
+-- ********************************************************************
 function LoopComposer.did_we_loop()
   -- This only works if the loop max is > 1
   -- We should assume that whenever a new loop is
@@ -101,9 +143,14 @@ function LoopComposer.did_we_loop()
 end
 
 
-function LoopComposer.set_next_loop()
+-- ********************************************************************
+function LoopComposer.set_next_loop(idx)
+
+  if (not idx) then
   if LoopComposer.current_loop < #LoopComposer.loop_list then
+  
     print("There is a next loop. Current loop is ", LoopComposer.current_loop )
+    
     LoopComposer.current_loop = LoopComposer.current_loop + 1
 
     print("Go get loop at index ", LoopComposer.current_loop );
@@ -117,23 +164,53 @@ function LoopComposer.set_next_loop()
     print("There is no next loop.")
     LoopComposer.clear()
   end
+
+else
+    LoopComposer.current_loop = idx
+
+    print("Go get loop at index ", LoopComposer.current_loop );
+
+    LoopComposer.current_loop_count = 1
+    LoopComposer.current_pattern =  LoopComposer.current_range_start()
+    LoopComposer.last_pattern =  LoopComposer.current_range_start()
+
+    LoopComposer.loop_schedule( LoopComposer.current_range_start(),  LoopComposer.current_range_end())       
+end
 end
 
+-- ********************************************************************
 function LoopComposer.clear()
   renoise.tool():remove_timer(LoopComposer.process_looping)
   LoopComposer.loop_clear()
 end
 
 
+-- ********************************************************************
 function LoopComposer.current_range_end()
   return LoopComposer.loop_list[LoopComposer.current_loop][2]+1
 end
 
 
+
+
+-- ********************************************************************
+--[[
+
+This breaks if the loop script is junk.
+And the script will be junk if it reads from the comments and not from a seperate
+scipt file.
+
+And it seems the code has been changed to run from the comments, even though the 
+"compose" window is shown.
+
+
+
+--]]
 function LoopComposer.current_range_start()
   return LoopComposer.loop_list[LoopComposer.current_loop][1]+1
 end
 
+-- ********************************************************************
 function LoopComposer.process_looping()
 
   local range_start, range_end, count, num_loops
@@ -144,7 +221,7 @@ function LoopComposer.process_looping()
 
   LoopComposer.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
 
-  print("Current pattern: ", LoopComposer.current_pattern, "; loop count = ",  LoopComposer.current_loop_count, "max loops ",  max_loops)
+--  print("Current pattern: ", LoopComposer.current_pattern, "; loop count = ",  LoopComposer.current_loop_count, "max loops ",  max_loops)
 
   if (LoopComposer.current_pattern == range_end ) then       
 
@@ -160,12 +237,24 @@ function LoopComposer.process_looping()
     if LoopComposer.current_loop_count >= max_loops then
       print("* * * * * Loop count >= max looping, so set next loop * * * * *")
       print("* * * * * end_function = ", end_function, " LoopComposer.current_loop = ", LoopComposer.current_loop, " * * * * *")
+
       if end_function then
-        print("Try to invoked '", end_function, "' ...")
-        _G[end_function]()
+        print("Try to invoke '", end_function, "' ...")
+        
+
+    
+         local current_line = LoopComposer.loop_list[LoopComposer.current_loop]
+         print("current_line: ")
+         rprint(current_line)
+        local f_args = U.subset(current_line, 5, #current_line) ----   current_line[ {   5, #current_line }  ] -- Keeps failing to return items
+
+        print("Core 242. f_args = ")
+        rprint(f_args)
+        _G[end_function](f_args)
       else
         LoopComposer.set_next_loop()
       end
+    
     else
       ---- Do nothing since we have loop counts to go
     end
@@ -175,6 +264,7 @@ function LoopComposer.process_looping()
 
 end
 
+-- ********************************************************************
 function LoopComposer.loop_clear()
   local song = renoise.song
   local pos_start = song().transport.loop_start
@@ -186,6 +276,7 @@ function LoopComposer.loop_clear()
   song().transport.loop_range = {pos_start, pos_end}
 end
 
+-- ********************************************************************
 function LoopComposer.loop_schedule(range_start, range_end)
   -- The main code and confg should be using the 0-based indexing the user sees in the Renoise UI
   -- but the actual values are +1
@@ -223,6 +314,9 @@ if a number it is the number of times to run the loop
     name.  
 
     --]]
+
+
+    -- ********************************************************************
     function LoopComposer:pattern_line_to_loop_table(s)
       local t = {}
       local count = 1
@@ -239,6 +333,7 @@ if a number it is the number of times to run the loop
       return t
     end
 
+    -- ********************************************************************
     function LoopComposer.load_loop_table_from_text(text)
 
       local lines = string.lines(text)
@@ -263,31 +358,38 @@ if a number it is the number of times to run the loop
       print("-------------- LoopComposer.loop_list --------------")
     end
 
+    -- ********************************************************************
     function LoopComposer.load_loop_table()
       load_loop_config() -- This is from Configuration.
       local raw_composition_text = string.trim(composition.text.value)
       LoopComposer.load_loop_table_from_text(raw_composition_text)
     end
 
+    -- ********************************************************************
     function LoopComposer.go() 
--- We have the option of storing the script in comments.
--- How do we handle this?
--- Currently, there is a menu option to compose a script.
---Is there anything that autoloads from disk?
--- Yes: load_loop_config() is called when you open that
--- compostion thing. 
--- If there is  ascript in the comments should that get auto-loaded?
--- Idea:  'go' should check to see if there is a comment script
--- If so, it gets loaed and executed
--- If not, then it looks to see if there is an existing script loaded.
--- If so, run it. If not, ope the composer window, auto-loadng any
--- existing script file.
--- Or just look for a script file and run that right away.
---
+
+      -- We have the option of storing the script in comments.
+      -- How do we handle this?
+      -- Currently, there is a menu option to compose a script.
+      --Is there anything that autoloads from disk?
+      -- Yes: load_loop_config() is called when you open that
+      -- compostion thing. 
+      -- If there is a script in the comments should that get auto-loaded?
+      --
+      -- Idea:  'go' should check to see if there is a comment script
+      -- If so, it gets loaed and executed
+      -- If not, then it looks to see if there is an existing script loaded.
+      -- If so, run it. If not, open the composer window, auto-loadng any
+      -- existing script file.
+      -- Or just look for a script file and run that right away.
+      --
 
       local comment_script = LoopComposer.read_script_from_comments()
+
+      print("Core 345: comment_script is '" .. comment_script .. "'")
+
       if not U.is_empty(comment_script) then
-         LoopComposer.load_loop_table_from_text(comment_script)
+        LoopComposer.load_loop_table_from_text(comment_script)
       else
         LoopComposer.load_loop_table()
       end
@@ -298,6 +400,11 @@ if a number it is the number of times to run the loop
       LoopComposer.current_loop = 1 
 
       LoopComposer.loop_schedule(LoopComposer.current_range_start(), LoopComposer.current_range_end())
+
+      if renoise.tool():has_timer( LoopComposer.process_looping ) then
+        renoise.tool():remove_timer( LoopComposer.process_looping )
+      end
+
       renoise.tool():add_timer(LoopComposer.process_looping, LoopComposer.timer_interval)
 
     end

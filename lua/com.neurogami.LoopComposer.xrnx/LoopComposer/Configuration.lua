@@ -121,18 +121,19 @@ renoise.tool():add_menu_entry {
   end
 }
 
-
+--[[
 renoise.tool():add_menu_entry {
   name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Read from track ...",
   invoke = function() LoopComposer.read_script_from_track() end
 }
+--]]
 
-
+--[[
 renoise.tool():add_menu_entry {
   name = "Main Menu:Tools:Neurogami:" .. TOOL_NAME .. ":Read from comments ...",
   invoke = function() LoopComposer.read_script_from_comments() end
 }
-
+--]]
 
 
 
