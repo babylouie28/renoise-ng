@@ -1,3 +1,4 @@
+-- TODO maybe these loose functions need to go to Utils
 
 --=======================================================================
 function print_pairs(t)
@@ -152,6 +153,7 @@ function volume_swap(max_vol1, max_vol2, lines_list)
 end
 
 
+-- ======================================================================
 function Core.new_set_from_funct_string(function_str, current_set)
 
   
