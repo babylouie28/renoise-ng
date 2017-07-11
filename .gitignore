@@ -10,4 +10,5 @@ tasks
 known-to-work*
 __*
 lua/com.neurogami.LoopComposer.xrnx/notes.md
+dist/
 demo-songs/
