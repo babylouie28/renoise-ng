@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 --[[
 TODO: Think about splitting this into files, each for handling note columns, tracks, and groups.
+=======
+-- TODO maybe these loose functions need to go to Utils
+>>>>>>> swap-group-2017
 
 --]]
 --=======================================================================
@@ -174,6 +178,7 @@ function volume_swap_note_columns(max_vol1, max_vol2, lines_list)
 end
 
 
+<<<<<<< HEAD
 --[[=====================================================================
 Note: This will alter the pre-device chain volume, and that will remain
 until something (i.e. another track volume fx) sets it back.
@@ -196,6 +201,10 @@ will want "C0".
 
 If you are pre-populating the volume fields with "70" then something
 needs to account for this when swapping track volumes.
+=======
+-- ======================================================================
+function Core.new_set_from_funct_string(function_str, current_set)
+>>>>>>> swap-group-2017
 
 Options:
 

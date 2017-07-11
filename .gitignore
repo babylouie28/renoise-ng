@@ -9,4 +9,6 @@ osc-repl-*
 tasks
 known-to-work*
 __*
-tool-page-content
+lua/com.neurogami.LoopComposer.xrnx/notes.md
+dist/
+demo-songs/
