@@ -15,6 +15,7 @@ V3 = '3.0.1'
 
 tool_names = %w{
   SwapChop
+  Alternator
   LoopComposer
   Conscripter
   Configgy
@@ -231,7 +232,16 @@ namespace :package do
     end
   end
 
-
+ 
+  desc "Package up Alternator"
+  task :alternator do
+    Dir.chdir'lua' do
+      name = "Alternator"
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
   
   desc "Package up SwapChop"
   task :swap_chop do
