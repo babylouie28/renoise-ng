@@ -1,5 +1,24 @@
 
 --  String stuff
+--
+
+-- *********************************************************************
+function string.to_word_table(s)
+  local words = {}
+  for w in s:gmatch("%S+") do table.insert(words, w) end
+  return words
+end
+
+
+-- *********************************************************************
+function string.int_list_to_numeric(s)
+  local ints = {}
+  for w in s:gmatch("%S+") do table.insert( ints, tonumber(w) ) end
+  return ints
+end
+
+
+
 function string.lpad(str, len, char)
   if char == nil then char = ' ' end
   return str .. string.rep(char, len - #str)
@@ -78,6 +97,23 @@ end
 
 
 --- Common util funcitons
+
+-- From https://stackoverflow.com/questions/22185684/how-to-shift-all-elements-in-a-table
+function U.wrap( t, l )
+  for i = 1, l do
+    table.insert( t, 1, table.remove( t, #t ) )
+  end
+  return t
+end
+
+
+
+-- *********************************************************************
+function U.i2hex(i)
+  return string.format("%02x", i)
+end
+
+
 function U.clamp_value(value, min_value, max_value)
   return math.min(max_value, math.max(value, min_value))
 end
@@ -178,6 +214,13 @@ function U.copy_file_to(source, target)
 end
 
 
+-- *********************************************************************
+function U.is_empty_string(str)
+  local _s = string.trim(str)
+  return _s == ''
+end
+
+
 function U.is_empty(s)
    return s == nil or s == ''
 end
@@ -195,6 +238,36 @@ function U.may_overwrite(path)
   end  
   return overwrite
 end
+
+
+-- *********************************************************************
+-- Split string into array (split at newline)
+-- TODO decide on one util/helper function to do this. This one or string.lines(s)
+function U.lines(str)
+  local t = {}
+  local function helper(line)
+    table.insert(t, line)
+    return ""
+  end
+  helper((str:gsub("(.-)\r?\n", helper))) 
+  return t  
+end
+
+
+-- *********************************************************************
+-- If file exists, popup a modal dialog asking permission to overwrite.
+function U.error_message(message)
+  local buttons = {"OK"}
+  renoise.app():show_prompt(message, buttons)
+end
+
+-- *********************************************************************
+function U.str_table_to_int(t)
+  for k,s in pairs(t) do 
+    t[k] = tonumber(s)
+  end
+end
+
 
 
 return U

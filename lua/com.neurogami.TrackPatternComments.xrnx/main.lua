@@ -28,6 +28,8 @@ local ok,err = manifest:load_from("manifest.xml")
 local tool_name = manifest:property("Name").value
 local tool_id = manifest:property("Id").value
 
+print("TPC has Id" .. tool_id)
+
 renoise.tool().app_new_document_observable:add_notifier(
 function()
   TPC.current_song = renoise.song()

@@ -3,10 +3,10 @@
   <ApiVersion>5</ApiVersion>
   <AutoUpgraded>true</AutoUpgraded>
   <Id>com.neurogami.Alternator</Id>
-  <Version>0.1</Version>
+  <Version>0.2</Version>
   <Author>Neurogami | james@neurogami.com  </Author>
   <Name>Neurogami Alternator</Name>
-  <Category>In Progress</Category>
+  <Category>Patern Editing</Category>
   <Description>Inserts alternating fx values</Description>
   <Homepage>http://neurogami.com</Homepage>
 </RenoiseScriptingTool>

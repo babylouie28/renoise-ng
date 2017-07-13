@@ -1,3 +1,4 @@
+
 --------------------------------------------------------------------------------
 -- GUI
 --------------------------------------------------------------------------------
@@ -10,6 +11,9 @@ GUI.lines_list = ""
 
 
 GUI.values = nil
+GUI.tool_name  = ""
+GUI.tool_id   = ""
+GUI.tool_version   = ""
 
 GUI.fx_values_text = ""
 
@@ -57,7 +61,9 @@ function load_values()
     lines_list  = GUI.lines_list
   }
 
-  GUI.values:load_from("alternator.xml")
+  local ok, err = GUI.values:load_from("alternator.xml")
+  print("Loaded previous values. err = " , err)
+
 
   GUI.func_text = GUI.values.gen_function.value 
   GUI.lines_list  = GUI.values.lines_list.value  
@@ -153,7 +159,7 @@ Lines
 
 
 
-  local title = "Neurogami:Alternator.t of beta."
+  local title = GUI.tool_name .. ". Version " .. GUI.tool_version
 
   local function_row = GUI.vb:row {
     GUI.vb:text {
