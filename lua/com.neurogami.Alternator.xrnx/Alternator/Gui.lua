@@ -1,3 +1,20 @@
+local function show_popup_panel(title, popup_text)
+  local vb = renoise.ViewBuilder()
+    renoise.app():show_custom_dialog(
+    title, 
+
+    vb:column {
+      margin = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN,
+      spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
+      uniform = true,
+  vb:text {
+    text = popup_text  
+  } 
+
+    }
+  )
+  
+end
 
 --------------------------------------------------------------------------------
 -- GUI
@@ -16,8 +33,45 @@ GUI.tool_id   = ""
 GUI.tool_version   = ""
 
 GUI.fx_values_text = ""
-
 GUI.func_text = ""
+
+
+GUI.help_text = [[ 
+  Basic usage:
+  
+  The tool takes the the values in the "Values" text field
+  and inserts them as alternating fx values in the selected
+  note colum or track fx column.
+
+  The values are placed on the lines in the "Apply to lines" box.
+
+  You can hand-edit that list of line numbers, or use a special 
+  syntax to generate a sequence.
+
+  The "Values" field has two buttons ("<<" and ">>") that 
+  rotates the values.
+
+  The tool saves the last used values.
+
+  The intended use was to alternate mute (00) and normal volume (e.g. C0).
+
+  Applied to two columns/tracks but with the values swapped you get a nice
+  chopped sound.
+
+  Track fx column values are applied to the pre-device chain volume.
+
+  If the track has a Gain device named ALTERNATOR then track fx values
+  are applied to that gainer.  
+  
+  In that case, the given value 0C is replaced with 3F (because of the
+  differences in how 0db is represented).
+
+  There should be a link to more tool info at:
+   
+       http://www.neurogami.com/code/
+  
+  ]]
+
 
 
 -- ======================================================================
@@ -141,6 +195,14 @@ Lines
   load_values()
 
   
+ local button_help = GUI.vb:button {
+      text = "Help",
+      released = function()
+        show_popup_panel("Help", GUI.help_text )
+      end
+    }
+ 
+ 
   local button_rotate_left = GUI.vb:button {
       text = " << ",
       released = function()
@@ -254,10 +316,15 @@ Lines
 
       GUI.vb:horizontal_aligner {
         mode = "left",
-
         button_clear,
         button_go, 
       },
+
+      GUI.vb:horizontal_aligner {
+        mode = "right",
+        button_help,
+      },
+
     },
 
   } -- end of main row
@@ -293,3 +360,4 @@ GUI.generate_values = function()
 end
 
 return GUI
+

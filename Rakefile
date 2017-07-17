@@ -103,7 +103,8 @@ def ng_vhost
   case  hostname 
   when /james1/
     if win32?
-        %~c:/Users/james/ownCloud/vhosts/2012.neurogami.com~
+
+        %~#{ENV['OWNCLOUD_FOLDER']}/vhosts/2012.neurogami.com~
     else
   %~/home/james/data/vhosts/2012.neurogami.com~
     end
@@ -122,6 +123,7 @@ def copy_to_neurogami_dist zipfile_name
     sh "cp #{zipfile_name} #{ng_vhost}/content/renoise-tools/ "
   else
     warn "copy_to_neurogami_dist: Cannot find #{ng_vhost}/content/renoise-tools/ "
+    exit
   end
 
 end

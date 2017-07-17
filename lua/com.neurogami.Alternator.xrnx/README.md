@@ -1,83 +1,102 @@
 # Neurogami Alternator
 
-## Placeholder readme
 
-Basic idea:  Like the SwapChop tool, but only works on a single fx column.
+The tool takes the values in the "Values" text field and inserts them as alternating volume fx values in the selected note column or track fx column.
 
-It should save all of the last-used values, and have a way to switch around some values.
+The values are placed on the track pattern lines listed in the "Apply to lines" box.
 
-Think of it as a more manual version of SwapChop.  Instead of assuming anything about column pairs, Alternator just works on a single column.  To get the same behavior as SwapChop you would re-run ALternator on antoehr column but switch around some values.
+You can hand-edit that list of line numbers, or use a special syntax to generate a sequence.
 
-SwapChop assumed you wanted to alternate a series of volume values (basically, full, and 00).  The set of values would be "swapped" across the column pairs (when one was at full volum, the other would be 00).
+You must click the "Go" button to apply the values.
 
-Like SwapChop, Alternator would generate a series of line numbers and use them to apply a series of fx values.  
+The "Values" field has two buttons (`<<` and `>>`) that rotates the values.
 
-If you were, for example, alternating 70 and 00 over the lines 0 3 6 9 12 in one column, then you would (perhaps) want to alternate 00 and 70 over those same lines in another column.  SwapChop just assumed this, and assumed it was operating on adjacent note columns.  
+The tool saves the last used values.
 
-### Possible GUI layout 
+The intended use was to alternate mute (`00`) and normal volume (e.g. `C0`).
 
-Mostly the same as SwapChop, with a text area for the set of line numbers, a field for a line-generating function,  and some sort of place for the fx values to alternate.
+Applied to two columns/tracks but with the values swapped you get a nice chopped sound.
 
-Likely plan: Use a single text field (as with the generator field).  Use it for space-delimited fx values.
+Track fx column values are applied to the pre-device chain volume.
 
-Provide a button to rotate (i.e. shift around) these values.  If there are but two values then this effectively swaps them.
+If the track has a Gainer device named `ALTERNATOR` then track fx values are applied to that gainer.  
 
-But you can use more than two; not sure how big this field should be.  Might plausibly allow for another kind of value generator so that this field an hold either literal fx commands or some notation to create values.  (A goal here might be to create a series of volume values that go from 00 to some max, over the number of lines to be used. E.g. `> 0 70`  `< 0 70`.  Or something. )
+In that case, the given value `0C` is replaced with `3F` (because of the differences in how `0db` is represented).
 
-So we get something like this:
-
-`
-Values    [_______________________________________________________________] [< rotate] [ rotate > ]
-
-Function  [_______________________________________________________________] [Generate]
-
-Lines  
-          |----------------------------------------------------------------|
-          |                                                                |
-          |                                                                |
-          |                                                                |
-          -----------------------------------------------------------------
-           [Clear]   [Go] 
-
-`
-
-More or less
+## Line number generation syntax
 
 
-## Code flow
+`+ i j k` means line numbers increment by i, then j, then k, then i, then j, etc.
 
 
-Like ChopSwap, it needs to see if GUI is already up.
+For example: 
 
-** DONE ** It needs to load any previous values for all of the fields: Values, Function, Lines
+`+ 3 5` would give you `0 3 8 11 16 19 24 ...` up to the number to lines in the current pattern.
 
-** DONE ** It needs to watch for the ESC key to auto-close (and change nothing)
+ `+ 3 2 5` would give you `0 3 5 10 13 15 20 23 25  ...` up to the number to lines in the current pattern.
 
 
-** DONE ** The Rotate buttons need to grab the values content, split on white space, rotate, then apply the updated text.
+`/ i j k` gives you all the lines evenly divisible by any of i, j, k, etc.
 
-SwapChop *always* used line 0 (i.e. the first line).  The reasoning was that, given two columns, one of them had to be muted at the start.
+For example: 
 
-Alternator will do the same unless there's a simple enough way to handle making this explicit while not breaking shit.  
-(E.g., a line generator of `/ 3` will never have 0, unless you make an assumption about 0, then it will always have 0.)
+`/ 3 5` would give you `0 3 5 6 9 10 12 15 18 20 21 ...` up to the number to lines in the current pattern.
 
-Plausibly the Lines text should insert 0 and then allow for manually removing it.  This line set would then be saved for the next use.
+`/ 6` would give you `0 6 12 18 24 30 ...` up to the number to lines in the current pattern.
 
-** DONE ** Line generator functions include 0 in the results.  User has to edit the generated results aftwards before applying.
 
-This means the code that *applies* the lines/values has to *not* assume 0; it needs to stick to the line number list.
+**NOTE** `0` is _always_ included in the results of any line-generation function.
 
-** DONE** Tool needs to work on vol column of  note column AND in fx column of a track.
 
-The behavior when applied to tracks is to automate the volume pre-devie chain.  Stuff like echos and revier will continue.
+You should be able to use any number of integers with either of those commands.  (Well, so long as they fit in the text field.)
 
-This is (pretty sure) the same as when automating note column volumn.
+** You should not include an commas in your line-generating function. **
 
-If you wanted to automate the volume post-fx, can you do that as well?  Seems not.
+Each time you run a line-generation function the generated numbers are *added* to the current list. 
 
-So, feature request:  If we have a track fx column selected, look to see if the track has a gainer named "ALTERNATOR".
+This allows you to construct a more complex sequence my combining different line-generation functions.
 
-If so, then enter automation values for that device instead of the pre-device chain volume.
+There is a `clear` button to clear the current list; you can also hand-edit that list to fine-tune the values.
 
-Code would need to - iterate over all track devices; get names; if name match, make note if device index; know what volume value to use.
+You must click the `Go` button in order to apply the results.
 
+## Stuff
+
+The last-applied values are saved and reloaded the next time the tool is used.
+
+This makes it easier to apply the same values to multiple tracks or note columns.
+
+This tool was derived from [ChopSwap.](http://www.renoise.com/tools/neurogami-swapchop)
+
+The goal was to make it easy to automate the swapping of mute and not-mute between two adjacent note columns or tracks.
+
+It works, and is easy to use, but doesn't play nice when you want to swap volume on tracks or note columns that are not adjacent (or simply apply it to both a track and a note column).
+
+`Alternator` avoids this by only acting on a single target. It looks to see if you have selected a note column or a track fx column and applies the appropriate automation command.
+
+This is the reason for saving the last-used settings, and for having a way to "rotate" the volume values applied.
+
+You can run `Alternator` on one track, go to another track, and rotate the fx values before applying the tool again.  This effectively mimics the behavior of `ChopSwap` (albeit with more steps).
+
+Unlike `ChopSwap` you are not limited to two volume values, and you are not required to work with two adjacent tracks or columns.
+
+## Special gainer behavior
+
+When operating on a track, the fx value entered operates on the pre-device chain volume (the one all the way over on the left).
+
+This means that any devices on that track may still be generating sounds after the root volume is set to `-INF`.
+
+For example, reverb and delay.
+
+If, however, the track has a gainer device renamed to `ALTERNATOR` then the fx automation is applied to that gainer.  
+
+This allows you to automate the track device anyplace along your device chain.
+
+
+## Watch for ...
+
+Since the tool is inserting volume automation values you need to be mindful of whatever was the last value added to a track pattern.  
+
+You will likely have to manually add an fx entry to reset the volume of a track.
+
+This same caveat applies if you are using the special `ALTERNATOR` gainer device.

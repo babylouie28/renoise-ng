@@ -41,7 +41,6 @@ function sequence_from_inc_set(inc_list, lines_in_pattern, current_set)
   return current_set
 end
 
-
 --=======================================================================
 -- Takes a list of ints, the number of lines in the pattern, 
 -- and the current list of line numbers
@@ -57,7 +56,7 @@ function sequence_from_mod_set(mod_list, lines_in_pattern, current_num_set)
   print_pairs(current_num_set)
 
   -- We always include line 0
-  current_set[0] = 0
+  current_num_set[0] = 0
 
   for i=1,lines_in_pattern do 
     for k,v in pairs(mod_list) do
