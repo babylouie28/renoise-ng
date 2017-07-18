@@ -39,9 +39,9 @@ GUI.func_text = ""
 GUI.help_text = [[ 
   Basic usage:
   
-  The tool takes the the values in the "Values" text field
+  The tool takes the values in the "Values" text field
   and inserts them as alternating fx values in the selected
-  note colum or track fx column.
+  note column or track fx column.
 
   The values are placed on the lines in the "Apply to lines" box.
 
@@ -53,7 +53,7 @@ GUI.help_text = [[
 
   The tool saves the last used values.
 
-  The intended use was to alternate mute (00) and normal volume (e.g. C0).
+  The intended use was to alternate mute (00) and normal volume (e.g. 7F or C0).
 
   Applied to two columns/tracks but with the values swapped you get a nice
   chopped sound.
@@ -65,6 +65,11 @@ GUI.help_text = [[
   
   In that case, the given value 0C is replaced with 3F (because of the
   differences in how 0db is represented).
+
+  Important: volume values for note columns work differently than with track or gainer fx
+
+  Max volume for a note column is 7F. If you mistakenly use C0 you will 
+  not get the results probably you expect.
 
   There should be a link to more tool info at:
    
@@ -245,6 +250,17 @@ Lines
     } 
   } -- end of row 
 
+  local fx_prompt_row1 = GUI.vb:row {
+    GUI.vb:text {
+      text = "Volume values differ among note columns, track fx, and Gainer automation.",
+     },
+    }
+
+  local fx_prompt_row2 = GUI.vb:row {
+    GUI.vb:text {
+      text = "Suggested values: 7F; C0; 3F",
+     },
+    }
 
     local fx_values_row = GUI.vb:row {
     GUI.vb:text {
@@ -286,11 +302,12 @@ Lines
 
   -- ********************************** ROW 
   local content = GUI.vb:row {
+    fx_prompt_row1,
+     fx_prompt_row2,
 
     GUI.vb:column {
       spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
       margin = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN,
-
       fx_values_row ,
       function_row,
 

@@ -10,14 +10,8 @@ GUI.col1_vol = "70"
 GUI.col2_vol = "70"
 GUI.lines_list = ""
 
-<<<<<<< HEAD
-=======
 
-GUI.values = nil
 
-GUI.func_text = ""
-
->>>>>>> swap-group-2017
 function line_nums_to_table(lines_str)
   print("In line_nums_to_table")
   local nums_table = string.int_list_to_numeric(lines_str)
@@ -30,56 +24,8 @@ function line_nums_to_table(lines_str)
   return paired_table 
 end
 
--- ======================================================================
-function load_values()
-  print("Load last-used values ...")
 
-
-  GUI.values = renoise.Document.create("SwapChopLastValues") {
-    volume_1 = GUI.col1_vol,
-    volume_2 = GUI.col2_vol,
-    gen_function = GUI.func_text,
-
-  }
-
-  GUI.values:load_from("swap_chop.xml")
-
-  GUI.col1_vol  = GUI.values.volume_1.value  
-  GUI.col2_vol  = GUI.values.volume_2.value 
-  GUI.func_text = GUI.values.gen_function.value 
-  print("Loaded values, GUI.func_text = " .. "'" .. GUI.func_text .. "'")
-
-
-end
-
--- ======================================================================
-function save_values()
-  print("Save current values ...")
-
-
-  if GUI.values ~= nil then
-    GUI.values.volume_1.value = GUI.col1_vol 
-    GUI.values.volume_2.value = GUI.col2_vol
-    GUI.values.gen_function.value = GUI.func_text
-    GUI.values:save_as("swap_chop.xml")
-  end
-end
-
-
--- TODO Decide how to define 'class' functions.  Either use `Foo.func_name = function` or `function Foo.func_name`
-
-
--- ======================================================================
 GUI.show_dialog = function()
-
-<<<<<<< HEAD
-   Core.set_location()
-   if (Core.we_are_in_track) then
-     GUI.col1_vol = "C0"
-    GUI.col2_vol = "C0"
-   end
-=======
->>>>>>> swap-group-2017
 
   if GUI.dialog and GUI.dialog.visible then
     GUI.dialog:show()
@@ -91,31 +37,29 @@ GUI.show_dialog = function()
   GUI.vb = renoise.ViewBuilder()
   GUI.current_text = ""  
 
-  load_values()
-
-  local title = "Neurogami:SwapChop.  Still sort of beta."
+  local title = "Raw values. Very alpha"
 
   local function_row = GUI.vb:row {
-    GUI.vb:text {
-      text = "Function",
-      tooltip = "Function to generate line numbers",
-    },
+        GUI.vb:text {
+          text = "Function",
+          tooltip = "Function to generate line numbers",
+        },
 
-    GUI.vb:textfield {
-      text = GUI.func_text,
-      id = "func_text",
-      notifier = function()
-        GUI.func_text = string.upper(GUI.vb.views.func_text.text)
-        print("Updated GUI.func_text: " .. GUI.func_text)
-      end,
-    },
-    GUI.vb:button {
-      text = "Generate",
-      released = function()
-        GUI.generate_values()
-      end
-    } 
-  } -- end of row 
+        GUI.vb:textfield {
+          text = "",
+          id = "func_text",
+          notifier = function()
+            GUI.func_text = string.upper(GUI.vb.views.func_text.text)
+            print("Updated GUI.func_text: " .. GUI.func_text)
+          end,
+        },
+GUI.vb:button {
+    text = "Generate",
+    released = function()
+      GUI.generate_values()
+    end
+  } 
+      } -- end of row 
 
 
 
@@ -130,12 +74,11 @@ GUI.show_dialog = function()
     text = "Go",
     released = function()
       Core.set_swap_values(GUI)
-      save_values()
       GUI.dialog:close()
     end
   }
 
-  -- ********************************** ROW 
+-- ********************************** ROW 
   local content = GUI.vb:row {
 
     GUI.vb:column {
@@ -172,7 +115,7 @@ GUI.show_dialog = function()
           end,
         },
       } ,
-
+      
       function_row,
 
     },
@@ -181,7 +124,7 @@ GUI.show_dialog = function()
       margin = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN,
 
 
-
+      
       GUI.vb:text {
         text = "Swap on lines:",
         tooltip = "Series of line numbers",
@@ -213,7 +156,6 @@ GUI.show_dialog = function()
 end
 
 
--- ======================================================================
 GUI.generate_values = function() 
 
   local current_set = line_nums_to_table(GUI.vb.views.lines_list_field.text)
@@ -222,7 +164,7 @@ GUI.generate_values = function()
   local function_str = string.trim(GUI.func_text)
 
   if U.is_empty_string(function_str) then
-    print("Function string is empty, returning.")
+  print("Function string is empty, returning.")
     return 
   end
 
