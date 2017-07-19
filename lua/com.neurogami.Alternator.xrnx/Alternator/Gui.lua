@@ -35,6 +35,8 @@ GUI.tool_version   = ""
 GUI.fx_values_text = ""
 GUI.func_text = ""
 
+GUI.spacing = 4 * renoise.ViewBuilder.DEFAULT_CONTROL_SPACING
+GUI.margin  = 1.5 * renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN
 
 GUI.help_text = [[ 
   Basic usage:
@@ -167,26 +169,6 @@ end
 -- ======================================================================
 GUI.show_dialog = function()
 
---[[   THE GOAL:
-
-Values    [_______________________________________________________________] [< rotate] [ rotate > ]
-
-Function  [_______________________________________________________________] [Generate]
-
-Lines  
-          |----------------------------------------------------------------|
-          |                                                                |
-          |                                                                |
-          |                                                                |
-          -----------------------------------------------------------------
-           [Clear]   [Go] 
-
-
-]]--
-
-
-
-
   if GUI.dialog and GUI.dialog.visible then
     GUI.dialog:show()
     return
@@ -225,8 +207,19 @@ Lines
     }
 
 
-
   local title = GUI.tool_name .. ". Version " .. GUI.tool_version
+
+  local fx_prompt_row1 = GUI.vb:row {
+    GUI.vb:text {
+      text = "Volume values differ among note columns, track fx, and Gainer automation.",
+     },
+    }
+
+  local fx_prompt_row2 = GUI.vb:row {
+    GUI.vb:text {
+      text = "Suggested values: 7F; C0; 3F",
+     },
+    }
 
   local function_row = GUI.vb:row {
     GUI.vb:text {
@@ -250,19 +243,8 @@ Lines
     } 
   } -- end of row 
 
-  local fx_prompt_row1 = GUI.vb:row {
-    GUI.vb:text {
-      text = "Volume values differ among note columns, track fx, and Gainer automation.",
-     },
-    }
 
-  local fx_prompt_row2 = GUI.vb:row {
-    GUI.vb:text {
-      text = "Suggested values: 7F; C0; 3F",
-     },
-    }
-
-    local fx_values_row = GUI.vb:row {
+  local fx_values_row = GUI.vb:row {
     GUI.vb:text {
       text = "Values",
       tooltip = "FX values to insert",
@@ -300,21 +282,32 @@ Lines
     end
   }
 
-  -- ********************************** ROW 
-  local content = GUI.vb:row {
+
+  local prompts_row = GUI.vb:row {
+          GUI.vb:column {
+        spacing = GUI.spacing,
+        margin = GUI.margin,
+
     fx_prompt_row1,
-     fx_prompt_row2,
+    fx_prompt_row2,
+   },
+  }
+
+  -- ********************************** ROW 
+  local content = GUI.vb:column {
+
+    prompts_row, 
 
     GUI.vb:column {
-      spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
-      margin = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN,
+      spacing = GUI.spacing,
+      margin = GUI.margin,
       fx_values_row ,
       function_row,
-
     },
+
     GUI.vb:column {
-      spacing = renoise.ViewBuilder.DEFAULT_CONTROL_SPACING,
-      margin = renoise.ViewBuilder.DEFAULT_DIALOG_MARGIN,
+      spacing = GUI.spacing,
+      margin = GUI.margin,
 
       GUI.vb:text {
         text = "Apply to lines:",
