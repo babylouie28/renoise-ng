@@ -11,9 +11,10 @@ Dir.glob("tasks/*.rake") do |t|
 end
 
 V2 = '2.8.2'
-V3 = '3.0.1'
+V3 = '3.1.1'
 
 tool_names = %w{
+  Retempo
   SwapChop
   Alternator
   LoopComposer
@@ -309,6 +310,16 @@ namespace :package do
     end
   end
 
+  
+  desc "Package up Retempo"
+  task :retempo do
+    Dir.chdir'lua' do
+      name = "Retempo"
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
 
 end
 
