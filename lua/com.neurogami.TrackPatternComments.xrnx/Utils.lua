@@ -1,7 +1,7 @@
 
 function string.trim(s)
   if s == nil then
-    return "" -- Is this a good idea?  TODO Think if silently converting nil to an empty string is a Good Thing
+    return "" -- Is this a good idea?  TODO Re-think if silently converting nil to an empty string is a Good Thing
   else
    return (s:gsub("^%s*(.-)%s*$", "%1"))
   end
@@ -29,7 +29,6 @@ function U.lines(str)
   return t  
 end
 
--- If file exists, popup a modal dialog asking permission to overwrite.
 function U.error_message(message)
   local buttons = {"OK"}
   renoise.app():show_prompt(message, buttons)
