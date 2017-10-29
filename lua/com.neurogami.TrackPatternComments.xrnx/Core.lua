@@ -212,7 +212,7 @@ end
 -- *************************************************************************
 -- Update the track comments
 -- The guid might be nil.  That means this is a new
--- comment.  If so, then go see if there
+-- comment.  If so, then the codes to see if there
 -- is any comment text.  If so, grab the next guid and use it
 -- If not, just return; don't waste a guid.
 function TPC.update_comments(guid, text)

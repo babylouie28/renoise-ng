@@ -1,7 +1,7 @@
 <RenoiseScriptingTool doc_version="0">
   <ApiVersion>5</ApiVersion>
   <Id>com.neurogami.TrackPatternComments</Id>
-  <Version>0.1</Version>
+  <Version>0.2</Version>
   <Author>James Britt / Neurogam (james@neurogami.com)</Author>
   <Name>Track-pattern Comments</Name>
   <Category>Pattern Editor</Category>

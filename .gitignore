@@ -1,4 +1,6 @@
 .rvmrc
+tool-notes.md
+ideas.md
 ._
 haz_var.txt
 update-local-installs.rb

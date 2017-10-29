@@ -50,6 +50,8 @@ task :copy_utils do
   end
 end
 
+task :default => :rebuild 
+
 desc "rebuild all"
 task :rebuild =>  [:copy_utils] do
   tool_names.each do |tool| 

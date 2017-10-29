@@ -4,8 +4,6 @@ Neurogami / James Britt <james@neurogami.com>
 
 Originally based on code swiped from the Track Comments tool, by Florian Krause <siebenhundertzehn@gmail.com>
 
-
-This new version: 0.1
 ============================================================================]]--
 
 require 'Utils'
