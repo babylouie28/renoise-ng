@@ -10,10 +10,8 @@ require 'Utils'
 require 'Core'
 require 'Gui'
 
--- Reload the script whendever this file is saved. 
 _AUTO_RELOAD_DEBUG = true
 
--- Read from the manifest.xml file.
 class "RenoiseScriptingTool" (renoise.Document.DocumentNode)
   function RenoiseScriptingTool:__init()    
     renoise.Document.DocumentNode.__init(self) 

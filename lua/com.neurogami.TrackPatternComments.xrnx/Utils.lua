@@ -29,7 +29,6 @@ function U.lines(str)
   return t  
 end
 
--- If file exists, popup a modal dialog asking permission to overwrite.
 function U.error_message(message)
   local buttons = {"OK"}
   renoise.app():show_prompt(message, buttons)
