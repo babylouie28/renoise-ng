@@ -1,12 +1,16 @@
+-- TODO See if there is some way to gra these direct from 
+-- the rotator tool code in case they change on
+-- an update.
+--
 local RANGE_WHOLE_SONG = 1
 local RANGE_WHOLE_PATTERN = 2
-local RANGE_TRACK_IN_SONG = 3
-local RANGE_TRACK_IN_PATTERN = 4
-local RANGE_SELECTION_IN_PATTERN = 5
+local RANGE_WHOLE_PHRASE = 3
+local RANGE_TRACK_IN_SONG = 4
+local RANGE_TRACK_IN_PATTERN = 5
+local RANGE_SELECTION_IN_PATTERN = 6
+local RANGE_SELECTION_IN_PHRASE = 7
 
 have_rotator = false
-
-
 
 local function attempt_remove_menu(menu_name)
   renoise.tool():remove_menu_entry(menu_name)
@@ -38,7 +42,6 @@ function attempt_rotate_setup()
 end
 
 
-
 rotate_handlers = {
   { 
     pattern = "/rotate/pattern",
@@ -55,10 +58,20 @@ rotate_handlers = {
         local selected_track_index = song().selected_track_index
         print( "ROTATE: selected_track_index is now " , selected_track_index )
       end
-
       rotate(lines, RANGE_TRACK_IN_PATTERN, true)
-
     end 
   }, 
-}
+  { 
+    pattern = "/rotate/current",
+    handler = function(lines)
+
+      print("Rotate current track-pattern",lines, " lines")
+      local song = renoise.song
+      local selected_track_index = song().selected_track_index
+      print( "ROTATE: selected_track_index is now " , selected_track_index, " lines = " .. lines )
+      -- function rotate(shift_amount, range_mode, shift_automation)
+        rotate(lines, RANGE_TRACK_IN_PATTERN, true)
+      end 
+    }, 
+  }
 

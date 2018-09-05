@@ -248,6 +248,7 @@ function RandyNoteColumns.construct_and_deploy_timer(track_index)
   ]]
 
   local timer_interval = RandyNoteColumns.volume_jumper_track_timer_interval[track_index]
+
   if(RandyNoteColumns.timers[track_index] and renoise.tool():has_timer( RandyNoteColumns.timers[track_index] ) ) then
     print("Remove existing timer ...")
     renoise.tool():remove_timer( RandyNoteColumns.timers[track_index] )

@@ -9,6 +9,8 @@ LoopComposer.current_loop_count = 1
 LoopComposer.current_loop = 0
 LoopComposer.timer_interval = 100 
 
+LoopComposer.function_called = false
+
 LoopComposer.loop_list = {
   {5, 5, 1},
   {1, 2, 1},
@@ -49,7 +51,7 @@ function LoopComposer.read_script_from_comments() -- Expected to return a string
 
   print("We should have a comments script")
 
--- This needs to read until the end of the comments and not look for an end marker
+  -- This needs to read until the end of the comments and not look for an end marker
   if start ~= nil then 
     local ending = #comments -- ?? -- table.find(LoopComposer.current_song.comments, LoopComposer.comment_end_marker, start)
     local first_line = start+1
@@ -65,7 +67,7 @@ function LoopComposer.read_script_from_comments() -- Expected to return a string
   print("Comment script:\n" ..  script_text)
 
 
---[[
+  --[[
   for idx, line in ipairs(comments) do
     print(line)
     local _ = string.trim(line)
@@ -76,8 +78,8 @@ function LoopComposer.read_script_from_comments() -- Expected to return a string
     end
     script_text = table.concat(script_lines,"\n")
   end
---]]
---
+  --]]
+  --
   return script_text
 end
 
@@ -124,9 +126,9 @@ function LoopComposer.did_we_loop()
   -- If we are not in the last pattern of the loop then return false
   LoopComposer.current_pattern = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
 
-  print("\n\tDid we loop? compare ", LoopComposer.current_pattern , " < ", LoopComposer.current_range_end() )
+----  print("\n\tDid we loop? compare ", LoopComposer.current_pattern , " < ", LoopComposer.current_range_end() )
   if LoopComposer.current_pattern < LoopComposer.current_range_end() then
-    print("\t\tNot in the last pattern of the loop")
+  ---  print("\t\tNot in the last pattern of the loop")
     return false
   end
 
@@ -147,25 +149,25 @@ end
 function LoopComposer.set_next_loop(idx)
 
   if (not idx) then
-  if LoopComposer.current_loop < #LoopComposer.loop_list then
-  
-    print("There is a next loop. Current loop is ", LoopComposer.current_loop )
-    
-    LoopComposer.current_loop = LoopComposer.current_loop + 1
+    if LoopComposer.current_loop < #LoopComposer.loop_list then
 
-    print("Go get loop at index ", LoopComposer.current_loop );
+      print("There is a next loop. Current loop is ", LoopComposer.current_loop )
 
-    LoopComposer.current_loop_count = 1
-    LoopComposer.current_pattern =  LoopComposer.current_range_start()
-    LoopComposer.last_pattern =  LoopComposer.current_range_start()
+      LoopComposer.current_loop = LoopComposer.current_loop + 1
 
-    LoopComposer.loop_schedule( LoopComposer.current_range_start(),  LoopComposer.current_range_end())       
+      print("Go get loop at index ", LoopComposer.current_loop );
+
+      LoopComposer.current_loop_count = 1
+      LoopComposer.current_pattern =  LoopComposer.current_range_start()
+      LoopComposer.last_pattern =  LoopComposer.current_range_start()
+
+      LoopComposer.loop_schedule( LoopComposer.current_range_start(),  LoopComposer.current_range_end())       
+    else
+      print("There is no next loop.")
+      LoopComposer.clear()
+    end
+
   else
-    print("There is no next loop.")
-    LoopComposer.clear()
-  end
-
-else
     LoopComposer.current_loop = idx
 
     print("Go get loop at index ", LoopComposer.current_loop );
@@ -175,7 +177,7 @@ else
     LoopComposer.last_pattern =  LoopComposer.current_range_start()
 
     LoopComposer.loop_schedule( LoopComposer.current_range_start(),  LoopComposer.current_range_end())       
-end
+  end
 end
 
 -- ********************************************************************
@@ -216,48 +218,73 @@ function LoopComposer.process_looping()
   local range_start, range_end, count, num_loops
   local max_loops = LoopComposer.loop_list[LoopComposer.current_loop][3]
   local end_function = LoopComposer.loop_list[LoopComposer.current_loop][4]
+
+  local pos_line = renoise.song().transport.playback_pos.line
+  local max_pattern_lines = renoise.song().patterns[renoise.song().transport.playback_pos.sequence].number_of_lines
+  
+  if pos_line < (max_pattern_lines-1) then
+    LoopComposer.function_called = false
+  end
+    
   range_start = LoopComposer.current_range_start()
   range_end = LoopComposer.current_range_end()
 
   LoopComposer.current_pattern  = renoise.song().sequencer.pattern_sequence[renoise.song().transport.playback_pos.sequence]
 
---  print("Current pattern: ", LoopComposer.current_pattern, "; loop count = ",  LoopComposer.current_loop_count, "max loops ",  max_loops)
+  --  print("Current pattern: ", LoopComposer.current_pattern, "; loop count = ",  LoopComposer.current_loop_count, "max loops ",  max_loops)
 
+  -- Problem: when the loop is only one patter this is always true
   if (LoopComposer.current_pattern == range_end ) then       
 
     print("We are in the last pattern of the loop.")
+    print("pos_line: ",  pos_line )
 
     if LoopComposer.did_we_loop() then
       print("\t\tWE LOOPED!")
       LoopComposer.current_loop_count = LoopComposer.current_loop_count + 1
     else
+      --LoopComposer.function_called = false
       print("! ! ! WE STILL HAVE NOT LOOPED")
     end
 
+
+    -- We need another latch value to ensure that this is not called over and over
+    -- as the loop is ending
     if LoopComposer.current_loop_count >= max_loops then
       print("* * * * * Loop count >= max looping, so set next loop * * * * *")
       print("* * * * * end_function = ", end_function, " LoopComposer.current_loop = ", LoopComposer.current_loop, " * * * * *")
+      print("* * * * * LoopComposer.function_called  ", LoopComposer.function_called , " * * * * *")
 
       if end_function then
-        print("Try to invoke '", end_function, "' ...")
-        
+        if not LoopComposer.function_called then
+          print("Try to invoke '", end_function, "' ...")
+          local current_line = LoopComposer.loop_list[LoopComposer.current_loop]
+          print("current_line: ")
+          rprint(current_line)
+          -- This is  breaking! 
+          -- Why subset 5?  current_line is an array of (maybe) 4 items 
+          -- 5, ... would be any optional arguments to a function
+          -- PROBLEM:  This code is getting called on every tick to something, so
+          -- if you are selecting, say, a random value (in rand_loop) then you soon get
+          -- a value you don't want.
+          -- This needs to only be called at the start of a loop (in the case of something like rand_loop)
+          -- where on each pass you eval the function to see what happens
+          local f_args = U.subset(current_line, 5, #current_line) ----   current_line[ {   5, #current_line }  ] -- Keeps failing to return items
 
-    
-         local current_line = LoopComposer.loop_list[LoopComposer.current_loop]
-         print("current_line: ")
-         rprint(current_line)
-        local f_args = U.subset(current_line, 5, #current_line) ----   current_line[ {   5, #current_line }  ] -- Keeps failing to return items
-
-        print("Core 242. f_args = ")
-        rprint(f_args)
-        _G[end_function](f_args)
+          print("Core 249. f_args = ")
+          rprint(f_args)
+          _G[end_function](f_args)
+          LoopComposer.function_called = true
+        end
       else
         LoopComposer.set_next_loop()
       end
-    
+
     else
       ---- Do nothing since we have loop counts to go
     end
+
+    
   end
 
   LoopComposer.last_pattern = LoopComposer.current_pattern 
@@ -410,3 +437,5 @@ if a number it is the number of times to run the loop
     end
 
     return LoopComposer
+
+

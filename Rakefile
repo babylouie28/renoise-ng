@@ -17,6 +17,8 @@ tool_names = %w{
   Retempo
   SwapChop
   Alternator
+  RenderVersion
+  Mixtor
   LoopComposer
   Conscripter
   Configgy
@@ -247,7 +249,30 @@ namespace :package do
       zipit name, folder, input_filenames
     end
   end
-  
+
+   
+  desc "Package up RenderVersion"
+  task :render_version do
+    Dir.chdir'lua' do
+      name = "RenderVersion"
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
+ 
+ 
+ 
+  desc "Package up Mixtor"
+  task :mixtor do
+    Dir.chdir'lua' do
+      name = "Mixtor"
+      folder = "com.neurogami.#{name}.xrnx"
+      input_filenames = files folder
+      zipit name, folder, input_filenames
+    end
+  end
+
   desc "Package up SwapChop"
   task :swap_chop do
     Dir.chdir'lua' do

@@ -92,7 +92,7 @@ function load_handlers(osc_device)
     end
     print("        ADDED ROTATE HANDLERS")
   else
-    print("Cannot add roate handlers because have_rotator is false")
+    print("Cannot add rotate handlers because have_rotator is false")
   end
 end
 

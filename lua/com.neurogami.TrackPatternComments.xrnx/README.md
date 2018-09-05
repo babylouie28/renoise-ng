@@ -23,9 +23,9 @@ The code assumes one comment marker per track pattern.
 
 ## Known issues/quirks
 
-Nothing in place for deleting comments.  That will be added.  You can delete a comment marker but the comment remains in the data stored in the song comments.
+Nothing in place for fully deleting comments.  You can delete a comment marker but the comment remains in the data stored in the song comments.  
 
 You can cut and paste fx columns values, so the same comment marker can be in more than one place, and you can manage to get multiple comments into  a single track pattern. The code currently looks for the closest marker so you can exploit this, but there's no current way to just add more comment markers to a track pattern if one already exists.
 
-
+If you manually enter an `NGxx` fx that does not correspond to an existing comment you will confuse the code.  They only reliable way to add a new comment is to use the tool.
 

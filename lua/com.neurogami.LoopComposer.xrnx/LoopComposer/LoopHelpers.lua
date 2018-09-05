@@ -22,14 +22,15 @@ function rand_looping(targs)
   local cutoff = 50
 
   if(targs) then
+    print("rand_looping targs[1] = " , targs[1] ) 
     cutoff = targs[1] or cutoff 
     cutoff = tonumber(cutoff)
   end
 
   local r = math.random(1, 100)
-  print("----- rand_loop() ----", r)
+  print("----- rand_loop() r ----", r)
 
-  if r > cutoff then
+  if cutoff > r then
     print(" ************* Reset loop pointer to current loop *************** ")
     LoopComposer.current_loop = LoopComposer.current_loop - 1   
   end
@@ -62,5 +63,6 @@ function goto(targs)
 
   LoopComposer.set_next_loop(next_loop)
 end
+
 
 
