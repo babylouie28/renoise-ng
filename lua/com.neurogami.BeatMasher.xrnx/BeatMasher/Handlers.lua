@@ -44,6 +44,16 @@ handlers = {
   },
 
 
+  {
+    pattern = "/track/clone",
+    handler = function(track_number)
+      print("handle track/clone")
+      local mute_source_track = true
+       BeatMasher.clone_track(track_number, mute_source_track)
+
+    end 
+  },
+
 
   {
     pattern = "/song/save_version",

@@ -10,13 +10,13 @@ end
 
 function BeatMasher.set_status_polling(bool, interval)
   print("-------------- BeatMasher.set_status_polling(", bool, ") -  bool is type ",type(bool),"------------- ")
- if (bool == true) then
-      print("       bool == true      start the status poller!")
-   Status.start_status_poller(interval)
- else
-  print("  bool == false           STOP THE STATUS POLLER!")
-   Status.stop_status_poller()
- end
+  if (bool == true) then
+    print("       bool == true      start the status poller!")
+    Status.start_status_poller(interval)
+  else
+    print("  bool == false           STOP THE STATUS POLLER!")
+    Status.stop_status_poller()
+  end
 
 end
 
@@ -41,6 +41,59 @@ function BeatMasher.song_track_clear(track_number)
   end
 end
 
+function copy_device_chain(src_track, target_track)
+
+  --rprint (song.tracks[ sti ].available_devices)
+  local device_path
+
+  -- This seems to do OK to copy devices but not device settings
+  for dev = 1, #src_track.devices do
+    device_path = src_track:device( dev ).device_path
+    if ( dev > 1 ) then
+      target_track:insert_device_at( device_path, dev )
+    end
+
+    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
+    target_track.devices[ dev ].is_active = src_track.devices[ dev ].is_active
+    target_track.devices[ dev ].active_preset = src_track.devices[ dev ].active_preset
+    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
+    
+
+  -- This copies all params (it seems) but does not update the preset name displayed.
+  -- BUT DOES NOT WORK IF THE PRESET HAS BEEN ACTIVATED!
+   -- for ip = 1, #target_track.devices[ dev ].parameters do
+     -- target_track.devices[ dev ].parameters[ip] = src_track.devices[ dev ].parameters[ip]
+   -- end
+
+  end
+end
+
+function BeatMasher.clone_track(track_number, mute_source_track)
+  print("BeatMasher.clone_track", track_number)
+  local new_track_index = track_number+1
+  -- Indexing matchs lua and track display: starts at 1
+  -- This inserts at the given index, and the track that was there 
+  local new_track = renoise.song():insert_track_at(new_track_index ) 
+  local src_track = renoise.song():track(track_number) 
+  new_track.name = src_track.name .. "+"
+
+  -- Iterate over all patterns in 
+  for _p =1, #renoise.song().sequencer.pattern_sequence do
+    renoise.song().patterns[_p].tracks[new_track_index]:copy_from( renoise.song().patterns[_p].tracks[track_number])
+  end
+
+  -- expose the note columns:
+  new_track.visible_note_columns  = src_track.visible_note_columns
+
+  -- Also need to copy over devices 
+
+  copy_device_chain(src_track, new_track)
+
+
+  src_track:mute()
+
+end
+
 
 function BeatMasher.song_save_version()
   print("song_save_version is not ready") -- FIXME
@@ -51,14 +104,14 @@ function BeatMasher.song_load_by_id(id_number)
 end
 
 function BeatMasher.trigger_note(client_renoise, instrument, track, note,  velocity)
-      local OscMessage = renoise.Osc.Message
-      client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-        {tag="i", value=track}, {tag="i", value=instrument}, {tag="i", value=note}, {tag="i", value=velocity} 
-      }))        
-      sleep(1.5) 
-      client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-       {tag="i", value=track}, {tag="i", value=instrument}, {tag="i", value=note} 
-      } )  )
+  local OscMessage = renoise.Osc.Message
+  client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+    {tag="i", value=track}, {tag="i", value=instrument}, {tag="i", value=note}, {tag="i", value=velocity} 
+  }))        
+  sleep(1.5) 
+  client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+    {tag="i", value=track}, {tag="i", value=instrument}, {tag="i", value=note} 
+  } )  )
 
 end
 
@@ -67,91 +120,91 @@ end
 function BeatMasher.speak_bpm(client_renoise, track_index, instrument_index)
   print("speak_bpm") -- FIXME
 
-    local OscMessage = renoise.Osc.Message
-    local OscBundle  = renoise.Osc.Bundle
-    local bpm_int    = renoise.song().transport.bpm  
-    local bpm_string = tostring(bpm_int)
+  local OscMessage = renoise.Osc.Message
+  local OscBundle  = renoise.Osc.Bundle
+  local bpm_int    = renoise.song().transport.bpm  
+  local bpm_string = tostring(bpm_int)
 
-    --                   0    1    2   3    4    5   6   7   8   9 
-    local midi_notes = { 48, 49,  50,  51,  52,  53, 54, 55, 56, 57}
-    local d1, d2, d3
-    print("triggered BPM query ")
-    print(tostring(track_index))
-    print( ("Try to speak %s" ):format(bpm_string))
+  --                   0    1    2   3    4    5   6   7   8   9 
+  local midi_notes = { 48, 49,  50,  51,  52,  53, 54, 55, 56, 57}
+  local d1, d2, d3
+  print("triggered BPM query ")
+  print(tostring(track_index))
+  print( ("Try to speak %s" ):format(bpm_string))
 
-    -- /renoise_response/transport/bpm
+  -- /renoise_response/transport/bpm
 
-    if  bpm_int < 100  then 
-      print( ("Under 100: Split up  %s" ):format(bpm_string) )
-      d1,d2 = bpm_string:match('(%d)(%d)')
-      print( ("Speak %s %s, track %d, intr %s "):format(d1, d2, track_index, instrument_index) )
-      
-      client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-        {tag="i", value=instrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} 
-      }))        
+  if  bpm_int < 100  then 
+    print( ("Under 100: Split up  %s" ):format(bpm_string) )
+    d1,d2 = bpm_string:match('(%d)(%d)')
+    print( ("Speak %s %s, track %d, intr %s "):format(d1, d2, track_index, instrument_index) )
+
+    client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+      {tag="i", value=instrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} 
+    }))        
+    sleep(1)
+    client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+      {tag="i", value=instrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}  
+    } )  )
+
+    print("Now speak the second digit ,,,")
+
+    client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+      {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} 
+    }))
+    sleep(1)
+    client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+      {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  
+    }))
+
+  else
+    print( ("100 or greater: Split up  %s" ):format(bpm_string) )
+    d1,d2,d3 = bpm_string:match('(%d)(%d)(%d)')
+    print( ("Speak %s %s %s"):format(d1, d2, d3) )
+
+    client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
+      {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} }))        
       sleep(1)
       client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-        {tag="i", value=instrument_index}, {tag="i", value=track_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}  
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]} 
       } )  )
 
-      print("Now speak the second digit ,,,")
 
       client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
         {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} 
       }))
       sleep(1)
       client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}  
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]} 
       }))
 
-    else
-      print( ("100 or greater: Split up  %s" ):format(bpm_string) )
-      d1,d2,d3 = bpm_string:match('(%d)(%d)(%d)')
-      print( ("Speak %s %s %s"):format(d1, d2, d3) )
 
       client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d1)+1]}, {tag="i", value=125} }))        
-        sleep(1)
-        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]} 
-        } )  )
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}, {tag="i", value=125}
+      }))
+      sleep(1)
+      client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
+        {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}  
+      }))
 
+    end
 
-        client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]}, {tag="i", value=125} 
-        }))
-        sleep(1)
-        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d2)+1]} 
-        }))
+    --[[
 
+    TODO: Some of these handlers should be sending a reply
+    back to the client to provide status messages.
 
-        client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}, {tag="i", value=125}
-        }))
-        sleep(1)
-        client_renoise:send( OscMessage("/renoise/trigger/note_off", { 
-          {tag="i", value=track_index}, {tag="i", value=instrument_index}, {tag="i", value=midi_notes[tonumber(d3)+1]}  
-        }))
+    print("Send info OSC message")
+    client:send(
+    OscMessage("/info", { 
+      {tag="s", value=tostring(renoise.song().transport.bpm)} 
+    })
+    )
+    print("OSC message sent")
 
-      end
+    ]]--
 
---[[
-
-TODO: Some of these handlers should be sending a reply
-back to the client to provide status messages.
-
-      print("Send info OSC message")
-      client:send(
-      OscMessage("/info", { 
-        {tag="s", value=tostring(renoise.song().transport.bpm)} 
-      })
-      )
-      print("OSC message sent")
-  
-]]--
-
-end
+  end
 
 
 
