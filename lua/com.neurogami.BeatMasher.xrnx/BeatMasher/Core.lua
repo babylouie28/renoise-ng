@@ -99,8 +99,25 @@ function BeatMasher.clone_track(track_number, mute_source_track)
 
 end
 
+
+-- Whole track, or current pattern track?
 function BeatMasher.stripe_track(track_number, remove_every_n)
   print("BeatMasher.stripe_track( ", track_number , ", " , remove_every_n , ") " )
+  local track
+
+    -- Iterate over all patterns in 
+  for _p =1, #renoise.song().sequencer.pattern_sequence do
+    track = renoise.song().patterns[_p].tracks[track_number]
+    for _l = 1, #track.lines do
+      if (0 == _l % remove_every_n ) then  
+        track.lines[_l]:clear()
+      end
+    end
+  end
+
+
+-- renoise.song().patterns[].tracks[].lines[]:clear()
+  
 end
 
 function BeatMasher.song_save_version()
