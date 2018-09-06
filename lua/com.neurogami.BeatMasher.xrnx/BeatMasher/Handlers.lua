@@ -7,7 +7,7 @@
 
 -- Some example handlers.  They invoke methods defined in Core.lua
 handlers = { 
-{
+  {
     pattern = "/set_status_polling",
     handler = function(bool, interval)
       interval = interval or 500 
@@ -30,7 +30,7 @@ handlers = {
     end 
   },
 
-{
+  {
     pattern = "/track/select",
     handler = function(track_number)
       BeatMasher.track_select(track_number)
@@ -45,15 +45,29 @@ handlers = {
 
 
   {
+    --[[
+    To consider: Pass a value for the cloned-track name pre/post-fix.
+    Code clones "SomeTrack" to "SomeTrack+"
+    If we are cntrolling this postfix ('+') then we can have a function
+    to rollback clones (or just delete them and unmute the original.
+
+    --]]
     pattern = "/track/clone",
     handler = function(track_number)
       print("handle track/clone")
       local mute_source_track = true
-       BeatMasher.clone_track(track_number, mute_source_track)
+      BeatMasher.clone_track(track_number, mute_source_track)
 
     end 
   },
 
+  {
+    pattern = "/track/stripe",
+    handler = function(track_number, remove_every_n)
+      print("handle track/mutate")
+      BeatMasher.stripe_track(track_number, remove_every_n)
+    end 
+  },
 
   {
     pattern = "/song/save_version",
@@ -69,7 +83,7 @@ handlers = {
     end 
   },
 
-    {
+  {
     pattern = "/trigger/note",
     handler = function(instrument, track, note,  velocity)
       BeatMasher.trigger_note(RENOISE_OSC, instrument, track, note,  velocity)

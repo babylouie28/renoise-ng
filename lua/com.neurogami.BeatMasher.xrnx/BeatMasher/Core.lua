@@ -1,4 +1,35 @@
 -- Core.lua 
+
+
+function copy_device_chain(src_track, target_track)
+
+  --rprint (song.tracks[ sti ].available_devices)
+  local device_path
+
+  -- This seems to do OK to copy devices but not device settings
+  for dev = 1, #src_track.devices do
+    device_path = src_track:device( dev ).device_path
+    if ( dev > 1 ) then
+      target_track:insert_device_at( device_path, dev )
+    end
+
+    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
+    target_track.devices[ dev ].is_active = src_track.devices[ dev ].is_active
+    target_track.devices[ dev ].active_preset = src_track.devices[ dev ].active_preset
+    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
+    
+
+  -- This copies all params (it seems) but does not update the preset name displayed.
+  -- BUT DOES NOT WORK IF THE PRESET HAS BEEN ACTIVATED!
+   -- for ip = 1, #target_track.devices[ dev ].parameters do
+     -- target_track.devices[ dev ].parameters[ip] = src_track.devices[ dev ].parameters[ip]
+   -- end
+   -- TURNS OUT: The copying of active_preset_data does this. :)
+
+  end
+end
+
+
 BeatMasher = {}
 
 function BeatMasher.song_reset()
@@ -41,32 +72,6 @@ function BeatMasher.song_track_clear(track_number)
   end
 end
 
-function copy_device_chain(src_track, target_track)
-
-  --rprint (song.tracks[ sti ].available_devices)
-  local device_path
-
-  -- This seems to do OK to copy devices but not device settings
-  for dev = 1, #src_track.devices do
-    device_path = src_track:device( dev ).device_path
-    if ( dev > 1 ) then
-      target_track:insert_device_at( device_path, dev )
-    end
-
-    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
-    target_track.devices[ dev ].is_active = src_track.devices[ dev ].is_active
-    target_track.devices[ dev ].active_preset = src_track.devices[ dev ].active_preset
-    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
-    
-
-  -- This copies all params (it seems) but does not update the preset name displayed.
-  -- BUT DOES NOT WORK IF THE PRESET HAS BEEN ACTIVATED!
-   -- for ip = 1, #target_track.devices[ dev ].parameters do
-     -- target_track.devices[ dev ].parameters[ip] = src_track.devices[ dev ].parameters[ip]
-   -- end
-
-  end
-end
 
 function BeatMasher.clone_track(track_number, mute_source_track)
   print("BeatMasher.clone_track", track_number)
@@ -94,6 +99,9 @@ function BeatMasher.clone_track(track_number, mute_source_track)
 
 end
 
+function BeatMasher.stripe_track(track_number, remove_every_n)
+  print("BeatMasher.stripe_track( ", track_number , ", " , remove_every_n , ") " )
+end
 
 function BeatMasher.song_save_version()
   print("song_save_version is not ready") -- FIXME

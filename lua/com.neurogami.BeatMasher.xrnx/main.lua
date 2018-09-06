@@ -50,4 +50,12 @@ renoise.tool():add_menu_entry {
   invoke = create_osc_server
 }
 
+
+------- keys --------------------------
+renoise.tool():add_keybinding {
+  name = "Global:Tools:Neurogami " .. TOOL_NAME .. " Start the OSC server ..",
+  invoke = create_osc_server
+}  
+
+
 require (TOOL_NAME .. '/Handlers')
