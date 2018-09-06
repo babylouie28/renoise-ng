@@ -97,7 +97,6 @@ function BeatMasher.clone_track(track_number, mute_source_track)
   local new_track = renoise.song():insert_track_at(new_track_index ) 
   local src_track = renoise.song():track(track_number) 
 
-  new_track.name = src_track.name
   
   
   -- Iterate over all patterns in 
@@ -112,7 +111,8 @@ function BeatMasher.clone_track(track_number, mute_source_track)
 
   copy_device_chain(src_track, new_track)
 
-  src_track.name = src_track.name + "+"
+  new_track.name = src_track.name
+  src_track.name = new_track.name .. "+"
   new_track:mute()
 
 end

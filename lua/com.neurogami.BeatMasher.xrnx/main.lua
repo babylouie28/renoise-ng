@@ -11,6 +11,11 @@ require (TOOL_NAME .. '/Utilities')
 require (TOOL_NAME .. '/Status')
 require (TOOL_NAME .. '/Rotator')
 
+-- Reload the script whendever this file is saved. 
+_AUTO_RELOAD_DEBUG = true
+
+
+
 attempt_rotate_setup()
 
 require (TOOL_NAME .. '/Core')
