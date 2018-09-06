@@ -73,15 +73,33 @@ function BeatMasher.song_track_clear(track_number)
 end
 
 
+function master_track_index()
+  local master_idx = 0
+  for i=1, #renoise.song().tracks do
+    if renoise.song().tracks[i].type == renoise.Track.TRACK_TYPE_MASTER then
+      master_idx = i
+    end
+  end
+  return master_idx
+end
+
+-- TODO: Track should go at the end of the grid (i.e. next to the master track)
+-- and serve as a backup rather than the target of any mutations.
+-- This way you can clone a track off, fuck with the original,
+-- and then (if you want) restore the former content.
+-- A restore function looks for any <trackname>+[+++] track and
+-- works backwards.  Or something.
+--
 function BeatMasher.clone_track(track_number, mute_source_track)
   print("BeatMasher.clone_track", track_number)
-  local new_track_index = track_number+1
-  -- Indexing matchs lua and track display: starts at 1
-  -- This inserts at the given index, and the track that was there 
+  local new_track_index = master_track_index()
+
   local new_track = renoise.song():insert_track_at(new_track_index ) 
   local src_track = renoise.song():track(track_number) 
-  new_track.name = src_track.name .. "+"
 
+  new_track.name = src_track.name
+  
+  
   -- Iterate over all patterns in 
   for _p =1, #renoise.song().sequencer.pattern_sequence do
     renoise.song().patterns[_p].tracks[new_track_index]:copy_from( renoise.song().patterns[_p].tracks[track_number])
@@ -94,8 +112,8 @@ function BeatMasher.clone_track(track_number, mute_source_track)
 
   copy_device_chain(src_track, new_track)
 
-
-  src_track:mute()
+  src_track.name = src_track.name + "+"
+  new_track:mute()
 
 end
 
