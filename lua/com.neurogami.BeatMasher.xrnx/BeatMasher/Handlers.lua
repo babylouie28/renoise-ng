@@ -61,10 +61,21 @@ handlers = {
     end 
   },
 
+
+  
+  {
+    pattern = "/track/stripe_current_pattern_track",
+    handler = function(remove_every_n)
+      print("handle stripe_current_pattern_track")
+      BeatMasher.stripe_current_pattern_track(remove_every_n)
+    end 
+  },
+
+  
   {
     pattern = "/track/stripe",
     handler = function(track_number, remove_every_n)
-      print("handle track/mutate")
+      print("handle /track/stripe")
       BeatMasher.stripe_track(track_number, remove_every_n)
     end 
   },
