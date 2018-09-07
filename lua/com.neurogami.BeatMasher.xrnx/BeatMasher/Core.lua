@@ -1,5 +1,7 @@
 -- Core.lua 
 
+-- helper stuff. 
+-- TODO: Consider moving this to Utilities 
 
 function copy_device_chain(src_track, target_track)
 
@@ -18,14 +20,6 @@ function copy_device_chain(src_track, target_track)
     target_track.devices[ dev ].active_preset = src_track.devices[ dev ].active_preset
     target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
     
-
-  -- This copies all params (it seems) but does not update the preset name displayed.
-  -- BUT DOES NOT WORK IF THE PRESET HAS BEEN ACTIVATED!
-   -- for ip = 1, #target_track.devices[ dev ].parameters do
-     -- target_track.devices[ dev ].parameters[ip] = src_track.devices[ dev ].parameters[ip]
-   -- end
-   -- TURNS OUT: The copying of active_preset_data does this. :)
-
   end
 end
 
