@@ -81,6 +81,14 @@ handlers = {
   },
 
   {
+    pattern = "/track/restore",
+    handler = function(track_number)
+      print("handle /track/restore")
+      BeatMasher.restore_track(track_number)
+    end 
+  },
+
+  {
     pattern = "/song/save_version",
     handler = function()
       BeatMasher.song_save_version()

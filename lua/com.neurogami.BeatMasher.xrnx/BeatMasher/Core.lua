@@ -26,6 +26,8 @@ end
 
 BeatMasher = {}
 
+BeatMasher.CLONE_SUFFIX = "+"
+
 function BeatMasher.song_reset()
   print("song_reset") 
   for i=0,300 do
@@ -77,6 +79,39 @@ function master_track_index()
   return master_idx
 end
 
+
+function BeatMasher.restore_track(track_number)
+
+  local target_track = nil
+
+  -- get name
+  local target_name = renoise.song().tracks[track_number].name
+  
+  if BeatMasher.CLONE_SUFFIX ~= string.sub(target_name, -1) then
+     print("target_name of '" .. target_name .. "' does not contain '" .. BeatMasher.CLONE_SUFFIX .. "' so cannot revert.")
+    return
+  end
+
+  local version_name = target_name:sub(1, -2)
+  print("Go find earlier version named '" .. version_name  ..   "'")
+  
+  -- get earlier version name
+
+  local version_track = nil
+  
+  for i=1, #renoise.song().tracks do
+    if renoise.song().tracks[i].name == version_name  then
+      version_track = renoise.song().tracks[i]
+    end
+  end
+
+  if nil == version_track then
+    print("No track named '" .. version_name .. "', exiting.")
+  end
+  
+end
+
+
 -- TODO: Track should go at the end of the grid (i.e. next to the master track)
 -- and serve as a backup rather than the target of any mutations.
 -- This way you can clone a track off, fuck with the original,
@@ -106,7 +141,7 @@ function BeatMasher.clone_track(track_number, mute_source_track)
   copy_device_chain(src_track, new_track)
 
   new_track.name = src_track.name
-  src_track.name = new_track.name .. "+"
+  src_track.name = new_track.name .. BeatMasher.CLONE_SUFFIX
   new_track:mute()
 
 end
