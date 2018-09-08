@@ -3,26 +3,6 @@
 -- helper stuff. 
 -- TODO: Consider moving this to Utilities 
 
-function copy_device_chain(src_track, target_track)
-
-  --rprint (song.tracks[ sti ].available_devices)
-  local device_path
-
-  -- This seems to do OK to copy devices but not device settings
-  for dev = 1, #src_track.devices do
-    device_path = src_track:device( dev ).device_path
-    if ( dev > 1 ) then
-      target_track:insert_device_at( device_path, dev )
-    end
-
-    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
-    target_track.devices[ dev ].is_active = src_track.devices[ dev ].is_active
-    target_track.devices[ dev ].active_preset = src_track.devices[ dev ].active_preset
-    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
-    
-  end
-end
-
 
 BeatMasher = {}
 
@@ -126,15 +106,18 @@ end
 -- works backwards.  Or something.
 --
 function BeatMasher.clone_track(track_number, mute_source_track)
+
+  
   print("BeatMasher.clone_track", track_number)
   local new_track_index = master_track_index()
 
+  U.clone_track(track_number, new_track_index)
+--[[
   local new_track = renoise.song():insert_track_at(new_track_index ) 
   local src_track = renoise.song():track(track_number) 
 
   
-  
-  -- Iterate over all patterns in 
+  -- Iterate over all patterns in song
   for _p =1, #renoise.song().sequencer.pattern_sequence do
     renoise.song().patterns[_p].tracks[new_track_index]:copy_from( renoise.song().patterns[_p].tracks[track_number])
   end
@@ -144,8 +127,13 @@ function BeatMasher.clone_track(track_number, mute_source_track)
 
   -- Also need to copy over devices 
 
-  copy_device_chain(src_track, new_track)
+  U.copy_device_chain(src_track, new_track)
+]]
 
+  local src_track = renoise.song():track(track_number) 
+  local new_track = renoise.song():track(new_track_index) 
+
+  new_track.name = src_track.name
   new_track.name = src_track.name
   src_track.name = new_track.name .. BeatMasher.CLONE_SUFFIX
   new_track:mute()

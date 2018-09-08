@@ -1,4 +1,6 @@
 
+
+
 --  String stuff
 --
 
@@ -93,6 +95,7 @@ PATH_SEP = "/"
 if (os.platform() == "WINDOWS") then
   PATH_SEP = "\\"
 end
+
 
 
 
@@ -269,5 +272,51 @@ function U.str_table_to_int(t)
 end
 
 
+-- Renoise stuff
+--
+
+-- *********************************************************************
+function U.copy_device_chain(src_track, target_track)
+
+  --rprint (song.tracks[ sti ].available_devices)
+  local device_path
+
+  -- This seems to do OK to copy devices but not device settings
+  for dev = 1, #src_track.devices do
+    device_path = src_track:device( dev ).device_path
+    if ( dev > 1 ) then
+      target_track:insert_device_at( device_path, dev )
+    end
+
+    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
+    target_track.devices[ dev ].is_active = src_track.devices[ dev ].is_active
+    target_track.devices[ dev ].active_preset = src_track.devices[ dev ].active_preset
+    target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
+    
+  end
+end
+
+
+-- *********************************************************************
+function U.clone_track(track_number, new_track_index)
+
+  local new_track = renoise.song():insert_track_at(new_track_index ) 
+  local src_track = renoise.song():track(track_number) 
+
+  -- Iterate over all patterns in song
+  for _p =1, #renoise.song().sequencer.pattern_sequence do
+    renoise.song().patterns[_p].tracks[new_track_index]:copy_from( renoise.song().patterns[_p].tracks[track_number])
+  end
+
+  -- expose the note columns:
+  new_track.visible_note_columns  = src_track.visible_note_columns
+
+  -- Also need to copy over devices 
+  U.copy_device_chain(src_track, new_track)
+  new_track.name = src_track.name
+
+end
+
+-- **********************************************************************
 
 return U

@@ -154,10 +154,10 @@ def files tool_folder, exlude_patterns = []
   _
 end
 
-namespace :package do
+namespace :package  do
 
   desc "Package up SharedCode"
-  task :shared_code do
+  task :shared_code => [:copy_utils ] do
     Dir.chdir'lua' do
       name = 'SharedCode'
       folder = "com.neurogami.#{name}.xrnx" 
@@ -167,7 +167,7 @@ namespace :package do
   end
 
   desc "Package up RandyNoteColumns"
-  task :randy_note_columns do
+  task :randy_note_columns => [:copy_utils] do
     Dir.chdir'lua' do
       name = 'RandyNoteColumns'
       folder = "com.neurogami.#{name}.xrnx"
@@ -284,7 +284,7 @@ namespace :package do
 
 
     desc "Package up BeatMasher"
-  task :beat_masher do
+  task :beat_masher  => [:copy_utils] do
     Dir.chdir'lua' do
       name = "BeatMasher"
       folder = "com.neurogami.#{name}.xrnx"

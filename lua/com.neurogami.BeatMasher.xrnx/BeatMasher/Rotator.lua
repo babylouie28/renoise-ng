@@ -61,6 +61,35 @@ rotate_handlers = {
       rotate(lines, RANGE_TRACK_IN_PATTERN, true)
     end 
   }, 
+
+  {
+    pattern = "/rotate/pattern/striped",
+    handler = function(track_num, lines, mod_num)
+
+      -- need a way to get the current pattern or something so that
+      -- this works on the right stuff
+      print("Rotate pattern striped", lines, " lines" )
+
+      --      local selected_track_index = song().selected_track_index
+      local song = renoise.song
+      
+      if (track_num > -1 ) then
+        song().selected_track_index = track_num
+        local selected_track_index = song().selected_track_index
+        print( "ROTATE: selected_track_index is now " , selected_track_index )
+      end
+
+      -- This is more complex
+      -- Code needs to 
+      --   clone the source pattern-track someplace (end of song I guess
+      --   rotate that cloned PT the given number of lines
+      --   Then copy over just the lines that have changed to the original
+      --   Then delete the cloned PT
+      
+      -- rotate(lines, RANGE_TRACK_IN_PATTERN, true)
+    end 
+  }, 
+
   { 
     pattern = "/rotate/current",
     handler = function(lines)
