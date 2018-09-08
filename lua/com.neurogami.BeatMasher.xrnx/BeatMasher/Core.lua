@@ -97,17 +97,23 @@ function BeatMasher.restore_track(track_number)
   
   -- get earlier version name
 
-  local version_track = nil
+  local version_track_index = 0
   
   for i=1, #renoise.song().tracks do
     if renoise.song().tracks[i].name == version_name  then
-      version_track = renoise.song().tracks[i]
+      version_track_index = i
     end
   end
 
-  if nil == version_track then
+  if 0 == version_track_index then
     print("No track named '" .. version_name .. "', exiting.")
+    return
   end
+  
+   renoise.song():swap_tracks_at(track_number, version_track_index)
+
+  renoise.song().tracks[track_number]:unmute()
+  renoise.song():delete_track_at(version_track_index)
   
 end
 
