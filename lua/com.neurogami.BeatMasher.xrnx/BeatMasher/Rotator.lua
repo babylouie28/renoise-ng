@@ -82,15 +82,21 @@ rotate_handlers = {
       -- Code needs to 
       --   clone the source pattern-track someplace (end of song I guess
 
-      local cloned_pattern_track = U.clone_pattern_track_to_end(selected_pattern_index, selected_track_index)
+      local new_pattern_index = U.clone_pattern_track_to_end(selected_pattern_index, selected_track_index)
 
-      --   rotate that cloned PT the given number of lines
-      --  first set that new PT as the current focus
-      ---- rotate(lines, RANGE_TRACK_IN_PATTERN, true)
+      -- This should set the song pointer to that new pattern
+      song().selected_sequence_index = new_pattern_index
+
+      rotate(lines, RANGE_TRACK_IN_PATTERN, true)
       --   Then copy over just the lines that have changed to the original
+      --   TODO
+      
       --   Then delete the cloned PT
+      song().sequencer:delete_sequence_at(#song().sequencer.pattern_sequence)
 
-      -- rotate(lines, RANGE_TRACK_IN_PATTERN, true)
+      -- and go back to the original sequence
+      song().selected_sequence_index = selected_pattern_index   
+
     end 
   }, 
 
@@ -98,7 +104,7 @@ rotate_handlers = {
     pattern = "/rotate/current",
     handler = function(lines)
 
-      print("Rotate current track-pattern",lines, " lines")
+      print("Rotate current track-pattern", lines, " lines")
       local song = renoise.song
       local selected_track_index = song().selected_track_index
       print( "ROTATE: selected_track_index is now " , selected_track_index, " lines = " .. lines )

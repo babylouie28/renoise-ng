@@ -314,19 +314,11 @@ function U.clone_pattern_track_to_end(src_pattern_index, src_track_index)
   print( "U.clone_pattern_track_to_end(" .. src_pattern_index .. ", "  ..  src_track_index .. ")" )
 
   local src_pattern_track   = renoise.song().patterns[src_pattern_index].tracks[src_track_index]
-
-
-  -- Hack: Copy the entire pattern.
   local last_seq_pos = #renoise.song().sequencer.pattern_sequence + 1
-
   local new_pattern_index = renoise.song().sequencer:insert_new_pattern_at(last_seq_pos)  --  -> [number, new pattern index]
-
   renoise.song().patterns[new_pattern_index]:copy_from(renoise.song().patterns[src_pattern_index])
 
-
---  local new_pattern_track = renoise.song().patterns[new_pattern_index].tracks[src_track_index]
   local mti = U.master_track_index()
-
 
   for ti=1, mti-1 do
     if ti ~= src_track_index then
@@ -334,7 +326,7 @@ function U.clone_pattern_track_to_end(src_pattern_index, src_track_index)
     end
   end
 
-  return(new_pattern_track)
+  return(new_pattern_index)
 end
 
 
