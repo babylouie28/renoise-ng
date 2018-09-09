@@ -30,7 +30,7 @@ function string.trim(s)
   if s == nil then
     return "" -- Is this a good idea?  TODO Think if silently converting nil to an empty string is a Good Thing
   else
-   return (s:gsub("^%s*(.-)%s*$", "%1"))
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
   end
 end
 
@@ -44,8 +44,8 @@ end
 
 function string:words(str)
   if str == nil then
-   print("string:words(str) has been given a nil value.")
-   return nil
+    print("string:words(str) has been given a nil value.")
+    return nil
   end
 
   print(str)
@@ -62,8 +62,8 @@ end
 
 function string:segs(str)
   if str == nil then
-   print("string:segments(str) has been given a nil value.")
-   return nil
+    print("string:segments(str) has been given a nil value.")
+    return nil
   end
 
   print(str)
@@ -225,7 +225,7 @@ end
 
 
 function U.is_empty(s)
-   return s == nil or s == ''
+  return s == nil or s == ''
 end
 
 
@@ -236,7 +236,7 @@ function U.may_overwrite(path)
     local buttons = {"Overwrite", "Keep existing file"}
     local choice = renoise.app():show_prompt("File exists", "The file\n\n " ..path .. " \n\n"
     .. "already exists. Overwrite existing file?", buttons)
-    
+
     overwrite = (choice~=buttons[2])
   end  
   return overwrite
@@ -275,6 +275,19 @@ end
 -- Renoise stuff
 --
 
+
+
+function U.master_track_index()
+  local master_idx = 0
+  for i=1, #renoise.song().tracks do
+    if renoise.song().tracks[i].type == renoise.Track.TRACK_TYPE_MASTER then
+      master_idx = i
+    end
+  end
+  return master_idx
+end
+
+
 -- *********************************************************************
 function U.copy_device_chain(src_track, target_track)
 
@@ -292,9 +305,40 @@ function U.copy_device_chain(src_track, target_track)
     target_track.devices[ dev ].is_active = src_track.devices[ dev ].is_active
     target_track.devices[ dev ].active_preset = src_track.devices[ dev ].active_preset
     target_track.devices[ dev ].active_preset_data = src_track.devices[ dev ].active_preset_data
-    
+
   end
 end
+
+-- *********************************************************************
+function U.clone_pattern_track_to_end(src_pattern_index, src_track_index)
+  print( "U.clone_pattern_track_to_end(" .. src_pattern_index .. ", "  ..  src_track_index .. ")" )
+
+  local src_pattern_track   = renoise.song().patterns[src_pattern_index].tracks[src_track_index]
+
+
+  -- Hack: Copy the entire pattern.
+  local last_seq_pos = #renoise.song().sequencer.pattern_sequence + 1
+
+  local new_pattern_index = renoise.song().sequencer:insert_new_pattern_at(last_seq_pos)  --  -> [number, new pattern index]
+
+  renoise.song().patterns[new_pattern_index]:copy_from(renoise.song().patterns[src_pattern_index])
+--[[
+
+--  local new_pattern_track = renoise.song().patterns[new_pattern_index].tracks[src_track_index]
+  local mti = U.master_track_index()
+  ]]
+
+  --[[
+  for ti=1, mti-1 do
+  
+    if ti ~= src_track_index then
+      renoise.song().patterns[new_pattern_index].tracks[ti]:clear()
+    end
+  end
+  ]]
+  --return(new_pattern_track)
+end
+
 
 
 -- *********************************************************************

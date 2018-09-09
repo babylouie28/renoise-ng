@@ -49,17 +49,6 @@ function BeatMasher.song_track_clear(track_number)
 end
 
 
-function master_track_index()
-  local master_idx = 0
-  for i=1, #renoise.song().tracks do
-    if renoise.song().tracks[i].type == renoise.Track.TRACK_TYPE_MASTER then
-      master_idx = i
-    end
-  end
-  return master_idx
-end
-
-
 function BeatMasher.restore_track(track_number)
 
   local target_track = nil
@@ -109,7 +98,7 @@ function BeatMasher.clone_track(track_number, mute_source_track)
 
   
   print("BeatMasher.clone_track", track_number)
-  local new_track_index = master_track_index()
+  local new_track_index = U.master_track_index()
 
   U.clone_track(track_number, new_track_index)
 --[[
