@@ -177,7 +177,7 @@ namespace :package  do
   end
 
   desc "Package up OscJumper"
-  task :osc_jumper do
+  task :osc_jumper  => [:copy_utils ] do
     Dir.chdir'lua' do
       name = 'OscJumper'
       folder = "com.neurogami.#{name}.xrnx"
@@ -188,7 +188,7 @@ namespace :package  do
   end
 
   desc "Package up NewFromTemplate"
-  task :new_from_template do
+  task :new_from_template => [:copy_utils ] do
     Dir.chdir'lua' do
       name = 'NewFromTemplate'
       folder = "com.neurogami.#{name}.xrnx"
@@ -199,7 +199,7 @@ namespace :package  do
 
 
   desc "Package up MidiMapper"
-  task :midi_mapping_demo do
+  task :midi_mapping_demo => [:copy_utils ] do
     Dir.chdir'lua' do
       name = 'MidiMappingDemo'
       folder = "com.neurogami.#{name}.xrnx"
@@ -209,7 +209,7 @@ namespace :package  do
   end
 
   desc "Package up RawMidi"
-  task :raw_midi2 do
+  task :raw_midi2 => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "RawMidi2"
       folder = "com.neurogami.#{name}.xrnx"
@@ -219,7 +219,7 @@ namespace :package  do
   end
 
   desc "Package up Configgy"
-  task :configgy do
+  task :configgy => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "Configgy"
       folder = "com.neurogami.#{name}.xrnx"
@@ -229,7 +229,7 @@ namespace :package  do
   end
 
   desc "Package up LoopComposer"
-  task :loop_composer do
+  task :loop_composer => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "LoopComposer"
       folder = "com.neurogami.#{name}.xrnx"
@@ -240,7 +240,7 @@ namespace :package  do
 
  
   desc "Package up Alternator"
-  task :alternator do
+  task :alternator => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "Alternator"
       folder = "com.neurogami.#{name}.xrnx"
@@ -251,7 +251,7 @@ namespace :package  do
 
    
   desc "Package up RenderVersion"
-  task :render_version do
+  task :render_version => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "RenderVersion"
       folder = "com.neurogami.#{name}.xrnx"
@@ -261,7 +261,7 @@ namespace :package  do
   end
 
   desc "Package up SwapChop"
-  task :swap_chop do
+  task :swap_chop => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "SwapChop"
       folder = "com.neurogami.#{name}.xrnx"
@@ -271,7 +271,7 @@ namespace :package  do
   end
 
     desc "Package up Conscripter"
-  task :conscripter do
+  task :conscripter => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "Conscripter"
       folder = "com.neurogami.#{name}.xrnx"
@@ -294,7 +294,7 @@ namespace :package  do
   end
 
   desc "Package up MisterMaster"
-  task :mister_master do
+  task :mister_master => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "MisterMaster"
       folder = "com.neurogami.#{name}.xrnx"
@@ -304,7 +304,7 @@ namespace :package  do
   end
 
   desc "Package up Generative"
-  task :generative do
+  task :generative => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "Generative"
       folder = "com.neurogami.#{name}.xrnx"
@@ -315,7 +315,7 @@ namespace :package  do
 
 
   desc "Package up TrackPatternComments"
-  task :track_pattern_comments do
+  task :track_pattern_comments => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "TrackPatternComments"
       folder = "com.neurogami.#{name}.xrnx"
@@ -326,7 +326,7 @@ namespace :package  do
 
   
   desc "Package up Retempo"
-  task :retempo do
+  task :retempo => [:copy_utils ] do
     Dir.chdir'lua' do
       name = "Retempo"
       folder = "com.neurogami.#{name}.xrnx"
