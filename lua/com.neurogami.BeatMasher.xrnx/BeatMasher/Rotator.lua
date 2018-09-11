@@ -24,6 +24,23 @@ function rotate_setup()
 end
 
 
+-- num pattern lines, mod number for selection, n is by who may lines we rotated
+function find_mod_copy_start_line( num_pattern_lines, mod, n)
+  local lowest = 100
+  local _t = 100
+  -- This assumes that "every n lines" never includes the first line.
+  for i=mod, num_pattern_lines, mod do
+    print("Look at " .. i .. " + " .. n .. " % " .. num_pattern_lines )
+    _t = (i+n) % num_pattern_lines 
+    if _t < lowest then
+      lowest = _t
+    end
+  end
+  -- cannot return zero, so what does that mean?
+  return(lowest)
+end
+
+
 function attempt_rotate_setup()
 
   local res, err = pcall(rotate_setup)
@@ -68,7 +85,7 @@ rotate_handlers = {
 
       -- need a way to get the current pattern or something so that
       -- this works on the right stuff
-      print("Rotate pattern striped(selected_track_index=", selected_track_index, " lines=", lines )
+      print("Rotate pattern striped(selected_track_index=" .. selected_track_index .. " lines=" .. lines .. "; mod_num=" .. mod_num)
 
       local song = renoise.song
 
@@ -90,7 +107,32 @@ rotate_handlers = {
       rotate(lines, RANGE_TRACK_IN_PATTERN, true)
       --   Then copy over just the lines that have changed to the original
       --   TODO
+      --   This means: 
+      --   In the original PT we clear the lines va mod_num
+      song().selected_sequence_index = selected_pattern_index   
+
+
+      local num_pattern_lines = #renoise.song().patterns[selected_pattern_index].tracks[selected_track_index].lines
+
+      print( "num_pattern_lines = " .. num_pattern_lines .. "; mod_num = " ..mod_num)
+
+      for i=1, num_pattern_lines, mod_num do
+        print("Clear source line " .. i )
+        song().patterns[selected_pattern_index].tracks[selected_track_index]:line(i):clear()
+      end
+
+      --   Then, in the rotated copy, we find the starting line for altered mod_num lines 
+
       
+      local sline = find_mod_copy_start_line( num_pattern_lines, mod_num, lines)
+
+      -- copy just the altered lines (i.e. every mod_num line from the starting line
+      local temp_patt = song().patterns[new_pattern_index].tracks[selected_track_index]
+      for i=sline,num_pattern_lines,mod_num do 
+        print("Copy over line " .. i .. "; " , temp_patt:line(i) )
+       song().patterns[selected_pattern_index].tracks[selected_track_index]:line(i):copy_from(  temp_patt:line(i) )
+      end
+
       --   Then delete the cloned PT
       song().sequencer:delete_sequence_at(#song().sequencer.pattern_sequence)
 
