@@ -284,8 +284,8 @@ function OscClient:__init(osc_host,osc_port)
   print( TOOL_NAME, " - 284")
 
   if (socket_error) then 
-    print( TOOL_NAME, " - 287" .. socket_error)
-    renoise.app():show_warning("Warning: ", TOOL_NAME, " failed to start the internal OSC client")
+    print( TOOL_NAME, " - 287 " .. socket_error)
+    renoise.app():show_error("Error: " .. TOOL_NAME .. " failed to start the internal OSC client")
     self._connection = nil
   else
     self._connection = client

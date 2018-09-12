@@ -95,9 +95,7 @@ rotate_handlers = {
       local src_pattern_track   = renoise.song().patterns[selected_pattern_index].tracks[selected_track_index]
 
 
-      -- This is more complex
-      -- Code needs to 
-      --   clone the source pattern-track someplace (end of song I guess
+      --   clone the source pattern-track someplace (end of song)
 
       local new_pattern_index = U.clone_pattern_track_to_end(selected_pattern_index, selected_track_index)
 
@@ -109,14 +107,15 @@ rotate_handlers = {
       --   TODO
       --   This means: 
       --   In the original PT we clear the lines va mod_num
-      song().selected_sequence_index = selected_pattern_index   
 
+      
+      song().selected_sequence_index = selected_pattern_index   
 
       local num_pattern_lines = #renoise.song().patterns[selected_pattern_index].tracks[selected_track_index].lines
 
       print( "num_pattern_lines = " .. num_pattern_lines .. "; mod_num = " ..mod_num)
 
-      for i=1, num_pattern_lines, mod_num do
+      for i=mod_num, num_pattern_lines, mod_num do
         print("Clear source line " .. i )
         song().patterns[selected_pattern_index].tracks[selected_track_index]:line(i):clear()
       end
@@ -130,7 +129,7 @@ rotate_handlers = {
       local temp_patt = song().patterns[new_pattern_index].tracks[selected_track_index]
       for i=sline,num_pattern_lines,mod_num do 
         print("Copy over line " .. i .. "; " , temp_patt:line(i) )
-       song().patterns[selected_pattern_index].tracks[selected_track_index]:line(i):copy_from(  temp_patt:line(i) )
+        song().patterns[selected_pattern_index].tracks[selected_track_index]:line(i):copy_from(  temp_patt:line(i) )
       end
 
       --   Then delete the cloned PT
