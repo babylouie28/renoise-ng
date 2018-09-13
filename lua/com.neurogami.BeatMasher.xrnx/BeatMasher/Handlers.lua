@@ -61,8 +61,6 @@ handlers = {
     end 
   },
 
-
-  
   {
     pattern = "/track/stripe_current_pattern_track",
     handler = function(remove_every_n)
@@ -70,7 +68,6 @@ handlers = {
       BeatMasher.stripe_current_pattern_track(remove_every_n)
     end 
   },
-
   
   {
     pattern = "/track/stripe",
@@ -81,24 +78,18 @@ handlers = {
   },
 
   {
+    pattern = "/track/swap_lines_current_pattern",
+    handler = function(selected_track_index, mod_num, line_gap)
+      print("handle /track/swap_lines_current_pattern")
+      BeatMasher.swap_lines_pattern_track(selected_track_index, mod_num, line_gap)
+    end 
+  },
+
+  {
     pattern = "/track/restore",
     handler = function(track_number)
       print("handle /track/restore")
       BeatMasher.restore_track(track_number)
-    end 
-  },
-
-  {
-    pattern = "/song/save_version",
-    handler = function()
-      BeatMasher.song_save_version()
-    end 
-  },
-
-  {
-    pattern = "/song/load_by_id",
-    handler = function(id_number)
-      BeatMasher.song_load_by_id(id_number)
     end 
   },
 

@@ -1,13 +1,11 @@
 -- Core.lua 
 
--- helper stuff. 
--- TODO: Consider moving this to Utilities 
-
 
 BeatMasher = {}
 
 BeatMasher.CLONE_SUFFIX = "+"
 
+-- **********************************************************************************
 function BeatMasher.song_reset()
   print("song_reset") 
   for i=0,300 do
@@ -15,6 +13,7 @@ function BeatMasher.song_reset()
   end
 end
 
+-- **********************************************************************************
 function BeatMasher.set_status_polling(bool, interval)
   print("-------------- BeatMasher.set_status_polling(", bool, ") -  bool is type ",type(bool),"------------- ")
   if (bool == true) then
@@ -28,18 +27,21 @@ function BeatMasher.set_status_polling(bool, interval)
 end
 
 
+-- **********************************************************************************
 function BeatMasher.song_undo()
   print("song_undo") 
   renoise.song():undo()
 end
 
 
+-- **********************************************************************************
 function BeatMasher.track_select(track_number)
   print("track_select(", track_number, ") ") 
   renoise.song().selected_track_index = track_number
 end
 
 
+-- **********************************************************************************
 function BeatMasher.song_track_clear(track_number)
   print("song_track_clear(", track_number, ") ") 
   local tracks = renoise.song().tracks
@@ -49,6 +51,7 @@ function BeatMasher.song_track_clear(track_number)
 end
 
 
+-- **********************************************************************************
 function BeatMasher.restore_track(track_number)
 
   local target_track = nil
@@ -87,13 +90,7 @@ function BeatMasher.restore_track(track_number)
 end
 
 
--- TODO: Track should go at the end of the grid (i.e. next to the master track)
--- and serve as a backup rather than the target of any mutations.
--- This way you can clone a track off, fuck with the original,
--- and then (if you want) restore the former content.
--- A restore function looks for any <trackname>+[+++] track and
--- works backwards.  Or something.
---
+-- **********************************************************************************
 function BeatMasher.clone_track(track_number, mute_source_track)
 
   
@@ -101,23 +98,6 @@ function BeatMasher.clone_track(track_number, mute_source_track)
   local new_track_index = U.master_track_index()
 
   U.clone_track(track_number, new_track_index)
---[[
-  local new_track = renoise.song():insert_track_at(new_track_index ) 
-  local src_track = renoise.song():track(track_number) 
-
-  
-  -- Iterate over all patterns in song
-  for _p =1, #renoise.song().sequencer.pattern_sequence do
-    renoise.song().patterns[_p].tracks[new_track_index]:copy_from( renoise.song().patterns[_p].tracks[track_number])
-  end
-
-  -- expose the note columns:
-  new_track.visible_note_columns  = src_track.visible_note_columns
-
-  -- Also need to copy over devices 
-
-  U.copy_device_chain(src_track, new_track)
-]]
 
   local src_track = renoise.song():track(track_number) 
   local new_track = renoise.song():track(new_track_index) 
@@ -130,6 +110,7 @@ function BeatMasher.clone_track(track_number, mute_source_track)
 end
 
 
+-- **********************************************************************************
 -- Whole track.
 function BeatMasher.stripe_track(track_number, remove_every_n)
   print("BeatMasher.stripe_track( ", track_number , ", " , remove_every_n , ") " )
@@ -144,9 +125,80 @@ function BeatMasher.stripe_track(track_number, remove_every_n)
   end
 end
 
+-- **********************************************************************************
+-- For the curent PT of the given track, for every mod_num lines, swap lines that are line_gap apart.
+function BeatMasher.swap_lines_pattern_track(selected_track_index, mod_num, line_gap)
+--[[
+
+The plan:
+
+- Clone the pattern to the end of the song
+- Figure out what lines are to be swapped and create a set of pairs:
+   cloned_pattarntrack_num -> src_pattarntrack_num
+- Iterate over that set and copy the lines from the clone to the original pattern track   
+]]
+
+      local song = renoise.song
+
+      local selected_pattern_index   = song().selected_pattern_index
+      local new_pattern_index = U.clone_pattern_track_to_end(selected_pattern_index, selected_track_index)
+
+--      song().selected_sequence_index = new_pattern_index
+
+-- Calc the swap pairs
+
+      local num_pattern_lines = #song().patterns[selected_pattern_index].tracks[selected_track_index].lines
+local swap_pairs = {}
+
+--[[
+
+Assume we have mod_num 3 and line_gap 2 (meaning e.g. swap lines 3 and 5)
+s usual we never start at line zero; might want to consider a way to pass that as an option.
+So we start at mod_num
+]]
+
+for i=mod_num,num_pattern_lines,mod_num do
+   swap_pairs[i] = i + line_gap
+end
 
 
--- Whole track.
+-- Iterate over these pairs and do the copying
+-- The pairs might have have values exceding the # of lines n=in the pattern, so use % to accoutn for wrapping
+
+  local temp_patt = song().patterns[new_pattern_index].tracks[selected_track_index]
+
+  for n,m in pairs(swap_pairs) do  -- print "[KEY] VALUE"
+--[[
+
+Given 16 lines, 1 to 16 if you want to swap if you want to swap line 15 + 17,
+that 17 needs to become line 1. 
+17 % 16 == 1
+
+But if we want to swap 14 +16, 16 % 16 == 0.
+
+What's the correct mod math?
+
+if we do 
+  (13 % 16) + 1 == 14
+  (15 %16) + 1 = 16
+]]
+  n = ((n-1) % num_pattern_lines) + 1 
+  m = ((m-1) % num_pattern_lines) + 1 
+  
+  song().patterns[selected_pattern_index].tracks[selected_track_index]:line(n):copy_from( temp_patt:line(m) )
+  song().patterns[selected_pattern_index].tracks[selected_track_index]:line(m):copy_from( temp_patt:line(n) )
+
+end
+  
+  --   Then delete the cloned PT
+      song().sequencer:delete_sequence_at(#song().sequencer.pattern_sequence)
+
+      -- and go back to the original sequence
+      song().selected_sequence_index = selected_pattern_index   
+
+end
+
+-- **********************************************************************************
 function BeatMasher.stripe_current_pattern_track(remove_every_n)
 
   print( "BeatMasher.stripe_current_pattern_track(" , remove_every_n , ")" )
@@ -164,14 +216,8 @@ function BeatMasher.stripe_current_pattern_track(remove_every_n)
 
 end
 
-function BeatMasher.song_save_version()
-  print("song_save_version is not ready") -- FIXME
-end
 
-function BeatMasher.song_load_by_id(id_number)
-  print("song_load_by_id(id_number) is not ready") -- FIXME
-end
-
+-- **********************************************************************************
 function BeatMasher.trigger_note(client_renoise, instrument, track, note,  velocity)
   local OscMessage = renoise.Osc.Message
   client_renoise:send( OscMessage("/renoise/trigger/note_on", { 
@@ -185,7 +231,7 @@ function BeatMasher.trigger_note(client_renoise, instrument, track, note,  veloc
 end
 
 
--- 
+-- **********************************************************************************
 function BeatMasher.speak_bpm(client_renoise, track_index, instrument_index)
   print("speak_bpm") -- FIXME
 
