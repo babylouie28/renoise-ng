@@ -31,14 +31,12 @@ handlers = {
   },
 
   {
-    pattern = "/track/select",
-    handler = function(track_number)
+    pattern = "/track/select", handler = function(track_number)
       BeatMasher.track_select(track_number)
     end 
   },
   {
-    pattern = "/song/track/clear",
-    handler = function(track_number)
+    pattern = "/song/track/clear", handler = function(track_number)
       BeatMasher.song_track_clear(track_number)
     end 
   },
@@ -52,8 +50,8 @@ handlers = {
     to rollback clones (or just delete them and unmute the original.
 
     --]]
-    pattern = "/track/clone",
-    handler = function(track_number)
+    
+    pattern = "/track/clone", handler = function(track_number)
       print("handle track/clone")
       local mute_source_track = true
       BeatMasher.clone_track(track_number, mute_source_track)
@@ -61,41 +59,30 @@ handlers = {
     end 
   },
 
-  {
-    pattern = "/track/stripe_current_pattern_track",
-    handler = function(remove_every_n)
-      print("handle stripe_current_pattern_track")
-      BeatMasher.stripe_current_pattern_track(remove_every_n)
-    end 
-  },
-  
-  {
-    pattern = "/track/stripe",
-    handler = function(track_number, remove_every_n)
+  { 
+    pattern = "/track/stripe", handler = function(track_number, mod_num)
       print("handle /track/stripe")
-      BeatMasher.stripe_track(track_number, remove_every_n)
+      BeatMasher.stripe_track(track_number, mod_num)
+    end 
+  },
+
+  { -- TODO Consider simplyfing names with the assumption that it's always the current selected patten.
+    -- e.g. "/track/swap_lines",
+    pattern = "/track/swap_lines", handler = function(track_number, mod_num, line_gap)
+      print("handle /track/swap_lines")
+      BeatMasher.swap_lines_pattern_track(track_number, mod_num, line_gap)
     end 
   },
 
   {
-    pattern = "/track/swap_lines_current_pattern",
-    handler = function(selected_track_index, mod_num, line_gap)
-      print("handle /track/swap_lines_current_pattern")
-      BeatMasher.swap_lines_pattern_track(selected_track_index, mod_num, line_gap)
-    end 
-  },
-
-  {
-    pattern = "/track/restore",
-    handler = function(track_number)
+    pattern = "/track/restore", handler = function(track_number)
       print("handle /track/restore")
       BeatMasher.restore_track(track_number)
     end 
   },
 
   {
-    pattern = "/trigger/note",
-    handler = function(instrument, track, note,  velocity)
+    pattern = "/trigger/note", handler = function(instrument, track, note,  velocity)
       BeatMasher.trigger_note(RENOISE_OSC, instrument, track, note,  velocity)
     end 
   },

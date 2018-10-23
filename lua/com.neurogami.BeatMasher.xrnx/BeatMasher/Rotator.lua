@@ -61,8 +61,7 @@ end
 
 rotate_handlers = {
   { 
-    pattern = "/rotate/pattern",
-    handler = function(track_num, lines)
+    pattern = "/rotate/pattern", handler = function(track_num, lines)
 
       -- need a way to get the current pattern or something so that
       -- this works on the right stuff
@@ -80,8 +79,7 @@ rotate_handlers = {
   }, 
 
   {
-    pattern = "/rotate/pattern/striped",
-    handler = function(selected_track_index, lines, mod_num)
+    pattern = "/rotate/pattern/striped", handler = function(selected_track_index, lines, mod_num)
 
       -- need a way to get the current pattern or something so that
       -- this works on the right stuff
@@ -142,8 +140,7 @@ rotate_handlers = {
   }, 
 
   { 
-    pattern = "/rotate/current",
-    handler = function(lines)
+    pattern = "/rotate/current", handler = function(lines)
 
       print("Rotate current track-pattern", lines, " lines")
       local song = renoise.song

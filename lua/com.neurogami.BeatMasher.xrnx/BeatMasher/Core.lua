@@ -58,19 +58,19 @@ function BeatMasher.restore_track(track_number)
 
   -- get name
   local target_name = renoise.song().tracks[track_number].name
-  
+
   if BeatMasher.CLONE_SUFFIX ~= string.sub(target_name, -1) then
-     print("target_name of '" .. target_name .. "' does not contain '" .. BeatMasher.CLONE_SUFFIX .. "' so cannot revert.")
+    print("target_name of '" .. target_name .. "' does not contain '" .. BeatMasher.CLONE_SUFFIX .. "' so cannot revert.")
     return
   end
 
   local version_name = target_name:sub(1, -2)
   print("Go find earlier version named '" .. version_name  ..   "'")
-  
+
   -- get earlier version name
 
   local version_track_index = 0
-  
+
   for i=1, #renoise.song().tracks do
     if renoise.song().tracks[i].name == version_name  then
       version_track_index = i
@@ -81,19 +81,19 @@ function BeatMasher.restore_track(track_number)
     print("No track named '" .. version_name .. "', exiting.")
     return
   end
-  
-   renoise.song():swap_tracks_at(track_number, version_track_index)
+
+  renoise.song():swap_tracks_at(track_number, version_track_index)
 
   renoise.song().tracks[track_number]:unmute()
   renoise.song():delete_track_at(version_track_index)
-  
+
 end
 
 
 -- **********************************************************************************
 function BeatMasher.clone_track(track_number, mute_source_track)
 
-  
+
   print("BeatMasher.clone_track", track_number)
   local new_track_index = U.master_track_index()
 
@@ -128,88 +128,54 @@ end
 -- **********************************************************************************
 -- For the curent PT of the given track, for every mod_num lines, swap lines that are line_gap apart.
 function BeatMasher.swap_lines_pattern_track(selected_track_index, mod_num, line_gap)
---[[
+  --[[
 
-The plan:
+  The plan:
 
-- Clone the pattern to the end of the song
-- Figure out what lines are to be swapped and create a set of pairs:
-   cloned_pattarntrack_num -> src_pattarntrack_num
-- Iterate over that set and copy the lines from the clone to the original pattern track   
-]]
+  - Clone the pattern to the end of the song
+  - Figure out what lines are to be swapped and create a set of pairs:
+  cloned_pattarntrack_num -> src_pattarntrack_num
+  - Iterate over that set and copy the lines from the clone to the original pattern track   
+  ]]
 
-      local song = renoise.song
+  local song = renoise.song
 
-      local selected_pattern_index   = song().selected_pattern_index
-      local new_pattern_index = U.clone_pattern_track_to_end(selected_pattern_index, selected_track_index)
+  local selected_pattern_index = song().selected_pattern_index
+  local new_pattern_index = U.clone_pattern_track_to_end(selected_pattern_index, selected_track_index)
 
---      song().selected_sequence_index = new_pattern_index
+  --      song().selected_sequence_index = new_pattern_index
 
--- Calc the swap pairs
+  local num_pattern_lines = #song().patterns[selected_pattern_index].tracks[selected_track_index].lines
+  local swap_pairs = calculate_swap_pairs(num_pattern_lines, mod_num, line_gap)
 
-      local num_pattern_lines = #song().patterns[selected_pattern_index].tracks[selected_track_index].lines
-local swap_pairs = {}
+  -- Iterate over these pairs and do the copying
+  local temp_patt_track = song().patterns[new_pattern_index].tracks[selected_track_index]
+   local orig_patt_track = song().patterns[ selected_pattern_index ].tracks[ selected_track_index ]
+  for i,j in pairs(swap_pairs) do  
+    print("Swap " .. tostring(i) .. " -> " .. tostring(j) )
+    orig_patt_track:line(i):copy_from( temp_patt_track:line(j) )
+  end
 
---[[
-
-Assume we have mod_num 3 and line_gap 2 (meaning e.g. swap lines 3 and 5)
-s usual we never start at line zero; might want to consider a way to pass that as an option.
-So we start at mod_num
-]]
-
-for i=mod_num,num_pattern_lines,mod_num do
-   swap_pairs[i] = i + line_gap
-end
-
-
--- Iterate over these pairs and do the copying
--- The pairs might have have values exceding the # of lines n=in the pattern, so use % to accoutn for wrapping
-
-  local temp_patt = song().patterns[new_pattern_index].tracks[selected_track_index]
-
-  for n,m in pairs(swap_pairs) do  -- print "[KEY] VALUE"
---[[
-
-Given 16 lines, 1 to 16 if you want to swap if you want to swap line 15 + 17,
-that 17 needs to become line 1. 
-17 % 16 == 1
-
-But if we want to swap 14 +16, 16 % 16 == 0.
-
-What's the correct mod math?
-
-if we do 
-  (13 % 16) + 1 == 14
-  (15 %16) + 1 = 16
-]]
-  n = ((n-1) % num_pattern_lines) + 1 
-  m = ((m-1) % num_pattern_lines) + 1 
-  
-  song().patterns[selected_pattern_index].tracks[selected_track_index]:line(n):copy_from( temp_patt:line(m) )
-  song().patterns[selected_pattern_index].tracks[selected_track_index]:line(m):copy_from( temp_patt:line(n) )
-
-end
-  
   --   Then delete the cloned PT
-      song().sequencer:delete_sequence_at(#song().sequencer.pattern_sequence)
+  song().sequencer:delete_sequence_at(#song().sequencer.pattern_sequence)
 
-      -- and go back to the original sequence
-      song().selected_sequence_index = selected_pattern_index   
+  -- and go back to the original sequence
+  song().selected_sequence_index = selected_pattern_index   
 
 end
 
 -- **********************************************************************************
-function BeatMasher.stripe_current_pattern_track(remove_every_n)
+function BeatMasher.stripe(track_number, remove_every_n)
 
-  print( "BeatMasher.stripe_current_pattern_track(" , remove_every_n , ")" )
-  
+  print( "BeatMasher.stripe(" , remove_every_n , ")" )
+
   local _ti = renoise.song().selected_track_index
   local _pi   = renoise.song().selected_pattern_index
   local _tp   = renoise.song().patterns[_pi].tracks[_ti]
   local lines_in_pattern = renoise.song().patterns[_pi].number_of_lines
 
-    for _l=1,lines_in_pattern do   
-      if (0 == _l % remove_every_n ) then  
+  for _l=1,lines_in_pattern do   
+    if (0 == _l % remove_every_n ) then  
       _tp.lines[_l]:clear()
     end
   end

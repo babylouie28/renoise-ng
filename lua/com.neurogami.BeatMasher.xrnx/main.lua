@@ -10,6 +10,7 @@ TOOL_NAME = "BeatMasher"
 require (TOOL_NAME .. '/Utilities')
 require (TOOL_NAME .. '/Status')
 require (TOOL_NAME .. '/Rotator')
+require 'LocalHelpers'
 
 -- Reload the script whendever this file is saved. 
 _AUTO_RELOAD_DEBUG = true
