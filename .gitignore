@@ -1,6 +1,7 @@
 .rvmrc
 BM_MidiToOsc  
 osc-15-repl-beat-masher.yaml
+mb_beatmasher
 P5BeatMasher
 tool-notes.md
 ideas.md

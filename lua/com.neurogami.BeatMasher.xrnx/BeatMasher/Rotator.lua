@@ -25,9 +25,11 @@ end
 
 
 -- num pattern lines, mod number for selection, n is by who may lines we rotated
+-- BUG: Sometimes returns 0, but there is never a line 0; must start at 1
 function find_mod_copy_start_line( num_pattern_lines, mod, n)
   local lowest = 100
   local _t = 100
+  
   -- This assumes that "every n lines" never includes the first line.
   for i=mod, num_pattern_lines, mod do
     print("Look at " .. i .. " + " .. n .. " % " .. num_pattern_lines )
@@ -36,7 +38,11 @@ function find_mod_copy_start_line( num_pattern_lines, mod, n)
       lowest = _t
     end
   end
+
   -- cannot return zero, so what does that mean?
+  if (lowest < 1 ) then
+    lowest = 1
+  end  -- SEEMS SO SO HACKY
   return(lowest)
 end
 
@@ -81,19 +87,16 @@ rotate_handlers = {
   {
     pattern = "/rotate/pattern/striped", handler = function(selected_track_index, lines, mod_num)
 
-      -- need a way to get the current pattern or something so that
-      -- this works on the right stuff
       print("Rotate pattern striped(selected_track_index=" .. selected_track_index .. " lines=" .. lines .. "; mod_num=" .. mod_num)
 
       local song = renoise.song
-
 
       song().selected_track_index = selected_track_index
       local selected_pattern_index   = renoise.song().selected_pattern_index
       local src_pattern_track   = renoise.song().patterns[selected_pattern_index].tracks[selected_track_index]
 
 
-      --   clone the source pattern-track someplace (end of song)
+      --   clone the source pattern-track to the end of song
 
       local new_pattern_index = U.clone_pattern_track_to_end(selected_pattern_index, selected_track_index)
 
@@ -101,31 +104,18 @@ rotate_handlers = {
       song().selected_sequence_index = new_pattern_index
 
       rotate(lines, RANGE_TRACK_IN_PATTERN, true)
-      --   Then copy over just the lines that have changed to the original
-      --   TODO
-      --   This means: 
-      --   In the original PT we clear the lines va mod_num
-
-      
       song().selected_sequence_index = selected_pattern_index   
 
       local num_pattern_lines = #renoise.song().patterns[selected_pattern_index].tracks[selected_track_index].lines
-
       print( "num_pattern_lines = " .. num_pattern_lines .. "; mod_num = " ..mod_num)
 
-      for i=mod_num, num_pattern_lines, mod_num do
-        print("Clear source line " .. i )
-        song().patterns[selected_pattern_index].tracks[selected_track_index]:line(i):clear()
-      end
-
       --   Then, in the rotated copy, we find the starting line for altered mod_num lines 
-
-      
       local sline = find_mod_copy_start_line( num_pattern_lines, mod_num, lines)
 
       -- copy just the altered lines (i.e. every mod_num line from the starting line
       local temp_patt = song().patterns[new_pattern_index].tracks[selected_track_index]
       for i=sline,num_pattern_lines,mod_num do 
+
         print("Copy over line " .. i .. "; " , temp_patt:line(i) )
         song().patterns[selected_pattern_index].tracks[selected_track_index]:line(i):copy_from(  temp_patt:line(i) )
       end
@@ -135,7 +125,6 @@ rotate_handlers = {
 
       -- and go back to the original sequence
       song().selected_sequence_index = selected_pattern_index   
-
     end 
   }, 
 
