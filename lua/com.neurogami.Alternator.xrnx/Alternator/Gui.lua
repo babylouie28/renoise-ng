@@ -348,6 +348,7 @@ end
 -- ======================================================================
 GUI.generate_values = function() 
 
+  print("DEBUG: generate_values begin.") -- JGB DEBUG
   local current_set = line_nums_to_table(GUI.vb.views.lines_list_field.text)
   -- Need to turn this into a table, then generate new values, then merge the tables, sort, and remove dupes
 
@@ -358,10 +359,13 @@ GUI.generate_values = function()
     return 
   end
 
+    print("DEBUG: function string is ", function_str) -- JGB DEBUG
   -- Need to get the new list and populate the text box
 
   local new_set = Core.new_set_from_funct_string(function_str, current_set)
   print("New, generated, set: ")
+
+  -- DEBUG WE get here, but new_set is empty :(
 
   rprint(new_set)
 

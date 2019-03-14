@@ -320,6 +320,7 @@ function alternate(value_list, lines_list)
 
         -- ======================================================================
         function Core.new_set_from_funct_string(function_str, current_set)
+          print("DEBUG: new_set_from_funct_string" ) -- JGB DEBUG
           local _pi   = renoise.song().selected_pattern_index
           local lines_in_pattern = renoise.song().patterns[_pi].number_of_lines
           local func_table = string.to_word_table(function_str)
@@ -331,6 +332,12 @@ function alternate(value_list, lines_list)
 
           print("Dispatch on '" .. "'" .. func_char .. "'")
 
+          -- FIXME If the user enters (for example) '+2 3' the value of func_char
+          -- ends up as '+2', and this fails to match anything.
+          -- We need code to fix that: Grab the first char, and then trim the remaining string
+          -- BYW, why does   "table.remove(func_table, 1)"  return a 2-character result?
+          -- Is it because of "func_table = string.to_word_table(function_str)"
+          --
           if (func_char == "+") then
             generated_line_table = sequence_from_inc_set(func_table, lines_in_pattern, current_set)
           end
